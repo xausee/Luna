@@ -17,6 +17,9 @@ public:
 		captuered = false;
 		hBmpFileDC = NULL;
 		hDesktopDC = NULL;
+		hdcScreen = NULL;
+	    hdcCompatible = NULL;
+		hbmScreen = NULL;
 		SetWindowTitle("Capturer");
 	};
 	
@@ -24,6 +27,9 @@ public:
 	int	 nWidth,nHeight;
 	HDC	 hBmpFileDC;
 	HDC  hDesktopDC;
+	HDC  hdcScreen; 
+	HDC  hdcCompatible;
+	HBITMAP hbmScreen;
 
 	void OnCreate();
 	void OnPaint();

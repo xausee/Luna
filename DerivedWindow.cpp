@@ -46,7 +46,6 @@ void CDerivedWindow::OnCreate()
 	LPVOID		    pBits=NULL;
 	static HBITMAP	hDesktopCompatibleBitmap=NULL;
 	static HDC		hDesktopCompatibleDC=NULL;
-	//static HDC		hDesktopDC=NULL;
 	static HWND		hDesktopWnd=NULL;
 	static NOTIFYICONDATA	nid;
 
@@ -79,7 +78,7 @@ void CDerivedWindow::OnCreate()
 			nid.hWnd=m_hwnd;
 			strcpy(nid.szTip,"Screen Capture Application - Double Click to Start Capturing");
 			nid.uCallbackMessage=NULL;//WM_NOTIFYICON_MESSAGE;
-			if(!Shell_NotifyIcon(NIM_ADD,&nid))	MessageBox(NULL,"Unable to Set Notification Icon","Error",MB_ICONINFORMATION|MB_OK);
+			//if(!Shell_NotifyIcon(NIM_ADD,&nid))	MessageBox(NULL,"Unable to Set Notification Icon","Error",MB_ICONINFORMATION|MB_OK);
 
 			//if((ghMenu=LoadMenu(hInst,MAKEINTRESOURCE(IDC_SCREENCAPTURE)))==NULL)
 			//{
@@ -91,26 +90,39 @@ void CDerivedWindow::OnCreate()
 
 void CDerivedWindow::OnPaint()
 {
-	if (captuered)
+	//if (captuered)
+	//{
+	//	
+	//	PAINTSTRUCT ps;	
+	//	HDC hdcClient = BeginPaint(m_hwnd, &ps);
+	//	HDC hdcWindow = GetWindowDC (m_hwnd) ;
+	//	TextOut(hdcClient, 0, 0, "capture success!!!", 17);
+	//	StretchBlt(hdcClient, 0, 0, nWidth, nHeight, hdcWindow, 0, 0, nWidth, nHeight, MERGECOPY) ;
+	//	//StretchBlt(hdcClient, 0, 0, nWidth, nHeight, hBmpFileDC, 0, 0, nWidth, nHeight, MERGECOPY) ;
+	//	//BitBlt(hBmpFileDC,0,0,nWidth,nHeight,hdcClient,0,0,SRCCOPY|CAPTUREBLT);
+	//	EndPaint(m_hwnd, &ps);
+	//}	
+
+    if (captuered)
 	{
-		
 		PAINTSTRUCT ps;	
 		HDC hdcClient = BeginPaint(m_hwnd, &ps);
-		HDC hdcWindow = GetWindowDC (m_hwnd) ;
-		TextOut(hdcClient, 0, 0, "capture success!!!", 17);
-		StretchBlt(hdcClient, 0, 0, nWidth, nHeight, hdcWindow, 0, 0, nWidth, nHeight, MERGECOPY) ;
-		StretchBlt(hdcClient, 0, 0, nWidth, nHeight, hBmpFileDC, 0, 0, nWidth, nHeight, MERGECOPY) ;
-		//BitBlt(hBmpFileDC,0,0,nWidth,nHeight,hdcClient,0,0,SRCCOPY|CAPTUREBLT);
-		EndPaint(m_hwnd, &ps);
-	}
+		SetCursor(LoadCursor(NULL,IDC_WAIT));	
+        /*nWidth = GetSystemMetrics(SM_CXSCREEN);
+        nHeight = GetSystemMetrics(SM_CYSCREEN);*/ 
+		/*HDC hdcScreen = CreateDC("DISPLAY", NULL, NULL, NULL); 
+		HDC hdcCompatible = CreateCompatibleDC(hdcScreen);*/		
+		// Create a compatible bitmap for hdcScreen.
+		//HBITMAP hbmScreen = CreateCompatibleBitmap(hdcScreen, GetDeviceCaps(hdcScreen, HORZRES), GetDeviceCaps(hdcScreen, VERTRES));
 
-	//HDC  hdcClient, hdcWindow ;
-	//hdcClient = BeginPaint (m_hwnd, &ps) ;  
-	//hdcWindow = GetWindowDC (m_hwnd) ;
-	////StretchBlt (hdcClient, 0, 0, cxClient, cyClient, hdcWindow, 0, 0, cxSource, cySource, MERGECOPY) ;
-	//BitBlt(hBmpFileDC,0,0,nWidth,nHeight,hDesktopDC,0,0,SRCCOPY|CAPTUREBLT);
-	//ReleaseDC (m_hwnd, hdcWindow) ;
-	//EndPaint (m_hwnd, &ps) ;
+		hdcScreen = CreateDC("DISPLAY", NULL, NULL, NULL); 
+		hdcCompatible = CreateCompatibleDC(hdcScreen);
+		hbmScreen = CreateCompatibleBitmap(hdcScreen, nWidth, nHeight);				
+		SelectObject(hdcCompatible, hbmScreen);	
+		StretchBlt(hdcClient, 0, 0, nWidth, nHeight, hdcScreen, 0, 0, nWidth, nHeight, MERGECOPY) ;
+	
+		EndPaint(m_hwnd, &ps);		
+     }
 }
 
 void CDerivedWindow::OnCaptureFullScreen()
@@ -137,21 +149,17 @@ void CDerivedWindow::OnCaptureFullScreen()
     
 	hBmpFileDC = CreateCompatibleDC(hDesktopDC);
     HBITMAP	hBmpFileBitmap = CreateCompatibleBitmap(hDesktopDC,nWidth,nHeight);
-
     HBITMAP hOldBitmap = (HBITMAP) SelectObject(hBmpFileDC,hBmpFileBitmap);
     BitBlt(hBmpFileDC,0,0,nWidth,nHeight,hDesktopDC,0,0,SRCCOPY|CAPTUREBLT);
     SelectObject(hBmpFileDC,hOldBitmap);
-
+	
     SaveBitmap(ofn.lpstrFile,hBmpFileBitmap);				
 
     DeleteDC(hBmpFileDC);
     DeleteObject(hBmpFileBitmap);
     SetCursor(LoadCursor(NULL,IDC_ARROW));
 
-	ShowWindow(m_hwnd,SW_SHOW);
-    RECT ClientRect;                                        
-    GetClientRect(m_hwnd, &ClientRect);
-    InvalidateRect(m_hwnd, &ClientRect, TRUE);
+	ShowWindow(m_hwnd,SW_SHOW); 	
 	captuered = true;
 }
 
