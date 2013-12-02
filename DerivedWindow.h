@@ -19,7 +19,13 @@ public:
 		hDesktopDC = NULL;
 		hdcScreen = NULL;
 	    hdcCompatible = NULL;
-		hbmScreen = NULL;
+		//hbmScreen = NULL;
+
+		 hdcScreen  = NULL;
+     hdcWindow = NULL;
+     hdcMemDC = NULL;
+     hbmScreen = NULL;
+     
 		SetWindowTitle("Capturer");
 	};
 	
@@ -27,9 +33,18 @@ public:
 	int	 nWidth,nHeight;
 	HDC	 hBmpFileDC;
 	HDC  hDesktopDC;
-	HDC  hdcScreen; 
+	//HDC  hdcScreen; 
 	HDC  hdcCompatible;
-	HBITMAP hbmScreen;
+	//HBITMAP hbmScreen;
+
+
+	HDC hdcScreen;
+    HDC hdcWindow;
+    HDC hdcMemDC;
+    HBITMAP hbmScreen;
+    BITMAP bmpScreen;
+
+	int CaptureAnImage();
 
 	void OnCreate();
 	void OnPaint();
