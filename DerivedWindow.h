@@ -25,10 +25,12 @@ public:
      hdcWindow = NULL;
      hdcMemDC = NULL;
      hbmScreen = NULL;
+	 fileName=NULL;
      
 		SetWindowTitle("Capturer");
 	};
 	
+	LPSTR fileName;
 	bool captuered;
 	int	 nWidth,nHeight;
 	HDC	 hBmpFileDC;

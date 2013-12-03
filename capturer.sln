@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "capturer", "capturer.vcxproj", "{7FC5DE48-60F8-B419-A4C8-18C8A134177C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "capturer", "capturer.vcxproj", "{C5E5A40A-03CC-B2C2-A331-D54904014F1B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +9,10 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7FC5DE48-60F8-B419-A4C8-18C8A134177C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{7FC5DE48-60F8-B419-A4C8-18C8A134177C}.Debug|Win32.Build.0 = Debug|Win32
-		{7FC5DE48-60F8-B419-A4C8-18C8A134177C}.Release|Win32.ActiveCfg = Release|Win32
-		{7FC5DE48-60F8-B419-A4C8-18C8A134177C}.Release|Win32.Build.0 = Release|Win32
+		{C5E5A40A-03CC-B2C2-A331-D54904014F1B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C5E5A40A-03CC-B2C2-A331-D54904014F1B}.Debug|Win32.Build.0 = Debug|Win32
+		{C5E5A40A-03CC-B2C2-A331-D54904014F1B}.Release|Win32.ActiveCfg = Release|Win32
+		{C5E5A40A-03CC-B2C2-A331-D54904014F1B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
