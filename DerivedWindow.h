@@ -14,38 +14,18 @@ public:
 	CDerivedWindow(HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL) 
 		:CBaseWindow(hInst, wcx)
 	{ 
-		captuered = false;
-		hBmpFileDC = NULL;
-		hDesktopDC = NULL;	
-		hdcScreen  = NULL;
-	    hdcCompatible = NULL;
-		hdcWindow = NULL;
-		hdcMemDC = NULL;
-		hBmpFileBitmap=NULL;
-     
+		hBmpFileBitmap = NULL;     
 		SetWindowTitle("Capturer");
-	};	
-	
-	bool captuered;
-	int	 nWidth,nHeight;
-	HDC	 hBmpFileDC;
-	HDC  hDesktopDC;
-	HDC  hdcCompatible;
-
-	HDC hdcScreen;
-    HDC hdcWindow;
-    HDC hdcMemDC;
-    HBITMAP hbmScreen;
-    BITMAP  bmpScreen;
-	HBITMAP	hBmpFileBitmap;
+	};		
 
 	void OnCreate();
 	void OnPaint();
-	void OnCaptureFullScreen();
+	HBITMAP OnCaptureFullScreen();
 	void SaveBitmap(HBITMAP hBitmap);
 
-protected:
-	// the message handler for this window
+protected:	
+	HBITMAP	hBmpFileBitmap;
+
 	LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);	
 };
 

@@ -5,7 +5,7 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 	switch (uMsg)
 	{
 	case WM_CREATE:
-		OnCreate();
+		//OnCreate();
 		break;		
 	case WM_PAINT:
 		OnPaint();
@@ -62,7 +62,7 @@ void CDerivedWindow::OnCreate()
 	bmpInfo.bmiHeader.biPlanes=1;
 	bmpInfo.bmiHeader.biSizeImage=abs(bmpInfo.bmiHeader.biHeight)*bmpInfo.bmiHeader.biWidth*bmpInfo.bmiHeader.biBitCount/8;
 	hDesktopWnd = GetDesktopWindow();
-    hDesktopDC = GetDC(hDesktopWnd);
+    HDC hDesktopDC = GetDC(hDesktopWnd);
 	hDesktopCompatibleDC = CreateCompatibleDC(hDesktopDC);
 	hDesktopCompatibleBitmap = CreateDIBSection(hDesktopDC,&bmpInfo,DIB_RGB_COLORS,&pBits,NULL,0);
 	if(hDesktopCompatibleDC == NULL || hDesktopCompatibleBitmap == NULL)
@@ -89,64 +89,71 @@ void CDerivedWindow::OnCreate()
 
 void CDerivedWindow::OnPaint()
 {
-	if (captuered)
+	if (hBmpFileBitmap)
 	{
-		if (hBmpFileBitmap)
-		{
-			BITMAP bm ;
-			RECT rcClient;
-			PAINTSTRUCT ps;	
-			HDC hdcClient, hdcMem;
-
-			GetClientRect(m_hwnd, &rcClient);
-			hdcClient = BeginPaint(m_hwnd, &ps);
-			GetClientRect (m_hwnd, &rcClient) ;
-			hdcMem = CreateCompatibleDC (hdcClient) ;
-			SelectObject (hdcMem, hBmpFileBitmap) ;
-			GetObject (hBmpFileBitmap, sizeof (BITMAP), (PSTR) &bm) ;
-			SetStretchBltMode (hdcClient, COLORONCOLOR) ;
-			StretchBlt (hdcClient,    0, 0, rcClient.right, rcClient.bottom,
-                        hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
-			DeleteDC (hdcMem) ;
-			EndPaint(m_hwnd, &ps);
-		}		
+		BITMAP             bm ;
+		RECT               rcClient;
+		PAINTSTRUCT        ps;	
+		HDC                hdcClient, hdcMem;
+		
+		GetClientRect(m_hwnd, &rcClient);
+		hdcClient = BeginPaint(m_hwnd, &ps);
+		GetClientRect(m_hwnd, &rcClient) ;
+		hdcMem = CreateCompatibleDC (hdcClient) ;
+		SelectObject(hdcMem, hBmpFileBitmap) ;
+		GetObject(hBmpFileBitmap, sizeof (BITMAP), (PSTR) &bm) ;
+		SetStretchBltMode(hdcClient, COLORONCOLOR) ;
+		StretchBlt(hdcClient, 0, 0, rcClient.right, rcClient.bottom,
+                   hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
+		DeleteDC(hdcMem) ;
+		EndPaint(m_hwnd, &ps);
 	}			
 }	
 	
 
-void CDerivedWindow::OnCaptureFullScreen()
+HBITMAP CDerivedWindow::OnCaptureFullScreen()
 {
 	ShowWindow(m_hwnd,SW_HIDE);
-	ShowWindow(m_hwnd,SW_HIDE);
+	Sleep(1000);
     SetCursor(LoadCursor(NULL,IDC_WAIT));	
-    nWidth = GetSystemMetrics(SM_CXSCREEN);
-    nHeight = GetSystemMetrics(SM_CYSCREEN);
-    
-	hBmpFileDC = CreateCompatibleDC(hDesktopDC);
+    int nWidth = GetSystemMetrics(SM_CXSCREEN);
+    int nHeight = GetSystemMetrics(SM_CYSCREEN);
+
+	HWND hDesktopWnd = GetDesktopWindow();
+    HDC hDesktopDC = GetDC(hDesktopWnd);    
+	HDC hBmpFileDC = CreateCompatibleDC(hDesktopDC);
+
     hBmpFileBitmap = CreateCompatibleBitmap(hDesktopDC,nWidth,nHeight);
+
     HBITMAP hOldBitmap = (HBITMAP) SelectObject(hBmpFileDC,hBmpFileBitmap);
     BitBlt(hBmpFileDC,0,0,nWidth,nHeight,hDesktopDC,0,0,SRCCOPY|CAPTUREBLT);
-    SelectObject(hBmpFileDC,hOldBitmap);    		
+    SelectObject(hBmpFileDC,hOldBitmap); 
+	 
+	DeleteDC(hDesktopDC);
+	DeleteObject(hDesktopWnd);
+	DeleteObject(hOldBitmap);
+	DeleteDC(hBmpFileDC);
 
-  /*  DeleteDC(hBmpFileDC);
-    DeleteObject(hBmpFileBitmap);*/
     SetCursor(LoadCursor(NULL,IDC_ARROW));	
-	
-	ShowWindow(m_hwnd,SW_SHOW); 	
-	captuered = true;
+	ShowWindow(m_hwnd,SW_SHOW); 		
+	return hBmpFileBitmap;
 }
 
 void CDerivedWindow::SaveBitmap(HBITMAP hBitmap)
 {
+	if (!hBitmap)	
+		return;
+
 	HDC					hdc=NULL;
 	FILE*				fp=NULL;
 	LPVOID				pBuf=NULL;
 	BITMAPINFO			bmpInfo;
 	BITMAPFILEHEADER	bmpFileHeader;
+	char	            szFileName[512];
 
-	OPENFILENAME	ofn;
-	char	szFileName[512];
-    strcpy(szFileName,"ScreenShot.bmp");
+	strcpy(szFileName,"ScreenShot.bmp");
+
+	OPENFILENAME	    ofn;	
     ZeroMemory(&ofn,sizeof(ofn));
     ofn.lStructSize=sizeof(OPENFILENAME);
     ofn.Flags=OFN_HIDEREADONLY|OFN_PATHMUSTEXIST;
@@ -157,6 +164,7 @@ void CDerivedWindow::SaveBitmap(HBITMAP hBitmap)
     ofn.hwndOwner = m_hwnd;
     if(!GetSaveFileName(&ofn))	return;	
 	char *fileName = ofn.lpstrFile;
+
 	do{
 		hdc=GetDC(NULL);
 		ZeroMemory(&bmpInfo,sizeof(BITMAPINFO));
