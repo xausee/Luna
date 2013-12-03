@@ -16,44 +16,33 @@ public:
 	{ 
 		captuered = false;
 		hBmpFileDC = NULL;
-		hDesktopDC = NULL;
-		hdcScreen = NULL;
+		hDesktopDC = NULL;	
+		hdcScreen  = NULL;
 	    hdcCompatible = NULL;
-		//hbmScreen = NULL;
-
-		 hdcScreen  = NULL;
-     hdcWindow = NULL;
-     hdcMemDC = NULL;
-     hbmScreen = NULL;
-	 fileName=NULL;
-	 hBmpFileBitmap=NULL;
+		hdcWindow = NULL;
+		hdcMemDC = NULL;
+		hBmpFileBitmap=NULL;
      
 		SetWindowTitle("Capturer");
-	};
+	};	
 	
-	LPSTR fileName;
 	bool captuered;
 	int	 nWidth,nHeight;
 	HDC	 hBmpFileDC;
 	HDC  hDesktopDC;
-	//HDC  hdcScreen; 
 	HDC  hdcCompatible;
-	//HBITMAP hbmScreen;
-
 
 	HDC hdcScreen;
     HDC hdcWindow;
     HDC hdcMemDC;
     HBITMAP hbmScreen;
-    BITMAP bmpScreen;
+    BITMAP  bmpScreen;
 	HBITMAP	hBmpFileBitmap;
-
-	int CaptureAnImage();
 
 	void OnCreate();
 	void OnPaint();
 	void OnCaptureFullScreen();
-	void SaveBitmap(char *szFilename,HBITMAP hBitmap);
+	void SaveBitmap(HBITMAP hBitmap);
 
 protected:
 	// the message handler for this window
