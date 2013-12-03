@@ -92,29 +92,47 @@ void CDerivedWindow::OnPaint()
 		RECT rcClient;
 		GetClientRect(m_hwnd, &rcClient);
 		HDC hdcClient = BeginPaint(m_hwnd, &ps);
-		SetCursor(LoadCursor(NULL,IDC_WAIT)); 
+		//SetCursor(LoadCursor(NULL,IDC_WAIT)); 
 
-		hdcScreen = CreateDC("DISPLAY", NULL, NULL, NULL); 
-		hdcCompatible = CreateCompatibleDC(hdcScreen);
-		hbmScreen = CreateCompatibleBitmap(hdcScreen, nWidth, nHeight);				
-		SelectObject(hdcCompatible, hbmScreen);	
+		//hdcScreen = CreateDC("DISPLAY", NULL, NULL, NULL); 
+		//hdcCompatible = CreateCompatibleDC(hdcScreen);
+		//hbmScreen = CreateCompatibleBitmap(hdcScreen, nWidth, nHeight);				
+		//SelectObject(hdcCompatible, hbmScreen);	
 
-	    fileName = "G:\ScreenShot.bmp";
-		HBITMAP   hbmp=(HBITMAP)LoadImage(hInstance, // small class icon 
-        fileName,
-        IMAGE_BITMAP, 
-        0, 
-        0, 
-        LR_LOADFROMFILE); 
+	 //   fileName = "G:\ScreenShot.bmp";
+		//HBITMAP   hbmp=(HBITMAP)LoadImage(hInstance, // small class icon 
+  //      fileName,
+  //      IMAGE_BITMAP, 
+  //      0, 
+  //      0, 
+  //      LR_LOADFROMFILE); 
 
-		hdcCompatible = CreateCompatibleDC(hdcScreen);
-		hbmScreen = CreateCompatibleBitmap(hdcScreen, nWidth, nHeight);				
-		SelectObject(hdcCompatible, hbmScreen);	
-		//BitBlt(hdcClient, 0,0, rcClient.right-rcClient.left, rcClient.bottom-rcClient.top, hdcScreen, 0, 0, SRCCOPY);			
-		StretchBlt(hdcClient, 0, 0,  rcClient.right-rcClient.left, rcClient.bottom-rcClient.top, hdcScreen, 0, 0, nWidth, nHeight, MERGECOPY);			
-		EndPaint(m_hwnd, &ps);		
-     }		
-}
+		//hdcCompatible = CreateCompatibleDC(hdcScreen);
+		//hbmScreen = CreateCompatibleBitmap(hdcScreen, nWidth, nHeight);				
+		//SelectObject(hdcCompatible, hbmScreen);	
+		////BitBlt(hdcClient, 0,0, rcClient.right-rcClient.left, rcClient.bottom-rcClient.top, hdcScreen, 0, 0, SRCCOPY);			
+		//StretchBlt(hdcClient, 0, 0,  rcClient.right-rcClient.left, rcClient.bottom-rcClient.top, hdcScreen, 0, 0, nWidth, nHeight, MERGECOPY);	
+		//
+		BITMAP         bm ;
+		if (hBmpFileBitmap)
+          {
+               GetClientRect (m_hwnd, &rcClient) ;
+
+               HDC hdcMem = CreateCompatibleDC (hdcClient) ;
+               SelectObject (hdcMem, hBmpFileBitmap) ;
+               GetObject (hBmpFileBitmap, sizeof (BITMAP), (PSTR) &bm) ;
+               SetStretchBltMode (hdcClient, COLORONCOLOR) ;
+
+               StretchBlt (hdcClient,    0, 0, rcClient.right, rcClient.bottom,
+                           hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
+
+               DeleteDC (hdcMem) ;
+          }
+		EndPaint(m_hwnd, &ps);
+	}			
+}	
+
+	
 
 void CDerivedWindow::OnCaptureFullScreen()
 {
@@ -139,7 +157,7 @@ void CDerivedWindow::OnCaptureFullScreen()
     nHeight = GetSystemMetrics(SM_CYSCREEN);
     
 	hBmpFileDC = CreateCompatibleDC(hDesktopDC);
-    HBITMAP	hBmpFileBitmap = CreateCompatibleBitmap(hDesktopDC,nWidth,nHeight);
+    /*HBITMAP*/	hBmpFileBitmap = CreateCompatibleBitmap(hDesktopDC,nWidth,nHeight);
     HBITMAP hOldBitmap = (HBITMAP) SelectObject(hBmpFileDC,hBmpFileBitmap);
     BitBlt(hBmpFileDC,0,0,nWidth,nHeight,hDesktopDC,0,0,SRCCOPY|CAPTUREBLT);
     SelectObject(hBmpFileDC,hOldBitmap);

@@ -26,6 +26,7 @@ public:
      hdcMemDC = NULL;
      hbmScreen = NULL;
 	 fileName=NULL;
+	 hBmpFileBitmap=NULL;
      
 		SetWindowTitle("Capturer");
 	};
@@ -45,6 +46,7 @@ public:
     HDC hdcMemDC;
     HBITMAP hbmScreen;
     BITMAP bmpScreen;
+	HBITMAP	hBmpFileBitmap;
 
 	int CaptureAnImage();
 
