@@ -1,5 +1,5 @@
 #define WIN32_LEAN_AND_MEAN
-#include "capturer.h"
+#include "Luna.h"
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,int nCmdShow)
 {

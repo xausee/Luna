@@ -17,7 +17,7 @@ public:
 	{ 
 		hBitmap = NULL ;  
 		capture = new(Capture);
-		SetWindowTitle ("Capturer") ;
+		SetWindowTitle ("Luna") ;
 	};	
 
 	Capture * capture;

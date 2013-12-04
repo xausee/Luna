@@ -69,14 +69,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BaseWindow.cpp" />
-    <ClCompile Include="capture.cpp" />
-    <ClCompile Include="capturer.cpp" />
-    <ClCompile Include="winmain.cpp" />
+    <ClCompile Include="Capture.cpp" />
+    <ClCompile Include="Luna.cpp" />
+    <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseWindow.h" />
-    <ClInclude Include="capture.h" />
-    <ClInclude Include="capturer.h" />
+    <ClInclude Include="Capture.h" />
+    <ClInclude Include="Luna.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
