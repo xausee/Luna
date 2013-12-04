@@ -4,6 +4,7 @@
 #ifndef _DERIVEDWINDOW_H_
 #define _DERIVEDWINDOW_H_
 #include "BaseWindow.h"
+#include "Capture.h"
 #include "resource.h"
 #include <windows.h>
 #include <stdio.h>
@@ -14,18 +15,12 @@ public:
 	CDerivedWindow (HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL) 
 		:CBaseWindow(hInst, wcx)
 	{ 
-		bCapturing = false ;
-		bBlocking = false ;
-		
-		hBitmap = NULL ;     
+		hBitmap = NULL ;  
+		capture = new(Capture);
 		SetWindowTitle ("Capturer") ;
 	};	
 
-	bool bCapturing ;
-	bool bBlocking ;
-	POINT ptBeg, ptEnd ;
-	HWND hwndScr;
-
+	Capture * capture;
 
 	void OnCreate();
 	void OnPaint();
@@ -34,10 +29,8 @@ public:
 	void OnRButtonDown (WPARAM wParam, LPARAM lParam) ;
 	void OnRButtonUp (WPARAM wParam, LPARAM lParam) ;
 	void OnMouseMove (WPARAM wParam, LPARAM lParam) ;
-	void InvertBlock (HWND hwndScr, HWND hwnd, POINT ptBeg, POINT ptEnd) ;
 
-	HBITMAP CaptureFullScreen () ;
-	void SaveBitmap (HBITMAP hBitmap) ;
+	void InvertBlock (HWND hwndScr, HWND hwnd, POINT ptBeg, POINT ptEnd) ;
 
 protected:	
 	HBITMAP	hBitmap;
