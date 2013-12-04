@@ -11,22 +11,38 @@
 class CDerivedWindow : public CBaseWindow
 {
 public:	
-	CDerivedWindow(HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL) 
+	CDerivedWindow (HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL) 
 		:CBaseWindow(hInst, wcx)
 	{ 
-		hBmpFileBitmap = NULL;     
-		SetWindowTitle("Capturer");
-	};		
+		bCapturing = false ;
+		bBlocking = false ;
+		
+		hBitmap = NULL ;     
+		SetWindowTitle ("Capturer") ;
+	};	
+
+	bool bCapturing ;
+	bool bBlocking ;
+	POINT ptBeg, ptEnd ;
+	HWND hwndScr;
+
 
 	void OnCreate();
 	void OnPaint();
-	HBITMAP OnCaptureFullScreen();
-	void SaveBitmap(HBITMAP hBitmap);
+	void OnLButtonDown (WPARAM wParam, LPARAM lParam) ;
+	void OnLButtonUp (WPARAM wParam, LPARAM lParam) ;
+	void OnRButtonDown (WPARAM wParam, LPARAM lParam) ;
+	void OnRButtonUp (WPARAM wParam, LPARAM lParam) ;
+	void OnMouseMove (WPARAM wParam, LPARAM lParam) ;
+	void InvertBlock (HWND hwndScr, HWND hwnd, POINT ptBeg, POINT ptEnd) ;
+
+	HBITMAP CaptureFullScreen () ;
+	void SaveBitmap (HBITMAP hBitmap) ;
 
 protected:	
-	HBITMAP	hBmpFileBitmap;
+	HBITMAP	hBitmap;
 
-	LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);	
+	LRESULT CALLBACK WinMsgHandler (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) ;	
 };
 
 #endif 

@@ -10,14 +10,27 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 	case WM_PAINT:
 		OnPaint();
 		break;
+	case WM_LBUTTONDOWN:
+		OnLButtonDown(wParam, lParam);
+		return 0;
+	case WM_RBUTTONDOWN:
+		OnRButtonDown(wParam, lParam);
+		return 0;
+	case WM_LBUTTONUP:
+	case WM_RBUTTONUP:
+		OnRButtonUp(wParam, lParam);
+		 return 0;
+	case WM_MOUSEMOVE:
+		OnMouseMove(wParam, lParam);
+		return 0;
 	case WM_COMMAND:
 		switch(LOWORD(wParam)) 
         {
 		case ID_FILE_SAVEAS:
-			SaveBitmap(hBmpFileBitmap);		
+			SaveBitmap(hBitmap);		
 			break;
 		case ID_CAPTURER_FULLSCREEN:
-			OnCaptureFullScreen();		
+			CaptureFullScreen();		
 			break;			
 	    case ID_CAPTURER_SINGLEWINDOW: 
 			exit(0);  
@@ -89,7 +102,7 @@ void CDerivedWindow::OnCreate()
 
 void CDerivedWindow::OnPaint()
 {
-	if (hBmpFileBitmap)
+	if (hBitmap)
 	{
 		BITMAP             bm ;
 		RECT               rcClient;
@@ -100,8 +113,8 @@ void CDerivedWindow::OnPaint()
 		hdcClient = BeginPaint(m_hwnd, &ps);
 		GetClientRect(m_hwnd, &rcClient) ;
 		hdcMem = CreateCompatibleDC (hdcClient) ;
-		SelectObject(hdcMem, hBmpFileBitmap) ;
-		GetObject(hBmpFileBitmap, sizeof (BITMAP), (PSTR) &bm) ;
+		SelectObject(hdcMem, hBitmap) ;
+		GetObject(hBitmap, sizeof (BITMAP), (PSTR) &bm) ;
 		SetStretchBltMode(hdcClient, COLORONCOLOR) ;
 		StretchBlt(hdcClient, 0, 0, rcClient.right, rcClient.bottom,
                    hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
@@ -109,9 +122,97 @@ void CDerivedWindow::OnPaint()
 		EndPaint(m_hwnd, &ps);
 	}			
 }	
+
+void CDerivedWindow::OnLButtonDown(WPARAM wParam, LPARAM lParam)
+{
+	if (!bCapturing)    
+	{
+		if (LockWindowUpdate (hwndScr = GetDesktopWindow ()))
+		{
+			bCapturing = TRUE ;
+			SetCapture (m_hwnd) ;
+			SetCursor (LoadCursor (NULL, IDC_CROSS)) ;
+		}
+		else
+			MessageBeep (0) ;
+	}	
+}
+
+void CDerivedWindow::OnLButtonUp(WPARAM wParam, LPARAM lParam)
+{
+}
+
+void CDerivedWindow::OnRButtonDown(WPARAM wParam, LPARAM lParam)
+{
+	if (bCapturing)
+	{
+		bBlocking = true ;
+		ptBeg.x = LOWORD (lParam) ;
+		ptBeg.y = HIWORD (lParam) ;
+		ptEnd = ptBeg ;
+		InvertBlock (hwndScr, m_hwnd, ptBeg, ptEnd) ;
+	}       
+}
+
+void CDerivedWindow::OnRButtonUp(WPARAM wParam, LPARAM lParam)
+{
+	if (bBlocking)
+	{
+		InvertBlock (hwndScr, m_hwnd, ptBeg, ptEnd) ;
+		ptEnd.x = LOWORD (lParam) ;
+		ptEnd.y = HIWORD (lParam) ;
+		
+		if (hBitmap)
+		{
+			DeleteObject (hBitmap) ;
+			hBitmap = NULL ;
+		}
+		
+		HDC hdc = GetDC (m_hwnd) ;
+		HDC hdcMem = CreateCompatibleDC (hdc) ;
+		hBitmap = CreateCompatibleBitmap (hdc, abs (ptEnd.x - ptBeg.x), abs (ptEnd.y - ptBeg.y)) ;
+		SelectObject (hdcMem, hBitmap) ;
+		StretchBlt (hdcMem, 0, 0, abs (ptEnd.x - ptBeg.x),
+                                  abs (ptEnd.y - ptBeg.y), 
+                    hdc, ptBeg.x, ptBeg.y, ptEnd.x - ptBeg.x, 
+                    ptEnd.y - ptBeg.y, SRCCOPY) ;
+		
+		DeleteDC (hdcMem) ;
+		ReleaseDC (m_hwnd, hdc) ;
+		InvalidateRect (m_hwnd, NULL, TRUE) ;
+	}
+
+	if (bBlocking || bCapturing)
+	{
+		bBlocking = bCapturing = FALSE ;
+		SetCursor (LoadCursor (NULL, IDC_ARROW)) ;
+		ReleaseCapture () ;
+		LockWindowUpdate (NULL) ;
+	}      
+}
+
+void CDerivedWindow::OnMouseMove(WPARAM wParam, LPARAM lParam)
+{
+	if (bBlocking)
+	{
+		InvertBlock (hwndScr, m_hwnd, ptBeg, ptEnd) ;
+		ptEnd.x = LOWORD (lParam) ;
+		ptEnd.y = HIWORD (lParam) ;
+		InvertBlock (hwndScr, m_hwnd, ptBeg, ptEnd) ;
+	}        
+}
+
+void CDerivedWindow::InvertBlock (HWND hwndScr, HWND hwnd, POINT ptBeg, POINT ptEnd)
+{
+     HDC hdc = GetDCEx (hwndScr, NULL, DCX_CACHE | DCX_LOCKWINDOWUPDATE) ;
+     ClientToScreen (hwnd, &ptBeg) ;
+     ClientToScreen (hwnd, &ptEnd) ;
+     PatBlt (hdc, ptBeg.x, ptBeg.y, ptEnd.x - ptBeg.x, ptEnd.y - ptBeg.y, DSTINVERT) ;
+     ReleaseDC (hwndScr, hdc) ;
+}
 	
 
-HBITMAP CDerivedWindow::OnCaptureFullScreen()
+HBITMAP CDerivedWindow::CaptureFullScreen()
 {
 	ShowWindow(m_hwnd,SW_HIDE);
 	Sleep(1000);
@@ -123,9 +224,9 @@ HBITMAP CDerivedWindow::OnCaptureFullScreen()
     HDC hDesktopDC = GetDC(hDesktopWnd);    
 	HDC hBmpFileDC = CreateCompatibleDC(hDesktopDC);
 
-    hBmpFileBitmap = CreateCompatibleBitmap(hDesktopDC,nWidth,nHeight);
+    hBitmap = CreateCompatibleBitmap(hDesktopDC,nWidth,nHeight);
 
-    HBITMAP hOldBitmap = (HBITMAP) SelectObject(hBmpFileDC,hBmpFileBitmap);
+    HBITMAP hOldBitmap = (HBITMAP) SelectObject(hBmpFileDC,hBitmap);
     BitBlt(hBmpFileDC,0,0,nWidth,nHeight,hDesktopDC,0,0,SRCCOPY|CAPTUREBLT);
     SelectObject(hBmpFileDC,hOldBitmap); 
 	 
@@ -136,7 +237,7 @@ HBITMAP CDerivedWindow::OnCaptureFullScreen()
 
     SetCursor(LoadCursor(NULL,IDC_ARROW));	
 	ShowWindow(m_hwnd,SW_SHOW); 		
-	return hBmpFileBitmap;
+	return hBitmap;
 }
 
 void CDerivedWindow::SaveBitmap(HBITMAP hBitmap)
