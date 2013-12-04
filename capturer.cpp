@@ -1,4 +1,4 @@
-#include "DerivedWindow.h"
+#include "capturer.h"
 
 LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {

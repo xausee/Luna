@@ -1,6 +1,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include "DerivedWindow.h"
+#include "capturer.h"
 
 int APIENTRY WinMain(HINSTANCE hInstance,
 	                 HINSTANCE hPrevInstance,
