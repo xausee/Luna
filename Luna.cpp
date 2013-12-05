@@ -10,15 +10,17 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 	case WM_PAINT:
 		OnPaint();
 		break;
-	case WM_LBUTTONDOWN:
+	case WM_LBUTTONDOWN:		
 		OnLButtonDown(wParam, lParam);
 		return 0;
-	case WM_RBUTTONDOWN:
-		OnRButtonDown(wParam, lParam);
-		return 0;
 	case WM_LBUTTONUP:
+		OnLButtonUp(wParam, lParam);
+		return 0;
+	case WM_RBUTTONDOWN:
+		//OnRButtonDown(wParam, lParam);
+		return 0;	
 	case WM_RBUTTONUP:
-		OnRButtonUp(wParam, lParam);
+		//OnRButtonUp(wParam, lParam);
 		 return 0;
 	case WM_MOUSEMOVE:
 		OnMouseMove(wParam, lParam);
@@ -36,7 +38,7 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 			exit(0);  
 			break;
 		case ID_CAPTURER_ANYAREA:
-			exit(0);   
+			capture->InitCaptureAnyArea() ;   
             break; 
 		case ID_CAPTURER_EXIT: 
 			exit(0);
@@ -125,73 +127,26 @@ void CDerivedWindow::OnPaint()
 
 void CDerivedWindow::OnLButtonDown(WPARAM wParam, LPARAM lParam)
 {
-	if (!capture->bCapturing)    
-	{
-		capture->hwndScreen = GetDesktopWindow ();
-		if (LockWindowUpdate (capture->hwndScreen))
-		{
-			capture->bCapturing = true ;
-			SetCapture (m_hwnd) ;
-			SetCursor (LoadCursor (NULL, IDC_CROSS)) ;
-		}
-		else
-			MessageBeep (0) ;
-	}	
+	POINT pBeg;
+	pBeg.x = LOWORD (lParam) ;
+	pBeg.y = HIWORD (lParam) ;
+	capture->StartCaptureAnyArea(pBeg) ;
 }
 
 void CDerivedWindow::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 {
+	POINT pEnd;
+	pEnd.x = LOWORD (lParam) ;
+	pEnd.y = HIWORD (lParam) ;
+	capture->EndCaptureAnyArea (pEnd) ;
 }
 
 void CDerivedWindow::OnRButtonDown(WPARAM wParam, LPARAM lParam)
-{
-	if (capture->bCapturing)
-	{
-		capture->bBlocking = true ;
-		capture->ptBeg.x = LOWORD (lParam) ;
-		capture->ptBeg.y = HIWORD (lParam) ;
-		capture->ptEnd = capture->ptBeg ;
-		//capture->InvertBlock (m_hwnd);
-		InvertBlock (capture->hwndScreen, m_hwnd, capture->ptBeg, capture->ptEnd) ;
-	}       
+{	    
 }
 
 void CDerivedWindow::OnRButtonUp(WPARAM wParam, LPARAM lParam)
-{
-	if (capture->bBlocking)
-	{
-		//capture->InvertBlock (m_hwnd);
-		InvertBlock (capture->hwndScreen, m_hwnd, capture->ptBeg, capture->ptEnd) ;
-		capture->ptEnd.x = LOWORD (lParam) ;
-		capture->ptEnd.y = HIWORD (lParam) ;
-		
-		if (hBitmap)
-		{
-			DeleteObject (hBitmap) ;
-			hBitmap = NULL ;
-		}
-		
-		HDC hdc = GetDC (m_hwnd) ;
-		HDC hdcMem = CreateCompatibleDC (hdc) ;
-		hBitmap = CreateCompatibleBitmap (hdc, abs (capture->ptEnd.x - capture->ptBeg.x), abs (capture->ptEnd.y - capture->ptBeg.y)) ;
-		SelectObject (hdcMem, hBitmap) ;
-		StretchBlt (hdcMem, 0, 0, abs (capture->ptEnd.x - capture->ptBeg.x),
-                                  abs (capture->ptEnd.y - capture->ptBeg.y), 
-                    hdc, capture->ptBeg.x, capture->ptBeg.y, capture->ptEnd.x - capture->ptBeg.x, 
-                    capture->ptEnd.y - capture->ptBeg.y, SRCCOPY) ;
-		
-		DeleteDC (hdcMem) ;
-		ReleaseDC (m_hwnd, hdc) ;
-		InvalidateRect (m_hwnd, NULL, TRUE) ;
-	}
-
-	if (capture->bBlocking || capture->bCapturing)
-	{
-		capture->bBlocking = capture->bCapturing = false ;
-		SetCursor (LoadCursor (NULL, IDC_ARROW)) ;
-		ReleaseCapture () ;
-		LockWindowUpdate (NULL) ;
-	}      
+{	  
 }
 
 void CDerivedWindow::OnMouseMove(WPARAM wParam, LPARAM lParam)
@@ -207,11 +162,11 @@ void CDerivedWindow::OnMouseMove(WPARAM wParam, LPARAM lParam)
 	}        
 }
 
-void CDerivedWindow::InvertBlock (HWND hwndScreen, HWND hwnd, POINT ptBeg, POINT ptEnd)
-{	
-     HDC hdc = GetDCEx (hwndScreen, NULL, DCX_CACHE | DCX_LOCKWINDOWUPDATE) ;	 
-     ClientToScreen (hwnd, &ptBeg) ;
-     ClientToScreen (hwnd, &ptEnd) ;
-     PatBlt (hdc, capture->ptBeg.x, capture->ptBeg.y, capture->ptEnd.x - capture->ptBeg.x, capture->ptEnd.y - capture->ptBeg.y, DSTINVERT) ;	 
-     ReleaseDC (hwndScreen, hdc) ;
-}
+//void CDerivedWindow::InvertBlock (HWND hwndScreen, HWND hwnd, POINT ptBeg, POINT ptEnd)
+//{	
+//     HDC hdc = GetDCEx (hwndScreen, NULL, DCX_CACHE | DCX_LOCKWINDOWUPDATE) ;	 
+//     ClientToScreen (hwnd, &ptBeg) ;
+//     ClientToScreen (hwnd, &ptEnd) ;
+//     PatBlt (hdc, capture->ptBeg.x, capture->ptBeg.y, capture->ptEnd.x - capture->ptBeg.x, capture->ptEnd.y - capture->ptBeg.y, DSTINVERT) ;	 
+//     ReleaseDC (hwndScreen, hdc) ;
+//}
