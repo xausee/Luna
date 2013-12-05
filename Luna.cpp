@@ -88,7 +88,7 @@ void CDerivedWindow::OnCreate()
 	nid.cbSize=sizeof(nid);
 	nid.uID=1000;
 	nid.uFlags=NIF_ICON|NIF_MESSAGE|NIF_TIP;
-	nid.hIcon=LoadIcon(hInstance,MAKEINTRESOURCE(IDI_DEFAULT));
+	nid.hIcon=LoadIcon(hInstance,MAKEINTRESOURCE(IDI_ICON));
 	nid.hWnd=m_hwnd;
 	strcpy(nid.szTip,"Screen Capture Application - Double Click to Start Capturing");
 	nid.uCallbackMessage=NULL;//WM_NOTIFYICON_MESSAGE;
