@@ -2,6 +2,9 @@
 
 LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	capture->hwndClient = hwnd;
+	capture->hwndScreen = GetDesktopWindow () ;
+	
 	switch (uMsg)
 	{
 	case WM_CREATE:
@@ -150,23 +153,9 @@ void CDerivedWindow::OnRButtonUp(WPARAM wParam, LPARAM lParam)
 }
 
 void CDerivedWindow::OnMouseMove(WPARAM wParam, LPARAM lParam)
-{
-	if (capture->bBlocking)
-	{
-		//capture->InvertBlock (m_hwnd);
-		InvertBlock (capture->hwndScreen, m_hwnd, capture->ptBeg, capture->ptEnd) ;
-		capture->ptEnd.x = LOWORD (lParam) ;
-		capture->ptEnd.y = HIWORD (lParam) ;
-		//capture->InvertBlock (m_hwnd);
-		InvertBlock (capture->hwndScreen, m_hwnd, capture->ptBeg, capture->ptEnd) ;		
-	}        
+{	
+	POINT pEnd;
+    pEnd.x = LOWORD (lParam) ;
+	pEnd.y = HIWORD (lParam) ;
+	capture->MarkCaptureArea (pEnd);
 }
-
-//void CDerivedWindow::InvertBlock (HWND hwndScreen, HWND hwnd, POINT ptBeg, POINT ptEnd)
-//{	
-//     HDC hdc = GetDCEx (hwndScreen, NULL, DCX_CACHE | DCX_LOCKWINDOWUPDATE) ;	 
-//     ClientToScreen (hwnd, &ptBeg) ;
-//     ClientToScreen (hwnd, &ptEnd) ;
-//     PatBlt (hdc, capture->ptBeg.x, capture->ptBeg.y, capture->ptEnd.x - capture->ptBeg.x, capture->ptEnd.y - capture->ptBeg.y, DSTINVERT) ;	 
-//     ReleaseDC (hwndScreen, hdc) ;
-//}

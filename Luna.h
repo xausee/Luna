@@ -28,9 +28,7 @@ public:
 	void OnLButtonUp (WPARAM wParam, LPARAM lParam) ;
 	void OnRButtonDown (WPARAM wParam, LPARAM lParam) ;
 	void OnRButtonUp (WPARAM wParam, LPARAM lParam) ;
-	void OnMouseMove (WPARAM wParam, LPARAM lParam) ;
-
-	void InvertBlock (HWND hwndScr, HWND hwnd, POINT ptBeg, POINT ptEnd) ;
+	void OnMouseMove (WPARAM wParam, LPARAM lParam) ;	
 
 protected:	
 	HBITMAP	hBitmap;

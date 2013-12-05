@@ -5,40 +5,26 @@ Capture::Capture(void)
 {
 	bCapturing = false ;
 	bBlocking  = false ;
-	hBitmap    = NULL ; 
-	hwndScreen = NULL;
+	hBitmap    = NULL ;
 	ptBeg.x    = 0;
 	ptBeg.y    = 0;
 	ptEnd.x    = 0;
 	ptEnd.y    = 0;
-
-	hwndScreen = GetDesktopWindow () ;
-	hwndClient = GetForegroundWindow () ;
 }
 
 Capture::~Capture(void)
 {
 }
 
-void Capture::InvertBlock (HWND hwnd)
-{	
-	HDC hdc = GetDCEx (hwndScreen, NULL, DCX_CACHE | DCX_LOCKWINDOWUPDATE) ;
-	ClientToScreen (hwnd, &ptBeg) ;
-	ClientToScreen (hwnd, &ptEnd) ;
-	PatBlt (hdc, ptBeg.x, ptBeg.y, ptEnd.x - ptBeg.x, ptEnd.y - ptBeg.y, DSTINVERT) ;
-    ReleaseDC (hwndScreen, hdc) ;
-}
-
 HBITMAP Capture::CaptureFullScreen ()
-{	
-	HWND hwnd = GetForegroundWindow() ;
-	ShowWindow (hwnd, SW_HIDE);
+{		
+	ShowWindow (hwndClient, SW_HIDE);
 	Sleep(1000);
     SetCursor(LoadCursor(NULL,IDC_WAIT));	
     int nWidth = GetSystemMetrics(SM_CXSCREEN);
     int nHeight = GetSystemMetrics(SM_CYSCREEN);
 
-	HWND hDesktopWnd = GetDesktopWindow();
+	HWND hDesktopWnd = hwndScreen;//GetDesktopWindow();
     HDC hDesktopDC = GetDC(hDesktopWnd);    
 	HDC hBmpFileDC = CreateCompatibleDC(hDesktopDC);
 
@@ -54,33 +40,29 @@ HBITMAP Capture::CaptureFullScreen ()
 	DeleteDC(hBmpFileDC);
 	
     SetCursor(LoadCursor(NULL,IDC_ARROW));
-	ShowWindow(hwnd,SW_SHOW);	
+	ShowWindow(hwndClient,SW_SHOW);	
 		
 	return hBitmap;
 }
 
-void Capture::StartCaptureAnyArea (POINT pBeg)
-{
-	if (bCapturing)
-	{
-		bBlocking = true ;
-		ptBeg.x = pBeg.x;//LOWORD (lParam) ;
-		ptBeg.y = pBeg.y;//HIWORD (lParam) ;
-		ptEnd = ptBeg ;
-		InvertBlock (hwndClient);
-		//InvertBlock (capture->hwndScreen, m_hwnd, capture->ptBeg, capture->ptEnd) ;
-	}  
+void Capture::InvertBlock ()
+{		
+	HDC hdc = GetDCEx (hwndScreen, NULL, DCX_CACHE | DCX_LOCKWINDOWUPDATE) ;
+	ClientToScreen (hwndClient, &ptBeg) ;
+	ClientToScreen (hwndClient, &ptEnd) ;
+	//PatBlt (hdc, ptBeg.x, ptBeg.y, ptEnd.x - ptBeg.x, ptEnd.y - ptBeg.y, DSTINVERT) ;
+	Rectangle(hdc, ptBeg.x, ptBeg.y, ptEnd.x, ptEnd.y);
+    ReleaseDC (hwndScreen, hdc) ;
 }
 
 void Capture::InitCaptureAnyArea()
-{
-	
+{	
 	if (!bCapturing)    
 	{		
 		if (LockWindowUpdate (hwndScreen))
 		{
 			bCapturing = true ;
-			SetCapture (GetForegroundWindow ()) ;
+			SetCapture (hwndClient) ;
 			SetCursor (LoadCursor (NULL, IDC_CROSS)) ;
 		}
 		else
@@ -88,14 +70,36 @@ void Capture::InitCaptureAnyArea()
 	}	
 }
 
+void Capture::StartCaptureAnyArea (POINT pBeg)
+{
+	if (bCapturing)
+	{
+		bBlocking = true ;
+		ptBeg.x = pBeg.x;
+		ptBeg.y = pBeg.y;
+		ptEnd = ptBeg ;
+		InvertBlock ();		
+	}  
+}
+
+void Capture::MarkCaptureArea (POINT pEnd) 
+{
+	if (bBlocking)
+	{
+		InvertBlock ();		
+		ptEnd.x = pEnd.x;
+		ptEnd.y = pEnd.y;
+		InvertBlock ();				
+	}   
+}
+
 HBITMAP Capture::EndCaptureAnyArea (POINT pEnd) 
 {
 	if (bBlocking)
 	{
-		InvertBlock (hwndClient);
-		//InvertBlock (hwndScreen, hwndClient, ptBeg, ptEnd) ;
-		ptEnd.x = pEnd.x;//LOWORD (lParam) ;
-		ptEnd.y = pEnd.y;//HIWORD (lParam) ;
+		InvertBlock ();		
+		ptEnd.x = pEnd.x;
+		ptEnd.y = pEnd.y;
 		
 		if (hBitmap)
 		{
@@ -107,10 +111,7 @@ HBITMAP Capture::EndCaptureAnyArea (POINT pEnd)
 		HDC hdcMem = CreateCompatibleDC (hdc) ;
 		hBitmap = CreateCompatibleBitmap (hdc, abs (ptEnd.x - ptBeg.x), abs (ptEnd.y - ptBeg.y)) ;
 		SelectObject (hdcMem, hBitmap) ;
-		StretchBlt (hdcMem, 0, 0, abs (ptEnd.x - ptBeg.x),
-                                  abs (ptEnd.y - ptBeg.y), 
-                    hdc, ptBeg.x, ptBeg.y, ptEnd.x - ptBeg.x, 
-                    ptEnd.y - ptBeg.y, SRCCOPY) ;
+		StretchBlt (hdcMem, 0, 0, abs (ptEnd.x - ptBeg.x), abs (ptEnd.y - ptBeg.y), hdc, ptBeg.x, ptBeg.y, ptEnd.x - ptBeg.x, ptEnd.y - ptBeg.y, SRCCOPY) ;
 		
 		DeleteDC (hdcMem) ;
 		ReleaseDC (hwndClient, hdc) ;
@@ -150,7 +151,7 @@ void Capture::SaveBitmap(HBITMAP hBitmap)
     ofn.lpstrDefExt="bmp";
     ofn.lpstrFile=szFileName;
     ofn.nMaxFile=512;	
-    ofn.hwndOwner = hwndClient; //GetForegroundWindow();
+    ofn.hwndOwner = hwndClient; 
     if(!GetSaveFileName(&ofn))	return;	
 	char *fileName = ofn.lpstrFile;
 

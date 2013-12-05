@@ -15,12 +15,12 @@ public:
 	HWND hwndClient ;
 	HWND hwndScreen ;
 
-	void Init () ;
 	void InitCaptureAnyArea() ;
 	void StartCaptureAnyArea (POINT pBeg) ;
+	void MarkCaptureArea (POINT pEnd) ;
 	HBITMAP EndCaptureAnyArea (POINT ptEnd) ;
 	HBITMAP CaptureFullScreen () ;
 	void SaveBitmap (HBITMAP hBitmap) ;
-	void InvertBlock (HWND hwnd);
+	void InvertBlock ();
 };
 
