@@ -48,10 +48,16 @@ HBITMAP Capture::CaptureFullScreen ()
 void Capture::InvertBlock ()
 {		
 	HDC hdc = GetDCEx (hwndScreen, NULL, DCX_CACHE | DCX_LOCKWINDOWUPDATE) ;
-	ClientToScreen (hwndClient, &ptBeg) ;
+	/*ClientToScreen (hwndClient, &ptBeg) ;
 	ClientToScreen (hwndClient, &ptEnd) ;
-	//PatBlt (hdc, ptBeg.x, ptBeg.y, ptEnd.x - ptBeg.x, ptEnd.y - ptBeg.y, DSTINVERT) ;
-	Rectangle(hdc, ptBeg.x, ptBeg.y, ptEnd.x, ptEnd.y);
+	PatBlt (hdc, ptBeg.x, ptBeg.y, ptEnd.x - ptBeg.x, ptEnd.y - ptBeg.y, DSTINVERT) ;	*/
+
+	POINT ptScreenBeg, ptScreenEnd ;
+	ptScreenBeg = ptBeg ;
+	ptScreenEnd = ptEnd ;
+	ClientToScreen (hwndClient, &ptScreenBeg) ;
+	ClientToScreen (hwndClient, &ptScreenEnd) ;
+	PatBlt (hdc, ptScreenBeg.x, ptScreenBeg.y, ptScreenEnd.x - ptScreenBeg.x, ptScreenEnd.y - ptScreenBeg.y, DSTINVERT) ;
     ReleaseDC (hwndScreen, hdc) ;
 }
 

@@ -122,10 +122,11 @@ void CDerivedWindow::OnPaint()
 		GetObject (hBitmap, sizeof (BITMAP), (PSTR) &bm) ;
 		SetStretchBltMode (hdcClient, COLORONCOLOR) ;
 		StretchBlt (hdcClient, 0, 0, rcClient.right, rcClient.bottom,
-                   hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
+                   hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;	
+		
 		DeleteDC (hdcMem) ;
 		EndPaint (m_hwnd, &ps);
-	}			
+	}	
 }	
 
 void CDerivedWindow::OnLButtonDown(WPARAM wParam, LPARAM lParam)
@@ -141,7 +142,7 @@ void CDerivedWindow::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 	POINT pEnd;
 	pEnd.x = LOWORD (lParam) ;
 	pEnd.y = HIWORD (lParam) ;
-	capture->EndCaptureAnyArea (pEnd) ;
+	hBitmap = capture->EndCaptureAnyArea (pEnd) ;
 }
 
 void CDerivedWindow::OnRButtonDown(WPARAM wParam, LPARAM lParam)
