@@ -20,19 +20,11 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     wcx.lpszClassName       = "CapturerWindow" ;						            // name of window class 
     wcx.hIconSm             = LoadIcon(hInstance, MAKEINTRESOURCE (IDI_ICON)) ;	    // small class icon 
 
-	/*DWORD dwStyles = WS_OVERLAPPEDWINDOW | WS_VISIBLE ;
-	
-	RECT rect;
-	int cx = GetSystemMetrics(SM_CXSCREEN);
-	int cy = GetSystemMetrics(SM_CYSCREEN);
-	rect.top = (cy-560)/2;
-	rect.left = (cx-790)/2;
-	rect.right = 790 + rect.left;
-	rect.bottom = 560 + rect.top;*/     
- 
+	DWORD dwStyles = WS_OVERLAPPEDWINDOW | WS_VISIBLE ;
+	 
 	if (mainWnd.RegisterWindow (&wcx))
 	{				
-		if (mainWnd.Create (/*dwStyles, &rect*/))
+		if (mainWnd.Create ())
 		{				
 			mainWnd.MsgLoop () ;			
 		}

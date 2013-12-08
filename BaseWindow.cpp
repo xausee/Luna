@@ -91,13 +91,13 @@ LRESULT CALLBACK CBaseWindow::stWinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
 
 BOOL CBaseWindow::Create()
 { 
-	// Create the window
 	RECT rect;
-
-	rect.top = 0;
-	rect.left = 0;
-	rect.right = 600;
-	rect.bottom = 400;
+	int cx = GetSystemMetrics(SM_CXSCREEN);
+	int cy = GetSystemMetrics(SM_CYSCREEN);
+	rect.top = (cy-200)/2;
+	rect.left = (cx-300)/2;
+	rect.right = 300 + rect.left;
+	rect.bottom = 200 + rect.top;     
 
 	return Create(WS_OVERLAPPEDWINDOW | WS_VISIBLE, &rect);
 }
