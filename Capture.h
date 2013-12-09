@@ -1,4 +1,5 @@
 #pragma once
+#pragma warning( disable : 4996)
 #include <windows.h>
 #include <stdio.h>
 
@@ -10,13 +11,14 @@ public:
 
 	bool bCapturing ;
 	bool bBlocking ;
+	bool bSpecifiedWindow ;
 	POINT ptBeg, ptEnd ;	
 	HBITMAP	hBitmap ;
 	HWND hwndClient ;
 	HWND hwndScreen ;
 
 	/* 
-    捕捉任意区域的成员函数
+    member functions of capture any area
 	*/
 	void InvertBlock () ;
 	void InitCaptureAnyArea() ;
@@ -25,17 +27,17 @@ public:
 	HBITMAP EndCaptureAnyArea (POINT ptEnd) ;
 
 	/*
-	捕捉全屏的成员函数
+	member functions of capture full screnn
 	*/
 	HBITMAP CaptureFullScreen () ;
 
 	/*
-	捕捉鼠标所在窗口的成员函数
+	member functions of capture specified window
 	*/
-	void CaptureSpecifiedWindow ();
+	void CaptureSpecifiedWindow (POINT point);
 
 	/*
-	保存截图的成员函数
+	save the bitmap member function
 	*/
 	void SaveBitmap (HBITMAP hBitmap) ;	
 };

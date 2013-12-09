@@ -2,6 +2,7 @@
 
 #ifndef _BASEWINDOW_H_
 #define _BASEWINDOW_H_
+#pragma warning( disable : 4996)
 #include <windows.h>
 
 class CBaseWindow

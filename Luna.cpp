@@ -38,7 +38,7 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 			hBitmap = capture->CaptureFullScreen () ;		
 			break;			
 	    case ID_CAPTURER_SINGLEWINDOW: 
-			exit(0);  
+			capture->bSpecifiedWindow = true;  
 			break;
 		case ID_CAPTURER_ANYAREA:
 			capture->InitCaptureAnyArea() ;   
@@ -159,4 +159,6 @@ void CDerivedWindow::OnMouseMove(WPARAM wParam, LPARAM lParam)
     pEnd.x = LOWORD (lParam) ;
 	pEnd.y = HIWORD (lParam) ;
 	capture->MarkCaptureArea (pEnd);
+
+	capture->CaptureSpecifiedWindow(pEnd) ;
 }

@@ -5,6 +5,7 @@ Capture::Capture(void)
 {
 	bCapturing = false ;
 	bBlocking  = false ;
+	bSpecifiedWindow = false ;
 	hBitmap    = NULL ;
 	ptBeg.x    = 0;
 	ptBeg.y    = 0;
@@ -133,6 +134,37 @@ HBITMAP Capture::EndCaptureAnyArea (POINT pEnd)
 	}
 
 	return hBitmap ;
+}
+
+void Capture::CaptureSpecifiedWindow (POINT point)
+{
+	if (bSpecifiedWindow)
+	{
+		HWND hwndPointNow = NULL ;
+		RECT rect ;
+		HDC hdc ;
+		HPEN  hpen ;		
+		POINT pNow = {0,0};
+
+		char title[30];
+		GetWindowText (hwndPointNow,  title, 30) ;			
+		if (GetCursorPos(&pNow)) 
+		{  			
+			hwndPointNow = WindowFromPoint(pNow);   
+			if (hwndPointNow)  
+			{
+				GetClientRect (hwndPointNow, &rect);
+				hdc = GetDC (hwndPointNow) ;
+				hpen = CreatePen (PS_SOLID, 5, RGB (255, 0, 0)) ;
+				SelectObject (hdc, hpen) ;
+				Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+			}				
+		} 
+		else 
+			MessageBox(NULL, title, "info", MB_OK);	
+
+		//bSpecifiedWindow = false;
+	}	
 }
 
 void Capture::SaveBitmap(HBITMAP hBitmap)
