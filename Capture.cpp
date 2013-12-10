@@ -145,7 +145,6 @@ void Capture::CaptureSpecifiedWindow (POINT point)
 		HDC hdc ;
 		HPEN  hpen ;		
 		POINT pNow = {0,0};
-
 				
 		if (GetCursorPos(&pNow)) 
 		{  			
@@ -156,7 +155,7 @@ void Capture::CaptureSpecifiedWindow (POINT point)
 			{
 				GetClientRect (hwndPointNow, &rect);
 				hdc = GetDC (hwndPointNow) ;
-				hpen = CreatePen (PS_SOLID, 5, RGB (255, 0, 0)) ;
+				hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
 				SelectObject (hdc, hpen) ;
 				Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
 
