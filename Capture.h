@@ -18,7 +18,7 @@ public:
 	HWND hwndScreen ;
 
 	/* 
-    member functions of capture any area
+    member functions of capturing any area
 	*/
 	void InvertBlock () ;
 	void InitCaptureAnyArea() ;
@@ -27,12 +27,12 @@ public:
 	HBITMAP EndCaptureAnyArea (POINT ptEnd) ;
 
 	/*
-	member functions of capture full screnn
+	member functions of capturing full screen
 	*/
 	HBITMAP CaptureFullScreen () ;
 
 	/*
-	member functions of capture specified window
+	member functions of capturing specified window
 	*/
 	void CaptureSpecifiedWindow (POINT point);
 

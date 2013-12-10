@@ -18,9 +18,7 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     wcx.hbrBackground       = (HBRUSH)GetStockObject (WHITE_BRUSH) ;	            // white background brush 
     wcx.lpszMenuName        = MAKEINTRESOURCE (IDM_CAPTURER) ;			            // name of menu resource 
     wcx.lpszClassName       = "CapturerWindow" ;						            // name of window class 
-    wcx.hIconSm             = LoadIcon(hInstance, MAKEINTRESOURCE (IDI_ICON)) ;	    // small class icon 
-
-	DWORD dwStyles = WS_OVERLAPPEDWINDOW | WS_VISIBLE ;
+    wcx.hIconSm             = LoadIcon(hInstance, MAKEINTRESOURCE (IDI_ICON)) ;	    // small class icon 	
 	 
 	if (mainWnd.RegisterWindow (&wcx))
 	{				

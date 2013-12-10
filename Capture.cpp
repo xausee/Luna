@@ -57,7 +57,7 @@ void Capture::InvertBlock ()
 	ptScreenBeg = ptBeg ;
 	ptScreenEnd = ptEnd ;
 	ClientToScreen (hwndClient, &ptScreenBeg) ;
-	ClientToScreen (hwndClient, &ptScreenEnd) ;
+	ClientToScreen (hwndClient, &ptScreenEnd) ;	
 	PatBlt (hdc, ptScreenBeg.x, ptScreenBeg.y, ptScreenEnd.x - ptScreenBeg.x, ptScreenEnd.y - ptScreenBeg.y, DSTINVERT) ;
     ReleaseDC (hwndScreen, hdc) ;
 }
@@ -146,11 +146,12 @@ void Capture::CaptureSpecifiedWindow (POINT point)
 		HPEN  hpen ;		
 		POINT pNow = {0,0};
 
-		char title[30];
-		GetWindowText (hwndPointNow,  title, 30) ;			
+				
 		if (GetCursorPos(&pNow)) 
 		{  			
 			hwndPointNow = WindowFromPoint(pNow);   
+			char title[30];
+			GetWindowText (hwndPointNow,  title, 30) ;	
 			if (hwndPointNow)  
 			{
 				GetClientRect (hwndPointNow, &rect);
@@ -158,10 +159,12 @@ void Capture::CaptureSpecifiedWindow (POINT point)
 				hpen = CreatePen (PS_SOLID, 5, RGB (255, 0, 0)) ;
 				SelectObject (hdc, hpen) ;
 				Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+
+				DeleteObject (hpen) ;
 			}				
 		} 
 		else 
-			MessageBox(NULL, title, "info", MB_OK);	
+			MessageBox(NULL, "dd", "info", MB_OK);	
 
 		//bSpecifiedWindow = false;
 	}	
