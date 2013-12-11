@@ -67,11 +67,33 @@ void UnHook ()
 	UnhookWindowsHookEx (g_hKeyb) ;
 }
 
+DWORD WINAPI MyThreadFunction( LPVOID lpParam ) 
+{
+	SetHook () ;
+	return 0;
+}
+
+typedef struct MyData {    
+	Capture * capture; 
+} MYDATA, *PMYDATA;
+
+
 int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	g_hInst = hInstance ;
-	SetHook () ;
 
+	//PMYDATA pDataArray[3];
+	//pDataArray[0] = (PMYDATA) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(MYDATA));
+	//DWORD   dwThreadIdArray[3];
+	//dwThreadIdArray[0] = 0;
+	//HANDLE handle = CreateThread(   
+ //           NULL,                   // default security attributes
+ //           0,                      // use default stack size  
+ //           MyThreadFunction,       // thread function name
+ //           pDataArray[0],          // argument to thread function 
+ //           0,                      // use default creation flags 
+ //           &dwThreadIdArray[0]);    // returns the thread identifier 	
+	SetHook () ;
 	DWORD dwError = 0 ; 	
 	CDerivedWindow mainWnd (hInstance) ;
 	
