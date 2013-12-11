@@ -4,30 +4,27 @@
 HINSTANCE g_hInst ;
 HHOOK g_hMouse ;
 HHOOK g_hKeyb ;
+HWND  g_hwndPointNow = NULL ;
 
 LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam )
 {
-	PKBDLLHOOKSTRUCT k = (PKBDLLHOOKSTRUCT)(lParam);	
-	int xMetric = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-	
+	LPMOUSEHOOKSTRUCT lpMouse=(MOUSEHOOKSTRUCT FAR*)lParam; 
+
 	HDC   hdc ;
 	RECT  rect ;	
-	HPEN  hpen ;
-	POINT pNow           = {0,0};	
-	HWND  hwndPointNow   = NULL ;
+	HPEN  hpen ;	
 
-	if (GetCursorPos(&pNow)) 
-	{  	
-		hwndPointNow = WindowFromPoint(pNow);  
-		char title[30];
-		GetWindowText (hwndPointNow,  title, 30) ;
-		if (hwndPointNow) 
+	if (g_hwndPointNow != WindowFromPoint (lpMouse->pt))
+	{
+		InvalidateRect (g_hwndPointNow, NULL, TRUE) ;
+		g_hwndPointNow = WindowFromPoint(lpMouse->pt);  
+		if (g_hwndPointNow) 
 		{
-			GetClientRect (hwndPointNow, &rect);
-			hdc = GetDC (hwndPointNow) ;
+			GetClientRect (g_hwndPointNow, &rect);
+			hdc = GetDC (g_hwndPointNow) ;
 			hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
-			SelectObject (hdc, hpen) ;		
-
+			SelectObject (hdc, hpen) ;	
+			
 			MoveToEx(hdc, rect.left, rect.top, (LPPOINT) NULL); 
 			LineTo(hdc, rect.right, rect.top); 
 			MoveToEx(hdc, rect.right, rect.top, (LPPOINT) NULL); 
@@ -38,12 +35,9 @@ LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam )
 			LineTo(hdc, rect.left, rect.top); 
 			
 			DeleteObject (hpen) ;
-			ReleaseDC (hwndPointNow, hdc) ;
+			ReleaseDC (g_hwndPointNow, hdc) ;
 		}
-	} 
-	else 
-		MessageBox(NULL, "dd", "info", MB_OK);	
-
+	}	
 	return CallNextHookEx(NULL,nCode,wParam,lParam);  	
 }
 
@@ -69,6 +63,7 @@ void UnHook ()
 
 DWORD WINAPI MyThreadFunction( LPVOID lpParam ) 
 {
+	MessageBox(NULL, "dd", "info", MB_OK);
 	SetHook () ;
 	return 0;
 }
