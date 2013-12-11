@@ -6,6 +6,7 @@ Capture::Capture(void)
 	bCapturing = false ;
 	bBlocking  = false ;
 	bSpecifiedWindow = false ;
+	hwndPointNow = NULL ;
 	hBitmap    = NULL ;
 	ptBeg.x    = 0;
 	ptBeg.y    = 0;
@@ -25,7 +26,7 @@ HBITMAP Capture::CaptureFullScreen ()
     int nWidth = GetSystemMetrics(SM_CXSCREEN);
     int nHeight = GetSystemMetrics(SM_CYSCREEN);
 
-	HWND hDesktopWnd = hwndScreen;//GetDesktopWindow();
+	HWND hDesktopWnd = hwndScreen;
     HDC hDesktopDC = GetDC(hDesktopWnd);    
 	HDC hBmpFileDC = CreateCompatibleDC(hDesktopDC);
 
@@ -137,10 +138,18 @@ HBITMAP Capture::EndCaptureAnyArea (POINT pEnd)
 }
 
 void Capture::CaptureSpecifiedWindow (POINT point)
-{
+{		
 	if (bSpecifiedWindow)
 	{
-		HWND hwndPointNow = NULL ;
+		HINSTANCE hInstance = (HINSTANCE)GetWindowLong (hwndClient, GWL_HINSTANCE) ;		
+		MouseHook *hook = new MouseHook(hInstance);	
+		if (hwndPointNow)
+		{
+			hook->hookData.g_hwndPointNow = hwndPointNow ;
+		}
+		hook->SetHook();
+
+		/*HWND hwndPointNow = NULL ;
 		RECT rect ;
 		HDC hdc ;
 		HPEN  hpen ;		
@@ -148,9 +157,7 @@ void Capture::CaptureSpecifiedWindow (POINT point)
 				
 		if (GetCursorPos(&pNow)) 
 		{  			
-			hwndPointNow = WindowFromPoint(pNow);   
-			char title[30];
-			GetWindowText (hwndPointNow,  title, 30) ;	
+			hwndPointNow = WindowFromPoint(pNow);   				
 			if (hwndPointNow)  
 			{
 				GetClientRect (hwndPointNow, &rect);
@@ -163,10 +170,11 @@ void Capture::CaptureSpecifiedWindow (POINT point)
 			}				
 		} 
 		else 
-			MessageBox(NULL, "dd", "info", MB_OK);	
+			MessageBox(NULL, "dd", "info", MB_OK);	*/
 
-		//bSpecifiedWindow = false;
+		bSpecifiedWindow = false;
 	}	
+	//hook->UnHook();
 }
 
 void Capture::SaveBitmap(HBITMAP hBitmap)

@@ -2,6 +2,7 @@
 #pragma warning( disable : 4996)
 #include <windows.h>
 #include <stdio.h>
+#include "MouseHook.h"
 
 class Capture
 {
@@ -16,6 +17,7 @@ public:
 	HBITMAP	hBitmap ;
 	HWND hwndClient ;
 	HWND hwndScreen ;
+	HWND hwndPointNow ;
 
 	/* 
     member functions of capturing any area
