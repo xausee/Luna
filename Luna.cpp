@@ -1,9 +1,10 @@
 #include "Luna.h"
+#include "MouseHook.h"
 
 LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	capture->hwndClient = hwnd;
-	capture->hwndScreen = GetDesktopWindow () ;
+	capture->hwndScreen = GetDesktopWindow () ;	
 	
 	switch (uMsg)
 	{
@@ -38,7 +39,7 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 			hBitmap = capture->CaptureFullScreen () ;		
 			break;			
 	    case ID_CAPTURER_SINGLEWINDOW: 
-			capture->bSpecifiedWindow = true;  
+			OnCaptureSpecifiedWindow () ;  
 			break;
 		case ID_CAPTURER_ANYAREA:
 			capture->InitCaptureAnyArea() ;   
@@ -158,7 +159,27 @@ void CDerivedWindow::OnMouseMove(WPARAM wParam, LPARAM lParam)
 	POINT pEnd;
     pEnd.x = LOWORD (lParam) ;
 	pEnd.y = HIWORD (lParam) ;
-	capture->MarkCaptureArea (pEnd);
+	capture->MarkCaptureArea (pEnd);	
+}
 
-	capture->CaptureSpecifiedWindow(pEnd) ;
+void CDerivedWindow::OnCaptureSpecifiedWindow()
+{	
+	HINSTANCE hInstance = (HINSTANCE)GetWindowLong (m_hwnd, GWL_HINSTANCE) ;
+	MouseHook *hook = new MouseHook(hInstance);	
+	if (capture->hwndPointNow)
+		hook->hookData.g_hwndPointNow = capture->hwndPointNow ;
+	hook->SetHook();
+
+	HDC hdc = GetDC (hook->hookData.g_hwndPointNow) ;
+	HDC hdcMem = CreateCompatibleDC (hdc) ;
+	RECT rcClient ;
+	GetClientRect (m_hwnd, &rcClient) ;
+	hBitmap = CreateCompatibleBitmap (hdc, abs (rcClient.right - rcClient.left), abs (rcClient.bottom - rcClient.top)) ;
+	SelectObject (hdcMem, hBitmap) ;
+	StretchBlt (hdcMem, 0, 0, abs (rcClient.right - rcClient.left), abs (rcClient.bottom - rcClient.top), hdc, 0, 0, abs (rcClient.right - rcClient.left), abs (rcClient.bottom - rcClient.top), SRCCOPY) ;
+		
+    DeleteDC (hdcMem) ;	
+	//InvalidateRect (hwndClient, NULL, TRUE) ;
+	
+	//hook->UnHook();
 }

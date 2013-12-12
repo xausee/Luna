@@ -1,6 +1,5 @@
 #include "Capture.h"
 
-
 Capture::Capture(void)
 {
 	bCapturing = false ;
@@ -141,13 +140,13 @@ void Capture::CaptureSpecifiedWindow (POINT point)
 {		
 	if (bSpecifiedWindow)
 	{
-		HINSTANCE hInstance = (HINSTANCE)GetWindowLong (hwndClient, GWL_HINSTANCE) ;		
+		/*HINSTANCE hInstance = (HINSTANCE)GetWindowLong (hwndClient, GWL_HINSTANCE) ;		
 		MouseHook *hook = new MouseHook(hInstance);	
 		if (hwndPointNow)
 		{
 			hook->hookData.g_hwndPointNow = hwndPointNow ;
 		}
-		hook->SetHook();
+		hook->SetHook();*/
 
 		/*HWND hwndPointNow = NULL ;
 		RECT rect ;
@@ -172,7 +171,7 @@ void Capture::CaptureSpecifiedWindow (POINT point)
 		else 
 			MessageBox(NULL, "dd", "info", MB_OK);	*/
 
-		bSpecifiedWindow = false;
+		//bSpecifiedWindow = false;
 	}	
 	//hook->UnHook();
 }

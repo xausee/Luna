@@ -1,7 +1,6 @@
 #pragma once
 #include <windows.h>
 
-
 typedef struct HookData
 {    
 	HINSTANCE g_hInst ;

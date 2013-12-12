@@ -29,6 +29,7 @@ public:
 	void OnRButtonDown (WPARAM wParam, LPARAM lParam) ;
 	void OnRButtonUp (WPARAM wParam, LPARAM lParam) ;
 	void OnMouseMove (WPARAM wParam, LPARAM lParam) ;	
+	void OnCaptureSpecifiedWindow () ;
 
 protected:	
 	HBITMAP	hBitmap;
