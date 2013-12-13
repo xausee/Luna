@@ -7,8 +7,7 @@ typedef struct HookData
 	HHOOK g_hMouse ;
 	HHOOK g_hKeyb ;
 	HWND  g_hwndPointNow ;
-	HWND  hwndClient ;
-	HBITMAP hBitmap ;
+	HWND  hwndClient ;	
 	bool captured ;
 } HookData, *PHookData;
 

@@ -137,20 +137,36 @@ void CDerivedWindow::OnLButtonDown(WPARAM wParam, LPARAM lParam)
 	pBeg.y = HIWORD (lParam) ;
 	capture->StartCaptureAnyArea(pBeg) ;
 
-	if (cpMouseHook->hookData.captured )
+	if (capture->bSpecifiedWindow)
 	{
-		POINT pNow ;
-		GetCursorPos (&pNow) ;
-		HWND hwndPointNow = WindowFromPoint(pNow);
-		HDC hdc = GetDC (hwndPointNow) ;
+		if (cpMouseHook->hookData.captured )
+		{
+			//POINT pNow ;
+			//GetCursorPos (&pNow) ;
+			//HWND hwndPointNow = WindowFromPoint(pNow);
+			//HDC hdc = GetDC (hwndPointNow) ;
+			//HDC hdcMem = CreateCompatibleDC (hdc) ;
+			//RECT rcClient ;	
+			////HWND hwnd = FindWindow("CapturerWindow", "Luna") ;
+			//GetClientRect (m_hwnd, &rcClient) ;
+			//hBitmap = CreateCompatibleBitmap (hdc, abs (rcClient.right - rcClient.left), abs (rcClient.bottom - rcClient.top)) ;
+			//SelectObject (hdcMem, hBitmap) ;
+
+			
+		HDC hdc = GetDC (m_hwnd) ;
 		HDC hdcMem = CreateCompatibleDC (hdc) ;
-		RECT rcClient ;	
-		//HWND hwnd = FindWindow("CapturerWindow", "Luna") ;
+		RECT rcClient ;
 		GetClientRect (m_hwnd, &rcClient) ;
 		hBitmap = CreateCompatibleBitmap (hdc, abs (rcClient.right - rcClient.left), abs (rcClient.bottom - rcClient.top)) ;
 		SelectObject (hdcMem, hBitmap) ;
+		StretchBlt (hdcMem, 0, 0, abs (rcClient.right - rcClient.left), abs (rcClient.bottom - rcClient.top), hdc,0, 0, abs (rcClient.right - rcClient.left), abs (rcClient.bottom - rcClient.top), SRCCOPY) ;
 
-		cpMouseHook->UnHook () ;
+
+			//hBitmap = capture->CaptureFullScreen () ;
+			//PatBlt (hdc, rcClient.left, rcClient.right, rcClient.right - rcClient.left, rcClient.bottom - rcClient.top, DSTINVERT) ;
+			cpMouseHook->UnHook () ;
+			capture->bSpecifiedWindow  =false ;
+		}
 	}
 }
 
@@ -180,14 +196,13 @@ void CDerivedWindow::OnMouseMove(WPARAM wParam, LPARAM lParam)
 
 void CDerivedWindow::OnCaptureSpecifiedWindow()
 {	
+	capture->bSpecifiedWindow = true ;
+
 	HINSTANCE hInstance = (HINSTANCE)GetWindowLong (m_hwnd, GWL_HINSTANCE) ;
 	cpMouseHook = new MouseHook(hInstance);	
 	if (capture->hwndPointNow)
 	{
 		cpMouseHook->hookData.g_hwndPointNow = capture->hwndPointNow ;		
-	}
-	//cpMouseHook->hookData.hwndClient = m_hwnd ;
-	cpMouseHook->SetHook();
-	/*cpMouseHook->hookData.hwndClient = m_hwnd ;
-	hBitmap = cpMouseHook->hookData.hBitmap ;*/	
+	}	
+	cpMouseHook->SetHook();	
 }

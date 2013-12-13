@@ -82,10 +82,10 @@ void Capture::StartCaptureAnyArea (POINT pBeg)
 	if (bCapturing)
 	{
 		bBlocking = true ;
-		ptBeg.x = pBeg.x;
-		ptBeg.y = pBeg.y;
+		ptBeg.x = pBeg.x ;
+		ptBeg.y = pBeg.y ;
 		ptEnd = ptBeg ;
-		InvertBlock ();		
+		InvertBlock () ;		
 	}  
 }
 
@@ -93,10 +93,10 @@ void Capture::MarkCaptureArea (POINT pEnd)
 {
 	if (bBlocking)
 	{
-		InvertBlock ();		
-		ptEnd.x = pEnd.x;
-		ptEnd.y = pEnd.y;
-		InvertBlock ();				
+		InvertBlock () ;		
+		ptEnd.x = pEnd.x ;
+		ptEnd.y = pEnd.y ;
+		InvertBlock () ;				
 	}   
 }
 
@@ -104,9 +104,9 @@ HBITMAP Capture::EndCaptureAnyArea (POINT pEnd)
 {
 	if (bBlocking)
 	{
-		InvertBlock ();		
-		ptEnd.x = pEnd.x;
-		ptEnd.y = pEnd.y;
+		InvertBlock () ;		
+		ptEnd.x = pEnd.x ;
+		ptEnd.y = pEnd.y ;
 		
 		if (hBitmap)
 		{

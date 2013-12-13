@@ -2,8 +2,7 @@
 
 MouseHook::MouseHook(void)
 {	
-	hookData.g_hwndPointNow = NULL ;
-	hookData.hBitmap = NULL ;
+	hookData.g_hwndPointNow = NULL ;	
 	hookData.captured = false ;
 }
 
@@ -59,21 +58,9 @@ LRESULT CALLBACK MouseHook::MouseMsgHandler(int nCode, WPARAM wParam, LPARAM lPa
 			switch(wParam)
 			{
 			case WM_LBUTTONDOWN:				
-				{					
-					HDC hdc = GetDC (hookData.g_hwndPointNow) ;
-					HDC hdcMem = CreateCompatibleDC (hdc) ;
-					RECT rcClient ;					
-					HWND hwnd = FindWindow("CapturerWindow", "Luna") ;
-					GetClientRect (hwnd, &rcClient) ;
-					hookData.hBitmap = CreateCompatibleBitmap (hdc, abs (rcClient.right - rcClient.left), abs (rcClient.bottom - rcClient.top)) ;
-					SelectObject (hdcMem, hookData.hBitmap) ;
-				    StretchBlt (hdcMem, 0, 0, abs (rcClient.right - rcClient.left), abs (rcClient.bottom - rcClient.top), hdc, 0, 0, abs (rcClient.right - rcClient.left), abs (rcClient.bottom - rcClient.top), SRCCOPY) ;
-		
-					if (hookData.hBitmap)
-						hookData.captured = true ;
-
-					DeleteDC (hdc) ;	
-                    DeleteDC (hdcMem) ;
+				{	
+					HWND hwnd = FindWindow("CapturerWindow", "Luna") ;					
+					SendMessage (hwnd, WM_LBUTTONDOWN, NULL, NULL) ;
 				}
 				break ;
 			case WM_RBUTTONDOWN: 
