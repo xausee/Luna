@@ -36,7 +36,7 @@ public:
 	/*
 	member functions of capturing specified window
 	*/
-	void CaptureSpecifiedWindow (POINT point);
+	HBITMAP CaptureSpecifiedWindow (HWND hwnd);
 
 	/*
 	save the bitmap member function

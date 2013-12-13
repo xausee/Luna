@@ -136,38 +136,19 @@ void CDerivedWindow::OnLButtonDown(WPARAM wParam, LPARAM lParam)
 	pBeg.x = LOWORD (lParam) ;
 	pBeg.y = HIWORD (lParam) ;
 	capture->StartCaptureAnyArea(pBeg) ;
-
+		
 	if (capture->bSpecifiedWindow)
 	{
-		if (cpMouseHook->hookData.captured )
+		if (cpMouseHook->hookData.captured)
 		{
-			//POINT pNow ;
-			//GetCursorPos (&pNow) ;
-			//HWND hwndPointNow = WindowFromPoint(pNow);
-			//HDC hdc = GetDC (hwndPointNow) ;
-			//HDC hdcMem = CreateCompatibleDC (hdc) ;
-			//RECT rcClient ;	
-			////HWND hwnd = FindWindow("CapturerWindow", "Luna") ;
-			//GetClientRect (m_hwnd, &rcClient) ;
-			//hBitmap = CreateCompatibleBitmap (hdc, abs (rcClient.right - rcClient.left), abs (rcClient.bottom - rcClient.top)) ;
-			//SelectObject (hdcMem, hBitmap) ;
-
-			
-		HDC hdc = GetDC (m_hwnd) ;
-		HDC hdcMem = CreateCompatibleDC (hdc) ;
-		RECT rcClient ;
-		GetClientRect (m_hwnd, &rcClient) ;
-		hBitmap = CreateCompatibleBitmap (hdc, abs (rcClient.right - rcClient.left), abs (rcClient.bottom - rcClient.top)) ;
-		SelectObject (hdcMem, hBitmap) ;
-		StretchBlt (hdcMem, 0, 0, abs (rcClient.right - rcClient.left), abs (rcClient.bottom - rcClient.top), hdc,0, 0, abs (rcClient.right - rcClient.left), abs (rcClient.bottom - rcClient.top), SRCCOPY) ;
-
-
-			//hBitmap = capture->CaptureFullScreen () ;
-			//PatBlt (hdc, rcClient.left, rcClient.right, rcClient.right - rcClient.left, rcClient.bottom - rcClient.top, DSTINVERT) ;
+			POINT pNow ;
+			GetCursorPos (&pNow) ;
+			HWND hwndPointNow = WindowFromPoint(pNow);
+			hBitmap = capture->CaptureSpecifiedWindow (hwndPointNow) ;
+			capture->bSpecifiedWindow = false ;
 			cpMouseHook->UnHook () ;
-			capture->bSpecifiedWindow  =false ;
-		}
-	}
+		}	
+	}	
 }
 
 void CDerivedWindow::OnLButtonUp(WPARAM wParam, LPARAM lParam)

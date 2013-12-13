@@ -19,31 +19,33 @@ Capture::~Capture(void)
 
 HBITMAP Capture::CaptureFullScreen ()
 {		
-	ShowWindow (hwndClient, SW_HIDE);
-	Sleep(1000);
-    SetCursor(LoadCursor(NULL,IDC_WAIT));	
-    int nWidth = GetSystemMetrics(SM_CXSCREEN);
-    int nHeight = GetSystemMetrics(SM_CYSCREEN);
+	ShowWindow (hwndClient, SW_HIDE) ;
+	/*
+	TODO: wait for Luna disapear gracefully
+	*/
+	Sleep (50) ;
+    SetCursor (LoadCursor(NULL,IDC_WAIT)) ;	
+    int nWidth = GetSystemMetrics (SM_CXSCREEN) ;
+    int nHeight = GetSystemMetrics (SM_CYSCREEN) ;
 
-	HWND hDesktopWnd = hwndScreen;
-    HDC hDesktopDC = GetDC(hDesktopWnd);    
-	HDC hBmpFileDC = CreateCompatibleDC(hDesktopDC);
+	HWND hDesktopWnd = hwndScreen ;
+    HDC hDesktopDC = GetDC (hDesktopWnd) ;    
+	HDC hBmpFileDC = CreateCompatibleDC(hDesktopDC) ;
 
-    hBitmap = CreateCompatibleBitmap(hDesktopDC,nWidth,nHeight);
-
-    HBITMAP hOldBitmap = (HBITMAP) SelectObject(hBmpFileDC, hBitmap);
-    BitBlt(hBmpFileDC,0,0,nWidth,nHeight,hDesktopDC,0,0,SRCCOPY|CAPTUREBLT);
-    SelectObject(hBmpFileDC,hOldBitmap); 
+    hBitmap = CreateCompatibleBitmap (hDesktopDC,nWidth,nHeight) ;
+    HBITMAP hOldBitmap = (HBITMAP) SelectObject (hBmpFileDC, hBitmap) ;
+    BitBlt (hBmpFileDC, 0, 0, nWidth, nHeight, hDesktopDC, 0, 0, SRCCOPY|CAPTUREBLT) ;
+    SelectObject (hBmpFileDC,hOldBitmap) ; 
 	 
-	DeleteDC(hDesktopDC);
-	DeleteObject(hDesktopWnd);
-	DeleteObject(hOldBitmap);
-	DeleteDC(hBmpFileDC);
+	DeleteDC (hDesktopDC) ;
+	DeleteObject (hDesktopWnd) ;
+	DeleteObject (hOldBitmap) ;
+	DeleteDC (hBmpFileDC) ;
 	
-    SetCursor(LoadCursor(NULL,IDC_ARROW));
-	ShowWindow(hwndClient,SW_SHOW);	
+    SetCursor (LoadCursor(NULL,IDC_ARROW)) ;
+	ShowWindow (hwndClient,SW_SHOW) ;	
 		
-	return hBitmap;
+	return hBitmap ;
 }
 
 void Capture::InvertBlock ()
@@ -136,44 +138,27 @@ HBITMAP Capture::EndCaptureAnyArea (POINT pEnd)
 	return hBitmap ;
 }
 
-void Capture::CaptureSpecifiedWindow (POINT point)
-{		
-	if (bSpecifiedWindow)
-	{
-		/*HINSTANCE hInstance = (HINSTANCE)GetWindowLong (hwndClient, GWL_HINSTANCE) ;		
-		MouseHook *hook = new MouseHook(hInstance);	
-		if (hwndPointNow)
-		{
-			hook->hookData.g_hwndPointNow = hwndPointNow ;
-		}
-		hook->SetHook();*/
-
-		/*HWND hwndPointNow = NULL ;
-		RECT rect ;
-		HDC hdc ;
-		HPEN  hpen ;		
-		POINT pNow = {0,0};
-				
-		if (GetCursorPos(&pNow)) 
-		{  			
-			hwndPointNow = WindowFromPoint(pNow);   				
-			if (hwndPointNow)  
-			{
-				GetClientRect (hwndPointNow, &rect);
-				hdc = GetDC (hwndPointNow) ;
-				hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
-				SelectObject (hdc, hpen) ;
-				Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
-
-				DeleteObject (hpen) ;
-			}				
-		} 
-		else 
-			MessageBox(NULL, "dd", "info", MB_OK);	*/
-
-		//bSpecifiedWindow = false;
-	}	
-	//hook->UnHook();
+HBITMAP Capture::CaptureSpecifiedWindow (HWND hwnd)
+{	
+	ShowWindow (hwndClient, SW_HIDE) ;
+	Sleep (50) ;
+	RECT rcClient ;
+	HDC hdc = GetDC (hwnd) ;
+	HDC hdcMem = CreateCompatibleDC (hdc) ;
+	GetClientRect (hwnd, &rcClient) ;
+	hBitmap = CreateCompatibleBitmap (hdc, abs (rcClient.right - rcClient.left), abs (rcClient.bottom - rcClient.top)) ;
+	SelectObject (hdcMem, hBitmap) ;
+	StretchBlt (hdcMem, 0, 0,
+		        rcClient.right - rcClient.left, 
+				rcClient.bottom - rcClient.top, 
+				hdc, rcClient.left, rcClient.top, 
+				rcClient.right - rcClient.left, 
+				rcClient.bottom - rcClient.top, SRCCOPY) ;
+	
+	DeleteDC (hdcMem) ;
+	ReleaseDC (hwnd, hdc) ;
+	ShowWindow (hwndClient, SW_SHOW) ;
+	return hBitmap ;	
 }
 
 void Capture::SaveBitmap(HBITMAP hBitmap)
