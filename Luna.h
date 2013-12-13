@@ -20,7 +20,8 @@ public:
 		SetWindowTitle ("Luna") ;
 	};	
 
-	Capture * capture;
+	Capture * capture ;
+	MouseHook *cpMouseHook ;
 
 	void OnCreate();
 	void OnPaint();
