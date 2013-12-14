@@ -23,14 +23,14 @@ HBITMAP Capture::CaptureFullScreen ()
 	/*
 	TODO: wait for Luna disapear gracefully
 	*/
-	Sleep (50) ;
-    SetCursor (LoadCursor(NULL,IDC_WAIT)) ;	
+	Sleep (100) ;
+    SetCursor (LoadCursor (NULL,IDC_WAIT)) ;	
     int nWidth = GetSystemMetrics (SM_CXSCREEN) ;
     int nHeight = GetSystemMetrics (SM_CYSCREEN) ;
 
 	HWND hDesktopWnd = hwndScreen ;
     HDC hDesktopDC = GetDC (hDesktopWnd) ;    
-	HDC hBmpFileDC = CreateCompatibleDC(hDesktopDC) ;
+	HDC hBmpFileDC = CreateCompatibleDC (hDesktopDC) ;
 
     hBitmap = CreateCompatibleBitmap (hDesktopDC,nWidth,nHeight) ;
     HBITMAP hOldBitmap = (HBITMAP) SelectObject (hBmpFileDC, hBitmap) ;
@@ -51,10 +51,6 @@ HBITMAP Capture::CaptureFullScreen ()
 void Capture::InvertBlock ()
 {		
 	HDC hdc = GetDCEx (hwndScreen, NULL, DCX_CACHE | DCX_LOCKWINDOWUPDATE) ;
-	/*ClientToScreen (hwndClient, &ptBeg) ;
-	ClientToScreen (hwndClient, &ptEnd) ;
-	PatBlt (hdc, ptBeg.x, ptBeg.y, ptEnd.x - ptBeg.x, ptEnd.y - ptBeg.y, DSTINVERT) ;	*/
-
 	POINT ptScreenBeg, ptScreenEnd ;
 	ptScreenBeg = ptBeg ;
 	ptScreenEnd = ptEnd ;
@@ -141,7 +137,7 @@ HBITMAP Capture::EndCaptureAnyArea (POINT pEnd)
 HBITMAP Capture::CaptureSpecifiedWindow (HWND hwnd)
 {	
 	ShowWindow (hwndClient, SW_HIDE) ;
-	Sleep (50) ;
+	Sleep (100) ;
 	RECT rcClient ;
 	HDC hdc = GetDC (hwnd) ;
 	HDC hdcMem = CreateCompatibleDC (hdc) ;
@@ -164,68 +160,68 @@ HBITMAP Capture::CaptureSpecifiedWindow (HWND hwnd)
 void Capture::SaveBitmap(HBITMAP hBitmap)
 {
 	if (!hBitmap)	
-		return;
+		return ;
 
-	HDC					hdc=NULL;
-	FILE*				fp=NULL;
-	LPVOID				pBuf=NULL;
-	BITMAPINFO			bmpInfo;
-	BITMAPFILEHEADER	bmpFileHeader;
-	char	            szFileName[512];
+	HDC					hdc = NULL ;
+	FILE*				fp = NULL ;
+	LPVOID				pBuf = NULL ;
+	BITMAPINFO			bmpInfo ;
+	BITMAPFILEHEADER	bmpFileHeader ;
+	char	            szFileName[512] ;
 
-	strcpy(szFileName,"ScreenShot.bmp");
+	strcpy (szFileName,"ScreenShot.bmp") ;
 
-	OPENFILENAME	    ofn;	
-    ZeroMemory(&ofn,sizeof(ofn));
-    ofn.lStructSize=sizeof(OPENFILENAME);
-    ofn.Flags=OFN_HIDEREADONLY|OFN_PATHMUSTEXIST;
-    ofn.lpstrFilter="Bitmap Files (*.bmp)\0*.bmp\0";
-    ofn.lpstrDefExt="bmp";
-    ofn.lpstrFile=szFileName;
-    ofn.nMaxFile=512;	
-    ofn.hwndOwner = hwndClient; 
-    if(!GetSaveFileName(&ofn))	return;	
-	char *fileName = ofn.lpstrFile;
+	OPENFILENAME	    ofn ;	
+    ZeroMemory (&ofn,sizeof (ofn)) ;
+    ofn.lStructSize = sizeof (OPENFILENAME) ;
+    ofn.Flags = OFN_HIDEREADONLY|OFN_PATHMUSTEXIST ;
+    ofn.lpstrFilter = "Bitmap Files (*.bmp)\0*.bmp\0" ;
+    ofn.lpstrDefExt = "bmp" ;
+    ofn.lpstrFile = szFileName ;
+    ofn.nMaxFile = 512 ;	
+    ofn.hwndOwner = hwndClient ; 
+    if (!GetSaveFileName(&ofn))	return ;	
+	char *fileName = ofn.lpstrFile ;
 
 	do{
-		hdc=GetDC(NULL);
-		ZeroMemory(&bmpInfo,sizeof(BITMAPINFO));
-		bmpInfo.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
-		GetDIBits(hdc,hBitmap,0,0,NULL,&bmpInfo,DIB_RGB_COLORS);
+		hdc = GetDC (NULL) ;
+		ZeroMemory (&bmpInfo,sizeof (BITMAPINFO)) ;
+		bmpInfo.bmiHeader.biSize = sizeof (BITMAPINFOHEADER) ;
+		GetDIBits (hdc,hBitmap,0,0,NULL,&bmpInfo,DIB_RGB_COLORS) ;
 
-		if(bmpInfo.bmiHeader.biSizeImage<=0)
-			bmpInfo.bmiHeader.biSizeImage=bmpInfo.bmiHeader.biWidth*abs(bmpInfo.bmiHeader.biHeight)*(bmpInfo.bmiHeader.biBitCount+7)/8;
+		if (bmpInfo.bmiHeader.biSizeImage <= 0)
+			bmpInfo.bmiHeader.biSizeImage = bmpInfo.bmiHeader.biWidth*abs (bmpInfo.bmiHeader.biHeight)* (bmpInfo.bmiHeader.biBitCount+7)/8 ;
 
-		if((pBuf=malloc(bmpInfo.bmiHeader.biSizeImage))==NULL)
+		if ((pBuf=malloc(bmpInfo.bmiHeader.biSizeImage)) == NULL)
 		{
-			MessageBox(NULL,"Unable to Allocate Bitmap Memory","Error",MB_OK|MB_ICONERROR);
-			break;
+			MessageBox (NULL,"Unable to Allocate Bitmap Memory","Error",MB_OK|MB_ICONERROR) ;
+			break ;
 		}
 		
-		bmpInfo.bmiHeader.biCompression=BI_RGB;
-		GetDIBits(hdc,hBitmap,0,bmpInfo.bmiHeader.biHeight,pBuf,&bmpInfo,DIB_RGB_COLORS);	
+		bmpInfo.bmiHeader.biCompression = BI_RGB;
+		GetDIBits (hdc,hBitmap,0,bmpInfo.bmiHeader.biHeight,pBuf,&bmpInfo,DIB_RGB_COLORS) ;	
 
-		if((fp=fopen(fileName,"wb"))==NULL)
+		if ((fp = fopen (fileName,"wb")) == NULL)
 		{
-			MessageBox(NULL,"Unable to Create Bitmap File","Error",MB_OK|MB_ICONERROR);
-			break;
+			MessageBox (NULL,"Unable to Create Bitmap File","Error",MB_OK|MB_ICONERROR) ;
+			break ;
 		}
 
-		bmpFileHeader.bfReserved1=0;
-		bmpFileHeader.bfReserved2=0;
-		bmpFileHeader.bfSize=sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER)+bmpInfo.bmiHeader.biSizeImage;
-		bmpFileHeader.bfType='MB';
-		bmpFileHeader.bfOffBits=sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER);
+		bmpFileHeader.bfReserved1 = 0 ;
+		bmpFileHeader.bfReserved2 = 0 ;
+		bmpFileHeader.bfSize = sizeof (BITMAPFILEHEADER) + sizeof (BITMAPINFOHEADER) + bmpInfo.bmiHeader.biSizeImage ;
+		bmpFileHeader.bfType ='MB' ;
+		bmpFileHeader.bfOffBits = sizeof (BITMAPFILEHEADER) + sizeof (BITMAPINFOHEADER) ;
 
-		fwrite(&bmpFileHeader,sizeof(BITMAPFILEHEADER),1,fp);
-		fwrite(&bmpInfo.bmiHeader,sizeof(BITMAPINFOHEADER),1,fp);
-		fwrite(pBuf,bmpInfo.bmiHeader.biSizeImage,1,fp);
+		fwrite (&bmpFileHeader, sizeof (BITMAPFILEHEADER), 1, fp) ;
+		fwrite (&bmpInfo.bmiHeader, sizeof (BITMAPINFOHEADER), 1, fp) ;
+		fwrite (pBuf, bmpInfo.bmiHeader.biSizeImage, 1, fp) ;
 
-	}while(false);
-	if(hdc)
-		ReleaseDC(NULL,hdc);
-	if(pBuf)
-		free(pBuf);
-	if(fp)
-		fclose(fp);
+	}while (false) ;
+	if (hdc)
+		ReleaseDC (NULL,hdc) ;
+	if (pBuf)
+		free (pBuf) ;
+	if (fp)
+		fclose (fp) ;
 }

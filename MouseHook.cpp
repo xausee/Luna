@@ -2,14 +2,13 @@
 
 MouseHook::MouseHook(void)
 {	
-	hookData.g_hwndPointNow = NULL ;	
-	hookData.captured = false ;
+	hookData.hwndPointNow = NULL ;		
 }
 
 MouseHook::MouseHook(HINSTANCE hInstance)
 {	
-	hookData.g_hInst =  hInstance ;
-	hookData.g_hwndPointNow = NULL ;
+	hookData.hInst =  hInstance ;
+	hookData.hwndPointNow = NULL ;
 }
 
 MouseHook::~MouseHook(void)
@@ -24,20 +23,20 @@ LRESULT CALLBACK MouseHook::MouseMsgHandler(int nCode, WPARAM wParam, LPARAM lPa
 	HDC   hdc ;
 	RECT  rect ;	
 	HPEN  hpen ;
-    MOUSEHOOKSTRUCT *msg = (MOUSEHOOKSTRUCT *)lParam;
+    MOUSEHOOKSTRUCT *msg = (MOUSEHOOKSTRUCT *)lParam ;
 
     switch (nCode) 
     { 
     case HC_ACTION: 
         {    
-			if (hookData.g_hwndPointNow != WindowFromPoint (msg->pt))
+			if (hookData.hwndPointNow != WindowFromPoint (msg->pt))
 			{
-				InvalidateRect (hookData.g_hwndPointNow, NULL, TRUE) ;
-				hookData.g_hwndPointNow = WindowFromPoint(msg->pt); 
-				if (hookData.g_hwndPointNow) 
+				InvalidateRect (hookData.hwndPointNow, NULL, TRUE) ;
+				hookData.hwndPointNow = WindowFromPoint(msg->pt) ; 
+				if (hookData.hwndPointNow) 
 				{		
-					GetClientRect (hookData.g_hwndPointNow, &rect) ;
-					hdc = GetDC (hookData.g_hwndPointNow) ;
+					GetClientRect (hookData.hwndPointNow, &rect) ;
+					hdc = GetDC (hookData.hwndPointNow) ;
 					hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
 					SelectObject (hdc, hpen) ;	
 			
@@ -51,7 +50,7 @@ LRESULT CALLBACK MouseHook::MouseMsgHandler(int nCode, WPARAM wParam, LPARAM lPa
 					LineTo (hdc, rect.left, rect.top) ; 	
 					
 					DeleteObject (hpen) ;
-					ReleaseDC (hookData.g_hwndPointNow, hdc) ;
+					ReleaseDC (hookData.hwndPointNow, hdc) ;
 				}
 			}
 
@@ -92,19 +91,12 @@ LRESULT CALLBACK MouseHook::KeybdProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 void MouseHook::SetHook () 
 {	
-	hookData.g_hMouse = SetWindowsHookEx (WH_MOUSE_LL, MouseHook::MouseProc, hookData.g_hInst, 0) ;
-	hookData.g_hKeyb = SetWindowsHookEx (WH_KEYBOARD_LL, MouseHook::KeybdProc, hookData.g_hInst, 0) ;	
+	hookData.hMouse = SetWindowsHookEx (WH_MOUSE_LL, MouseHook::MouseProc, hookData.hInst, 0) ;
+	hookData.hKeyb = SetWindowsHookEx (WH_KEYBOARD_LL, MouseHook::KeybdProc, hookData.hInst, 0) ;	
 }
 
 void MouseHook::UnHook ()
 {
-	UnhookWindowsHookEx (hookData.g_hMouse) ;
-	UnhookWindowsHookEx (hookData.g_hKeyb) ;
-}
-
-DWORD WINAPI MouseHook::MouseHookThreadFunction( LPVOID lpParam ) 
-{
-	MessageBox(NULL, "dd", "info", MB_OK);
-	SetHook () ;
-	return 0;
+	UnhookWindowsHookEx (hookData.hMouse) ;
+	UnhookWindowsHookEx (hookData.hKeyb) ;
 }

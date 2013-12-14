@@ -3,100 +3,100 @@
 
 LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	capture->hwndClient = hwnd;
+	capture->hwndClient = hwnd ;
 	capture->hwndScreen = GetDesktopWindow () ;	
 	
 	switch (uMsg)
 	{
 	case WM_CREATE:
 		//OnCreate();
-		break;		
+		break ;		
 	case WM_PAINT:
-		OnPaint();
-		break;
+		OnPaint () ;
+		break ;
 	case WM_LBUTTONDOWN:		
-		OnLButtonDown(wParam, lParam);
-		return 0;
+		OnLButtonDown (wParam, lParam) ;
+		return 0 ;
 	case WM_LBUTTONUP:
-		OnLButtonUp(wParam, lParam);
-		return 0;
+		OnLButtonUp (wParam, lParam) ;
+		return 0 ;
 	case WM_RBUTTONDOWN:
-		//OnRButtonDown(wParam, lParam);
-		return 0;	
+		//OnRButtonDown (wParam, lParam) ;
+		return 0 ;	
 	case WM_RBUTTONUP:
-		//OnRButtonUp(wParam, lParam);
-		 return 0;
+		//OnRButtonUp (wParam, lParam) ;
+		 return 0 ;
 	case WM_MOUSEMOVE:
-		OnMouseMove(wParam, lParam);
-		return 0;
+		OnMouseMove (wParam, lParam);
+		return 0 ;
 	case WM_COMMAND:
-		switch(LOWORD(wParam)) 
+		switch (LOWORD (wParam)) 
         {
 		case ID_FILE_SAVEAS:
-			capture->SaveBitmap(hBitmap);		
-			break;
+			capture->SaveBitmap (hBitmap) ;		
+			break ;
 		case ID_CAPTURER_FULLSCREEN:
 			hBitmap = capture->CaptureFullScreen () ;		
-			break;			
-	    case ID_CAPTURER_SINGLEWINDOW: 
+			break ;			
+	    case ID_CAPTURER_SPECIFIED_WINDOW: 
 			OnCaptureSpecifiedWindow () ;  
-			break;
+			break ;
 		case ID_CAPTURER_ANYAREA:
 			capture->InitCaptureAnyArea() ;   
-            break; 
+            break ; 
 		case ID_CAPTURER_EXIT: 
-			exit(0);
+			exit (0) ;
 		case ID_HELP_ABOUT:
-			SendMessage(hwnd,WM_SYSCOMMAND,SC_MINIMIZE,0);			
-			break;
+			SendMessage(hwnd,WM_SYSCOMMAND,SC_MINIMIZE,0) ;			
+			break ;
 		default: 
-			break; 
+			break ; 
 		} 
-		return 0; 
+		return 0 ; 
 	case WM_DESTROY:
 		bWindowClosed = TRUE;
-		break;
+		break ;
 	default:
-		return DefWindowProc(hwnd, uMsg, wParam, lParam);
+		return DefWindowProc(hwnd, uMsg, wParam, lParam) ;
 	}
-	return 0;
+	return 0 ;
 }
 
 void CDerivedWindow::OnCreate()
 {
-	#define         BITSPERPIXEL 32;
-	LPVOID		    pBits=NULL;
-	static HBITMAP	hDesktopCompatibleBitmap=NULL;
-	static HDC		hDesktopCompatibleDC=NULL;
-	static HWND		hDesktopWnd=NULL;
-	static NOTIFYICONDATA	nid;
+	#define         BITSPERPIXEL 32 ;
+	LPVOID		    pBits = NULL ;
+	static HBITMAP	hDesktopCompatibleBitmap = NULL ;
+	static HDC		hDesktopCompatibleDC = NULL ;
+	static HWND		hDesktopWnd = NULL ;
+	static NOTIFYICONDATA	nid ;
 
-	BITMAPINFO	bmpInfo;	
-	ZeroMemory(&bmpInfo,sizeof(BITMAPINFO));
-	bmpInfo.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
-	bmpInfo.bmiHeader.biBitCount=BITSPERPIXEL;
-	bmpInfo.bmiHeader.biCompression = BI_RGB;
-	bmpInfo.bmiHeader.biWidth=GetSystemMetrics(SM_CXSCREEN);
-	bmpInfo.bmiHeader.biHeight=GetSystemMetrics(SM_CYSCREEN);
-	bmpInfo.bmiHeader.biPlanes=1;
-	bmpInfo.bmiHeader.biSizeImage=abs(bmpInfo.bmiHeader.biHeight)*bmpInfo.bmiHeader.biWidth*bmpInfo.bmiHeader.biBitCount/8;
-	hDesktopWnd = GetDesktopWindow();
-    HDC hDesktopDC = GetDC(hDesktopWnd);
-	hDesktopCompatibleDC = CreateCompatibleDC(hDesktopDC);
-	hDesktopCompatibleBitmap = CreateDIBSection(hDesktopDC,&bmpInfo,DIB_RGB_COLORS,&pBits,NULL,0);
+	BITMAPINFO	bmpInfo ;	
+	ZeroMemory (&bmpInfo,sizeof (BITMAPINFO)) ;
+	bmpInfo.bmiHeader.biSize = sizeof (BITMAPINFOHEADER) ;
+	bmpInfo.bmiHeader.biBitCount = BITSPERPIXEL ;
+	bmpInfo.bmiHeader.biCompression = BI_RGB ;
+	bmpInfo.bmiHeader.biWidth = GetSystemMetrics (SM_CXSCREEN) ;
+	bmpInfo.bmiHeader.biHeight = GetSystemMetrics (SM_CYSCREEN) ;
+	bmpInfo.bmiHeader.biPlanes = 1;
+	bmpInfo.bmiHeader.biSizeImage = abs (bmpInfo.bmiHeader.biHeight) * bmpInfo.bmiHeader.biWidth*bmpInfo.bmiHeader.biBitCount/8 ;
+	hDesktopWnd = GetDesktopWindow () ;
+    HDC hDesktopDC = GetDC (hDesktopWnd) ;
+	hDesktopCompatibleDC = CreateCompatibleDC (hDesktopDC) ;
+	hDesktopCompatibleBitmap = CreateDIBSection (hDesktopDC,&bmpInfo,DIB_RGB_COLORS,&pBits,NULL,0) ;
 	if(hDesktopCompatibleDC == NULL || hDesktopCompatibleBitmap == NULL)
 	{
-		MessageBox(m_hwnd, "Unable to Create Desktop Compatible DC/Bitmap", "error",MB_OK);	
+		MessageBox (m_hwnd, "Unable to Create Desktop Compatible DC/Bitmap", "error",MB_OK) ;	
 		return ;
 	}
-	SelectObject(hDesktopCompatibleDC,hDesktopCompatibleBitmap);
-	ZeroMemory(&nid,sizeof(nid));
-	nid.cbSize=sizeof(nid);
-	nid.uID=1000;
-	nid.uFlags=NIF_ICON|NIF_MESSAGE|NIF_TIP;
-	nid.hIcon=LoadIcon(hInstance,MAKEINTRESOURCE(IDI_ICON));
-	nid.hWnd=m_hwnd;
-	strcpy(nid.szTip,"Screen Capture Application - Double Click to Start Capturing");
+	SelectObject (hDesktopCompatibleDC,hDesktopCompatibleBitmap) ;
+	ZeroMemory (&nid,sizeof(nid)) ;
+	nid.cbSize =sizeof (nid) ;
+	nid.uID = 1000;
+	nid.uFlags = NIF_ICON|NIF_MESSAGE|NIF_TIP;
+	nid.hIcon = LoadIcon(hInstance,MAKEINTRESOURCE (IDI_ICON)) ;
+	nid.hWnd = m_hwnd;
+	strcpy (nid.szTip,"Screen Capture Application - Double Click to Start Capturing") ;
 	nid.uCallbackMessage=NULL;//WM_NOTIFYICON_MESSAGE;
 	//if(!Shell_NotifyIcon(NIM_ADD,&nid))	MessageBox(NULL,"Unable to Set Notification Icon","Error",MB_ICONINFORMATION|MB_OK);
 	//if((ghMenu=LoadMenu(hInst,MAKEINTRESOURCE(IDC_SCREENCAPTURE)))==NULL)
@@ -106,7 +106,7 @@ void CDerivedWindow::OnCreate()
 	//nTimerId=SetTimer(hWnd,12345,500,NULL);	//Timer set to 500 ms.
 }
 
-void CDerivedWindow::OnPaint()
+void CDerivedWindow::OnPaint ()
 {
 	if (hBitmap)
 	{
@@ -130,7 +130,7 @@ void CDerivedWindow::OnPaint()
 	}	
 }	
 
-void CDerivedWindow::OnLButtonDown(WPARAM wParam, LPARAM lParam)
+void CDerivedWindow::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 {
 	POINT pBeg;
 	pBeg.x = LOWORD (lParam) ;
@@ -139,19 +139,16 @@ void CDerivedWindow::OnLButtonDown(WPARAM wParam, LPARAM lParam)
 		
 	if (capture->bSpecifiedWindow)
 	{
-		if (cpMouseHook->hookData.captured)
-		{
-			POINT pNow ;
-			GetCursorPos (&pNow) ;
-			HWND hwndPointNow = WindowFromPoint(pNow);
-			hBitmap = capture->CaptureSpecifiedWindow (hwndPointNow) ;
-			capture->bSpecifiedWindow = false ;
-			cpMouseHook->UnHook () ;
-		}	
+		POINT pNow ;
+		GetCursorPos (&pNow) ;
+		HWND hwndPointNow = WindowFromPoint(pNow);
+		hBitmap = capture->CaptureSpecifiedWindow (hwndPointNow) ;
+		capture->bSpecifiedWindow = false ;
+		cpMouseHook->UnHook () ;			
 	}	
 }
 
-void CDerivedWindow::OnLButtonUp(WPARAM wParam, LPARAM lParam)
+void CDerivedWindow::OnLButtonUp (WPARAM wParam, LPARAM lParam)
 {
 	POINT pEnd;
 	pEnd.x = LOWORD (lParam) ;
@@ -159,15 +156,15 @@ void CDerivedWindow::OnLButtonUp(WPARAM wParam, LPARAM lParam)
 	hBitmap = capture->EndCaptureAnyArea (pEnd) ;
 }
 
-void CDerivedWindow::OnRButtonDown(WPARAM wParam, LPARAM lParam)
+void CDerivedWindow::OnRButtonDown (WPARAM wParam, LPARAM lParam)
 {	    
 }
 
-void CDerivedWindow::OnRButtonUp(WPARAM wParam, LPARAM lParam)
+void CDerivedWindow::OnRButtonUp (WPARAM wParam, LPARAM lParam)
 {	  
 }
 
-void CDerivedWindow::OnMouseMove(WPARAM wParam, LPARAM lParam)
+void CDerivedWindow::OnMouseMove (WPARAM wParam, LPARAM lParam)
 {	
 	POINT pEnd;
     pEnd.x = LOWORD (lParam) ;
@@ -175,15 +172,15 @@ void CDerivedWindow::OnMouseMove(WPARAM wParam, LPARAM lParam)
 	capture->MarkCaptureArea (pEnd);	
 }
 
-void CDerivedWindow::OnCaptureSpecifiedWindow()
+void CDerivedWindow::OnCaptureSpecifiedWindow ()
 {	
 	capture->bSpecifiedWindow = true ;
 
 	HINSTANCE hInstance = (HINSTANCE)GetWindowLong (m_hwnd, GWL_HINSTANCE) ;
-	cpMouseHook = new MouseHook(hInstance);	
+	cpMouseHook = new MouseHook (hInstance) ;	
 	if (capture->hwndPointNow)
 	{
-		cpMouseHook->hookData.g_hwndPointNow = capture->hwndPointNow ;		
+		cpMouseHook->hookData.hwndPointNow = capture->hwndPointNow ;		
 	}	
-	cpMouseHook->SetHook();	
+	cpMouseHook->SetHook ();	
 }
