@@ -44,7 +44,7 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 		case ID_CAPTURER_ANYAREA:
 			capture->InitCaptureAnyArea() ;   
             break ; 
-		case ID_CAPTURER_EXIT: 
+		case ID_EXIT: 
 			exit (0) ;
 		case ID_HELP_ABOUT:
 			SendMessage(hwnd,WM_SYSCOMMAND,SC_MINIMIZE,0) ;			
