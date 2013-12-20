@@ -1,14 +1,12 @@
 #include "MouseHook.h"
 
 MouseHook::MouseHook(void)
-{	
-	hookData.hwndPointNow = NULL ;		
+{		
 }
 
 MouseHook::MouseHook(HINSTANCE hInstance)
 {	
-	hookData.hInst =  hInstance ;
-	hookData.hwndPointNow = NULL ;
+	hookData.hInst =  hInstance ;	
 }
 
 MouseHook::~MouseHook(void)
@@ -23,20 +21,23 @@ LRESULT CALLBACK MouseHook::MouseMsgHandler(int nCode, WPARAM wParam, LPARAM lPa
 	HDC   hdc ;
 	RECT  rect ;	
 	HPEN  hpen ;
-    MOUSEHOOKSTRUCT *msg = (MOUSEHOOKSTRUCT *)lParam ;
+	HWND hwndPointNow = NULL ;
+	static HWND hwndPointOld = NULL ;
+    MOUSEHOOKSTRUCT *msg = (MOUSEHOOKSTRUCT *)lParam ;	
 
     switch (nCode) 
     { 
     case HC_ACTION: 
         {    
-			if (hookData.hwndPointNow != WindowFromPoint (msg->pt))
+			hwndPointNow = WindowFromPoint (msg->pt) ;			
+			if (hwndPointOld != hwndPointNow)
 			{
-				InvalidateRect (hookData.hwndPointNow, NULL, TRUE) ;
-				hookData.hwndPointNow = WindowFromPoint(msg->pt) ; 
-				if (hookData.hwndPointNow) 
+				InvalidateRect (hwndPointOld, NULL, TRUE) ;
+				hwndPointOld = hwndPointNow ; 
+				if (hwndPointOld) 
 				{		
-					GetClientRect (hookData.hwndPointNow, &rect) ;
-					hdc = GetDC (hookData.hwndPointNow) ;
+					GetClientRect (hwndPointOld, &rect) ;
+					hdc = GetDC (hwndPointOld) ;
 					hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
 					SelectObject (hdc, hpen) ;	
 			
@@ -50,7 +51,7 @@ LRESULT CALLBACK MouseHook::MouseMsgHandler(int nCode, WPARAM wParam, LPARAM lPa
 					LineTo (hdc, rect.left, rect.top) ; 	
 					
 					DeleteObject (hpen) ;
-					ReleaseDC (hookData.hwndPointNow, hdc) ;
+					ReleaseDC (hwndPointOld, hdc) ;
 				}
 			}
 

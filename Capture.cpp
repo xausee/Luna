@@ -4,8 +4,7 @@ Capture::Capture(void)
 {
 	bCapturing = false ;
 	bBlocking  = false ;
-	bSpecifiedWindow = false ;
-	hwndPointNow = NULL ;
+	bSpecifiedWindow = false ;	
 	hBitmap    = NULL ;
 	ptBeg.x    = 0;
 	ptBeg.y    = 0;
@@ -136,6 +135,7 @@ HBITMAP Capture::EndCaptureAnyArea (POINT pEnd)
 
 HBITMAP Capture::CaptureSpecifiedWindow (HWND hwnd)
 {	
+	InvalidateRect (hwnd, NULL, TRUE) ;
 	ShowWindow (hwndClient, SW_HIDE) ;
 	Sleep (100) ;
 	RECT rcClient ;

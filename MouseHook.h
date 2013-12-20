@@ -5,8 +5,7 @@ typedef struct HookData
 {    
 	HINSTANCE  hInst ;
 	HHOOK      hMouse ;
-	HHOOK      hKeyb ;
-	HWND       hwndPointNow ;	
+	HHOOK      hKeyb ;	
 } HookData, *PHookData ;
 
 class MouseHook

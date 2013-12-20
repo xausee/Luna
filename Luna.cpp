@@ -169,7 +169,7 @@ void CDerivedWindow::OnMouseMove (WPARAM wParam, LPARAM lParam)
 	POINT pEnd;
     pEnd.x = LOWORD (lParam) ;
 	pEnd.y = HIWORD (lParam) ;
-	capture->MarkCaptureArea (pEnd);	
+	capture->MarkCaptureArea (pEnd) ;	
 }
 
 void CDerivedWindow::OnCaptureSpecifiedWindow ()
@@ -177,10 +177,6 @@ void CDerivedWindow::OnCaptureSpecifiedWindow ()
 	capture->bSpecifiedWindow = true ;
 
 	HINSTANCE hInstance = (HINSTANCE)GetWindowLong (m_hwnd, GWL_HINSTANCE) ;
-	cpMouseHook = new MouseHook (hInstance) ;	
-	if (capture->hwndPointNow)
-	{
-		cpMouseHook->hookData.hwndPointNow = capture->hwndPointNow ;		
-	}	
+	cpMouseHook = new MouseHook (hInstance) ;		
 	cpMouseHook->SetHook ();	
 }

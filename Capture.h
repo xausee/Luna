@@ -17,7 +17,6 @@ public:
 	HBITMAP	hBitmap ;
 	HWND hwndClient ;
 	HWND hwndScreen ;
-	HWND hwndPointNow ;
 
 	/* 
     member functions of capturing any area
