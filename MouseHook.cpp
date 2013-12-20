@@ -23,6 +23,7 @@ LRESULT CALLBACK MouseHook::MouseMsgHandler(int nCode, WPARAM wParam, LPARAM lPa
 	HPEN  hpen ;
 	HWND hwndPointNow = NULL ;
 	static HWND hwndPointOld = NULL ;
+	HWND hwndLuna = FindWindow("CapturerWindow", "Luna") ;
     MOUSEHOOKSTRUCT *msg = (MOUSEHOOKSTRUCT *)lParam ;	
 
     switch (nCode) 
@@ -57,11 +58,8 @@ LRESULT CALLBACK MouseHook::MouseMsgHandler(int nCode, WPARAM wParam, LPARAM lPa
 
 			switch(wParam)
 			{
-			case WM_LBUTTONDOWN:				
-				{	
-					HWND hwnd = FindWindow("CapturerWindow", "Luna") ;					
-					SendMessage (hwnd, WM_LBUTTONDOWN, NULL, NULL) ;
-				}
+			case WM_LBUTTONDOWN:
+				SendMessage (hwndLuna, WM_LBUTTONDOWN, NULL, NULL) ;				
 				break ;
 			case WM_RBUTTONDOWN: 
 				break ;
