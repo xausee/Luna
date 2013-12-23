@@ -19,13 +19,7 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 		return 0 ;
 	case WM_LBUTTONUP:
 		OnLButtonUp (wParam, lParam) ;
-		return 0 ;
-	case WM_RBUTTONDOWN:
-		//OnRButtonDown (wParam, lParam) ;
 		return 0 ;	
-	case WM_RBUTTONUP:
-		//OnRButtonUp (wParam, lParam) ;
-		 return 0 ;
 	case WM_MOUSEMOVE:
 		OnMouseMove (wParam, lParam);
 		return 0 ;
@@ -42,14 +36,7 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 			OnCaptureSpecifiedWindow () ;  
 			break ;
 		case ID_CAPTURER_ANYAREA:
-			{
-				TrasparentWindow pTrasparentWindow (hInstance) ;
-				pTrasparentWindow.RegisterWindow () ;
-				pTrasparentWindow.Create () ;
-				pTrasparentWindow.MsgLoop () ;
-
-				//capture->InitCaptureAnyArea () ;  
-			}
+			 OnCaptureAnyArea () ;
             break ; 
 		case ID_EXIT: 
 			exit (0) ;
@@ -177,6 +164,16 @@ void CDerivedWindow::OnMouseMove (WPARAM wParam, LPARAM lParam)
     pEnd.x = LOWORD (lParam) ;
 	pEnd.y = HIWORD (lParam) ;
 	capture->MarkCaptureArea (pEnd) ;	
+}
+
+void CDerivedWindow::OnCaptureAnyArea ()
+{
+	TrasparentWindow pTrasparentWindow (hInstance) ;
+	pTrasparentWindow.RegisterWindow () ;
+	pTrasparentWindow.Create () ;
+	pTrasparentWindow.MsgLoop () ;
+	
+	hBitmap = pTrasparentWindow.hBitmap ;	
 }
 
 void CDerivedWindow::OnCaptureSpecifiedWindow ()

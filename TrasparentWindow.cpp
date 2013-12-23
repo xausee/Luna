@@ -1,7 +1,9 @@
 #include "TrasparentWindow.h"
 
 TrasparentWindow::~TrasparentWindow(void)
-{
+{ 
+	delete (capture) ; 
+	capture = NULL ;
 }
 
 BOOL TrasparentWindow::Create()
@@ -15,8 +17,8 @@ BOOL TrasparentWindow::Create()
 	rect.bottom  = cy ;     
 
 	// No border window 
-	return CBaseWindow::Create(~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZE | WS_MAXIMIZE | WS_SYSMENU | WS_HSCROLL | WS_VSCROLL), &rect) ;
-	//return CBaseWindow::Create( WS_OVERLAPPEDWINDOW | WS_VISIBLE, &rect) ;
+	//return CBaseWindow::Create(~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZE | WS_MAXIMIZE | WS_SYSMENU | WS_HSCROLL | WS_VSCROLL), &rect) ;
+	return CBaseWindow::Create( WS_OVERLAPPEDWINDOW | WS_VISIBLE, &rect) ;
 }
 
 void TrasparentWindow::SetWindowTransparent (HWND hwnd) 
@@ -79,9 +81,37 @@ void TrasparentWindow::OnPaint ()
 	}	
 }
 
+void TrasparentWindow::OnLButtonDown (WPARAM wParam, LPARAM lParam)
+{	
+	POINT pBeg;
+	pBeg.x = LOWORD (lParam) ;
+	pBeg.y = HIWORD (lParam) ;
+	capture->InitCaptureAnyArea () ; 
+	capture->StartCaptureAnyArea(pBeg) ;
+}
+
+void TrasparentWindow::OnLButtonUp (WPARAM wParam, LPARAM lParam)
+{
+	POINT pEnd;
+	pEnd.x = LOWORD (lParam) ;
+	pEnd.y = HIWORD (lParam) ;
+	hBitmap = capture->EndCaptureAnyArea (pEnd) ;
+	//SendMessage (m_hwnd, WM_DESTROY, NULL, NULL) ;
+}
+
+void TrasparentWindow::OnMouseMove (WPARAM wParam, LPARAM lParam)
+{	
+	POINT pEnd;
+    pEnd.x = LOWORD (lParam) ;
+	pEnd.y = HIWORD (lParam) ;
+	capture->MarkCaptureArea (pEnd) ;	
+}
+
 LRESULT CALLBACK TrasparentWindow::WinMsgHandler (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	HBITMAP hBitmap = NULL ;
+	capture->hwndClient = hwnd ;
+	capture->hwndScreen = GetDesktopWindow () ;	
 
 	switch (uMsg)
 	{
@@ -92,19 +122,13 @@ LRESULT CALLBACK TrasparentWindow::WinMsgHandler (HWND hwnd, UINT uMsg, WPARAM w
 		OnPaint () ;
 		break ;
 	case WM_LBUTTONDOWN:		
-		//OnLButtonDown (wParam, lParam) ;
+		OnLButtonDown (wParam, lParam) ;
 		return 0 ;
 	case WM_LBUTTONUP:
-		//OnLButtonUp (wParam, lParam) ;
+		OnLButtonUp (wParam, lParam) ;
 		return 0 ;
-	case WM_RBUTTONDOWN:
-		//OnRButtonDown (wParam, lParam) ;
-		return 0 ;	
-	case WM_RBUTTONUP:
-		//OnRButtonUp (wParam, lParam) ;
-		 return 0 ;
 	case WM_MOUSEMOVE:
-		//OnMouseMove (wParam, lParam);
+		OnMouseMove (wParam, lParam);
 		return 0 ;	
 	case WM_DESTROY:
 		bWindowClosed = TRUE;

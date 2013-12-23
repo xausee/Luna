@@ -30,6 +30,7 @@ public:
 	void OnRButtonDown (WPARAM wParam, LPARAM lParam) ;
 	void OnRButtonUp (WPARAM wParam, LPARAM lParam) ;
 	void OnMouseMove (WPARAM wParam, LPARAM lParam) ;	
+	void OnCaptureAnyArea () ;
 	void OnCaptureSpecifiedWindow () ;
 
 protected:	
