@@ -30,6 +30,9 @@
     <ClCompile Include="MouseHook.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TrasparentWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseWindow.h">
@@ -45,6 +48,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MouseHook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TrasparentWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

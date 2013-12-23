@@ -72,6 +72,7 @@
     <ClCompile Include="Capture.cpp" />
     <ClCompile Include="Luna.cpp" />
     <ClCompile Include="MouseHook.cpp" />
+    <ClCompile Include="TrasparentWindow.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +81,7 @@
     <ClInclude Include="Luna.h" />
     <ClInclude Include="MouseHook.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="TrasparentWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="capturer.rc" />

@@ -4,6 +4,7 @@
 #ifndef _DERIVEDWINDOW_H_
 #define _DERIVEDWINDOW_H_
 #include "BaseWindow.h"
+#include "TrasparentWindow.h"
 #include "Capture.h"
 #include "resource.h"
 #include <windows.h>
@@ -16,10 +17,9 @@ public:
 		:CBaseWindow(hInst, wcx)
 	{ 
 		hBitmap = NULL ;  
-		capture = new(Capture);
+		capture = new(Capture);		
 		SetWindowTitle ("Luna") ;
-	};	
-
+	};		
 	Capture * capture ;
 	MouseHook *cpMouseHook ;
 
