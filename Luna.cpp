@@ -16,13 +16,7 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 		break ;
 	case WM_LBUTTONDOWN:		
 		OnLButtonDown (wParam, lParam) ;
-		return 0 ;
-	case WM_LBUTTONUP:
-		OnLButtonUp (wParam, lParam) ;
 		return 0 ;	
-	case WM_MOUSEMOVE:
-		OnMouseMove (wParam, lParam);
-		return 0 ;
 	case WM_COMMAND:
 		switch (LOWORD (wParam)) 
         {
@@ -126,11 +120,6 @@ void CDerivedWindow::OnPaint ()
 
 void CDerivedWindow::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 {
-	POINT pBeg;
-	pBeg.x = LOWORD (lParam) ;
-	pBeg.y = HIWORD (lParam) ;
-	capture->StartCaptureAnyArea(pBeg) ;
-		
 	if (capture->bSpecifiedWindow)
 	{
 		POINT pNow ;
@@ -140,30 +129,6 @@ void CDerivedWindow::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 		capture->bSpecifiedWindow = false ;
 		cpMouseHook->UnHook () ;			
 	}	
-}
-
-void CDerivedWindow::OnLButtonUp (WPARAM wParam, LPARAM lParam)
-{
-	POINT pEnd;
-	pEnd.x = LOWORD (lParam) ;
-	pEnd.y = HIWORD (lParam) ;
-	hBitmap = capture->EndCaptureAnyArea (pEnd) ;
-}
-
-void CDerivedWindow::OnRButtonDown (WPARAM wParam, LPARAM lParam)
-{	    
-}
-
-void CDerivedWindow::OnRButtonUp (WPARAM wParam, LPARAM lParam)
-{	  
-}
-
-void CDerivedWindow::OnMouseMove (WPARAM wParam, LPARAM lParam)
-{	
-	POINT pEnd;
-    pEnd.x = LOWORD (lParam) ;
-	pEnd.y = HIWORD (lParam) ;
-	capture->MarkCaptureArea (pEnd) ;	
 }
 
 void CDerivedWindow::OnCaptureAnyArea ()

@@ -25,11 +25,7 @@ public:
 
 	void OnCreate();
 	void OnPaint();
-	void OnLButtonDown (WPARAM wParam, LPARAM lParam) ;
-	void OnLButtonUp (WPARAM wParam, LPARAM lParam) ;
-	void OnRButtonDown (WPARAM wParam, LPARAM lParam) ;
-	void OnRButtonUp (WPARAM wParam, LPARAM lParam) ;
-	void OnMouseMove (WPARAM wParam, LPARAM lParam) ;	
+	void OnLButtonDown (WPARAM wParam, LPARAM lParam) ;	
 	void OnCaptureAnyArea () ;
 	void OnCaptureSpecifiedWindow () ;
 
