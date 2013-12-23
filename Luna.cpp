@@ -42,7 +42,14 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 			OnCaptureSpecifiedWindow () ;  
 			break ;
 		case ID_CAPTURER_ANYAREA:
-			capture->InitCaptureAnyArea() ;   
+			{
+				TrasparentWindow pTrasparentWindow (hInstance) ;
+				pTrasparentWindow.RegisterWindow () ;
+				pTrasparentWindow.Create () ;
+				pTrasparentWindow.MsgLoop () ;
+
+				//capture->InitCaptureAnyArea () ;  
+			}
             break ; 
 		case ID_EXIT: 
 			exit (0) ;
