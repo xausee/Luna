@@ -9,16 +9,22 @@ TrasparentWindow::~TrasparentWindow(void)
 BOOL TrasparentWindow::Create()
 { 
 	RECT rect;
-	int cx = GetSystemMetrics(SM_CXSCREEN) ;
-	int cy = GetSystemMetrics(SM_CYSCREEN) ;
+	int cx = GetSystemMetrics (SM_CXSCREEN) ;
+	int cy = GetSystemMetrics (SM_CYSCREEN) ;
+	int cf = GetSystemMetrics (SM_CXFRAME) ;
+	int cc = GetSystemMetrics (SM_CYCAPTION) ;
 	rect.top     = 0 ;
 	rect.left    = 0 ;
 	rect.right   = cx ;
-	rect.bottom  = cy ;     
+	rect.bottom  = cy ; 
 
-	// No border window 
-	//return CBaseWindow::Create(~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZE | WS_MAXIMIZE | WS_SYSMENU | WS_HSCROLL | WS_VSCROLL), &rect) ;
-	return CBaseWindow::Create( WS_OVERLAPPEDWINDOW | WS_VISIBLE, &rect) ;
+	if (!CBaseWindow::Create (0, &rect))
+		return false;
+	SetWindowLong (m_hwnd, GWL_STYLE, 0);	
+	SetWindowPos (m_hwnd, HWND_TOPMOST, 0, 0, cx, cy + cc - 20, SWP_SHOWWINDOW) ;	
+	ShowWindow (m_hwnd, SW_SHOW) ;
+
+	return true ;
 }
 
 void TrasparentWindow::SetWindowTransparent (HWND hwnd) 
@@ -52,6 +58,11 @@ HBITMAP TrasparentWindow::CreateDesktopBitmap ()
 
 void TrasparentWindow::OnCreate (HWND hwnd)
 {	
+	//-------------------------------------------
+		/*DWORD dwStyle = GetWindowLong(hwnd, GWL_STYLE);
+		dwStyle &= ~WS_BORDER;
+		SetWindowLong(hwnd, GWL_STYLE, dwStyle); 	*/
+	//-----------------------------------------------
 	CreateDesktopBitmap ();	
     //Todo: m_hwnd != hwnd?
 	//SetWindowTransparent (hwnd) ;
@@ -75,8 +86,13 @@ void TrasparentWindow::OnPaint ()
 		SetStretchBltMode (hdcClient, COLORONCOLOR) ;
 		StretchBlt (hdcClient, 0, 0, rcClient.right, rcClient.bottom,
                    hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;	
-		
+
+		//Invert the solor of the all client area
+		//HDC hdc = GetDCEx (m_hwnd, NULL, DCX_CACHE | DCX_LOCKWINDOWUPDATE) ;
+		//PatBlt (hdcClient, rcClient.left, rcClient.top, rcClient.right - rcClient.left, rcClient.bottom - rcClient.top, DSTINVERT) ;
+
 		DeleteDC (hdcMem) ;
+		DeleteDC (hdcClient) ;
 		EndPaint (m_hwnd, &ps) ;
 	}	
 }
@@ -95,8 +111,8 @@ void TrasparentWindow::OnLButtonUp (WPARAM wParam, LPARAM lParam)
 	POINT pEnd;
 	pEnd.x = LOWORD (lParam) ;
 	pEnd.y = HIWORD (lParam) ;
-	hBitmap = capture->EndCaptureAnyArea (pEnd) ;
-	//SendMessage (m_hwnd, WM_DESTROY, NULL, NULL) ;
+	hBitmap = capture->EndCaptureAnyArea (pEnd) ;	
+	DestroyWindow (m_hwnd) ;
 }
 
 void TrasparentWindow::OnMouseMove (WPARAM wParam, LPARAM lParam)
