@@ -35,7 +35,7 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 		case ID_EXIT: 
 			exit (0) ;
 		case ID_HELP_ABOUT:
-			SendMessage(hwnd,WM_SYSCOMMAND,SC_MINIMIZE,0) ;			
+			MessageBox (hwnd, "Copyright@Phiso Hu 2013", "About Luna", MB_OK) ;			
 			break ;
 		default: 
 			break ; 
@@ -133,12 +133,18 @@ void CDerivedWindow::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 
 void CDerivedWindow::OnCaptureAnyArea ()
 {
+	ShowWindow (m_hwnd, SW_HIDE) ;
+	/*
+	TODO: wait for Luna disapear gracefully
+	*/
+	Sleep (100) ;
 	TrasparentWindow pTrasparentWindow (hInstance) ;
 	pTrasparentWindow.RegisterWindow () ;
 	pTrasparentWindow.Create () ;
-	pTrasparentWindow.MsgLoop () ;
-	
-	hBitmap = pTrasparentWindow.hBitmap ;	
+	pTrasparentWindow.MsgLoop () ;	
+	hBitmap = pTrasparentWindow.hBitmap ;
+
+	ShowWindow (m_hwnd,SW_SHOW) ;	
 }
 
 void CDerivedWindow::OnCaptureSpecifiedWindow ()

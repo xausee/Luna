@@ -66,8 +66,9 @@ void Capture::InitCaptureAnyArea()
 		if (LockWindowUpdate (hwndScreen))
 		{
 			bCapturing = true ;
-			SetCapture (hwndClient) ;
-			SetCursor (LoadCursor (NULL, IDC_CROSS)) ;
+			//move to window creating
+			//SetCapture (hwndClient) ;
+			//SetCursor (LoadCursor (NULL, IDC_CROSS)) ;
 		}
 		else
 			MessageBeep (0) ;

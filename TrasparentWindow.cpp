@@ -57,12 +57,9 @@ HBITMAP TrasparentWindow::CreateDesktopBitmap ()
 }
 
 void TrasparentWindow::OnCreate (HWND hwnd)
-{	
-	//-------------------------------------------
-		/*DWORD dwStyle = GetWindowLong(hwnd, GWL_STYLE);
-		dwStyle &= ~WS_BORDER;
-		SetWindowLong(hwnd, GWL_STYLE, dwStyle); 	*/
-	//-----------------------------------------------
+{		
+	SetCapture (hwnd) ;
+	SetCursor (LoadCursor (NULL, IDC_CROSS)) ;
 	CreateDesktopBitmap ();	
     //Todo: m_hwnd != hwnd?
 	//SetWindowTransparent (hwnd) ;
