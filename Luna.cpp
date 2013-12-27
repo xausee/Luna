@@ -21,10 +21,7 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 		switch (LOWORD (wParam)) 
         {
 		case ID_FILE_SAVEAS:
-			{
-				SaveFile () ;
-				capture->SaveBitmap (hBitmap) ;	
-			}				
+			SaveFile () ;				
 			break ;
 		case ID_CAPTURER_FULLSCREEN:
 			hBitmap = capture->CaptureFullScreen () ;		
@@ -192,8 +189,8 @@ int CDerivedWindow::GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 
 void CDerivedWindow::SaveFile () 
 {
-	char	            szFileName[512] ;
-	strcpy (szFileName,"ScreenShot.bmp") ;
+	char szFileName[512] ;
+	strcpy (szFileName,"ScreenShot") ;
 
 	/*char  filesFilter[250];
 	char * pBitmapStr  = "Bitmap Files (*.bmp)\0*.bmp\0" ;
@@ -238,16 +235,20 @@ void CDerivedWindow::SaveFile ()
 		GetEncoderClsid(L"image/jpeg", &encoderClsid) ;
 	else if (strstr (fileName, "gif") != NULL)
 		GetEncoderClsid(L"image/gif", &encoderClsid) ;
-	else if (strstr (fileName, "tiff") != NULL)
-		GetEncoderClsid(L"image/tif", &encoderClsid) ;	
-	fileName;
-
-	stat = bitmap->Save(L"dd.png", &encoderClsid, NULL);
+	else if (strstr (fileName, "tif") != NULL)
+		GetEncoderClsid(L"image/tiff", &encoderClsid) ;	
+	// change filename string type
+	DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, fileName, -1, NULL, 0);
+	WCHAR * psText = new WCHAR[dwNum];
+	if(!psText)
+	{
+		delete []psText;
+	} 
+	MultiByteToWideChar (CP_ACP, 0, fileName, -1, psText, dwNum);
+	stat = bitmap->Save(psText, &encoderClsid, NULL);
 	
-	if(stat == Ok)
-		printf("picture was saved successfully\n");
-	else
-		printf("Failure: stat = %d\n", stat); 
+	if(stat != Ok)
+		MessageBox (NULL, "±£´æÎÄ¼şÊ§°Ü", "´íÎó", MB_OK) ;
 	
 	delete bitmap;
 	GdiplusShutdown(gdiplusToken);
