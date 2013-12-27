@@ -21,7 +21,10 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 		switch (LOWORD (wParam)) 
         {
 		case ID_FILE_SAVEAS:
-			capture->SaveBitmap (hBitmap) ;		
+			{
+				SaveFile () ;
+				capture->SaveBitmap (hBitmap) ;	
+			}				
 			break ;
 		case ID_CAPTURER_FULLSCREEN:
 			hBitmap = capture->CaptureFullScreen () ;		
@@ -154,4 +157,99 @@ void CDerivedWindow::OnCaptureSpecifiedWindow ()
 	HINSTANCE hInstance = (HINSTANCE)GetWindowLong (m_hwnd, GWL_HINSTANCE) ;
 	cpMouseHook = new MouseHook (hInstance) ;		
 	cpMouseHook->SetHook ();	
+}
+
+int CDerivedWindow::GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
+{
+   UINT  num = 0;          // number of image encoders
+   UINT  size = 0;         // size of the image encoder array in bytes
+
+   ImageCodecInfo* pImageCodecInfo = NULL;
+
+   GetImageEncodersSize(&num, &size);
+   if(size == 0)
+      return -1;  // Failure
+
+   pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+   if(pImageCodecInfo == NULL)
+      return -1;  // Failure
+
+   GetImageEncoders(num, size, pImageCodecInfo);
+
+   for(UINT j = 0; j < num; ++j)
+   {
+      if( wcscmp(pImageCodecInfo[j].MimeType, format) == 0 )
+      {
+         *pClsid = pImageCodecInfo[j].Clsid;
+         free(pImageCodecInfo);
+         return j;  // Success
+      }    
+   }
+
+   free(pImageCodecInfo);
+   return -1;  // Failure
+}
+
+void CDerivedWindow::SaveFile () 
+{
+	char	            szFileName[512] ;
+	strcpy (szFileName,"ScreenShot.bmp") ;
+
+	/*char  filesFilter[250];
+	char * pBitmapStr  = "Bitmap Files (*.bmp)\0*.bmp\0" ;
+	char * pPngStr     = "PNG Files (*.png)\0*.png\0" ;
+	char * pJpgStr     = "JPG Files (*.jpg)\0*.jpg\0" ;
+	char * pGifStr     = "GIF Files (*.gif)\0*.gif\0" ;
+	char * pTiffStr    = "TIFF Files (*.tif)\0*.tif\0" ;
+	strcat (filesFilter, pBitmapStr) ;
+	strcat (filesFilter, pPngStr) ;
+	strcat (filesFilter, pJpgStr) ;
+	strcat (filesFilter, pGifStr) ;
+	strcat (filesFilter, pTiffStr) ;*/
+
+	OPENFILENAME	    ofn ;	
+    ZeroMemory (&ofn,sizeof (ofn)) ;
+    ofn.lStructSize = sizeof (OPENFILENAME) ;
+    ofn.Flags = OFN_HIDEREADONLY|OFN_PATHMUSTEXIST ;
+    ofn.lpstrFilter = "Bitmap Files (*.bmp)\0*.bmp\0PNG Files (*.png)\0*.png\0JPG Files (*.jpg)\0*.jpg\0GIF Files (*.gif)\0*.gif\0TIFF Files (*.tif)\0*.tif\0" ;
+    ofn.lpstrDefExt = "bmp" ;
+    ofn.lpstrFile = szFileName ;
+    ofn.nMaxFile = 512 ;	
+    ofn.hwndOwner = m_hwnd ; 
+    if (!GetSaveFileName(&ofn))	
+		return ;
+	char *fileName = ofn.lpstrFile ;
+
+	// Initialize GDI+.
+	GdiplusStartupInput gdiplusStartupInput;
+	ULONG_PTR gdiplusToken;
+	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+	
+	CLSID   encoderClsid;
+	Status  stat;	
+	Bitmap* bitmap = Bitmap::FromHBITMAP(hBitmap, NULL) ;
+	
+	// Get the CLSID of the PNG encoder. 
+	if (strstr (fileName, "bmp") != NULL)
+		GetEncoderClsid(L"image/bmp", &encoderClsid) ;
+	else if (strstr (fileName, "png") != NULL)
+		GetEncoderClsid(L"image/png", &encoderClsid) ;	
+	else if (strstr (fileName, "jpg") != NULL)
+		GetEncoderClsid(L"image/jpeg", &encoderClsid) ;
+	else if (strstr (fileName, "gif") != NULL)
+		GetEncoderClsid(L"image/gif", &encoderClsid) ;
+	else if (strstr (fileName, "tiff") != NULL)
+		GetEncoderClsid(L"image/tif", &encoderClsid) ;	
+	fileName;
+
+	stat = bitmap->Save(L"dd.png", &encoderClsid, NULL);
+	
+	if(stat == Ok)
+		printf("picture was saved successfully\n");
+	else
+		printf("Failure: stat = %d\n", stat); 
+	
+	delete bitmap;
+	GdiplusShutdown(gdiplusToken);
+	return ;
 }

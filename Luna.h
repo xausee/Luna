@@ -9,6 +9,10 @@
 #include "resource.h"
 #include <windows.h>
 #include <stdio.h>
+#include <objidl.h>
+#include <gdiplus.h>
+using namespace Gdiplus;
+#pragma comment (lib,"Gdiplus.lib")
 
 class CDerivedWindow : public CBaseWindow
 {
@@ -28,6 +32,8 @@ public:
 	void OnLButtonDown (WPARAM wParam, LPARAM lParam) ;	
 	void OnCaptureAnyArea () ;
 	void OnCaptureSpecifiedWindow () ;
+	int  GetEncoderClsid (const WCHAR* format, CLSID* pClsid) ;
+	void SaveFile () ;
 
 protected:	
 	HBITMAP	hBitmap;

@@ -181,7 +181,8 @@ void Capture::SaveBitmap(HBITMAP hBitmap)
     ofn.lpstrFile = szFileName ;
     ofn.nMaxFile = 512 ;	
     ofn.hwndOwner = hwndClient ; 
-    if (!GetSaveFileName(&ofn))	return ;	
+    if (!GetSaveFileName(&ofn))
+		return ;	
 	char *fileName = ofn.lpstrFile ;
 
 	do{
