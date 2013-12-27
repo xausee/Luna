@@ -208,8 +208,8 @@ void CDerivedWindow::SaveFile ()
     ZeroMemory (&ofn,sizeof (ofn)) ;
     ofn.lStructSize = sizeof (OPENFILENAME) ;
     ofn.Flags = OFN_HIDEREADONLY|OFN_PATHMUSTEXIST ;
-    ofn.lpstrFilter = "Bitmap Files (*.bmp)\0*.bmp\0PNG Files (*.png)\0*.png\0JPG Files (*.jpg)\0*.jpg\0GIF Files (*.gif)\0*.gif\0TIFF Files (*.tif)\0*.tif\0" ;
-    ofn.lpstrDefExt = "bmp" ;
+    ofn.lpstrFilter = "JPG Files (*.jpg)\0*.jpg\0Bitmap Files (*.bmp)\0*.bmp\0PNG Files (*.png)\0*.png\0GIF Files (*.gif)\0*.gif\0TIFF Files (*.tif)\0*.tif\0" ;
+    ofn.lpstrDefExt = "jpg" ;
     ofn.lpstrFile = szFileName ;
     ofn.nMaxFile = 512 ;	
     ofn.hwndOwner = m_hwnd ; 
