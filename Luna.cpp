@@ -110,9 +110,46 @@ void CDerivedWindow::OnPaint ()
 		SelectObject (hdcMem, hBitmap) ;
 		GetObject (hBitmap, sizeof (BITMAP), (PSTR) &bm) ;
 		SetStretchBltMode (hdcClient, COLORONCOLOR) ;
-		StretchBlt (hdcClient, 0, 0, rcClient.right, rcClient.bottom,
-                   hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;	
-		
+
+		POINT point  ;
+		float rate ;
+		int clientWidth, clientHeitht , Width, Height;
+		clientWidth = rcClient.right - rcClient.left ;
+		clientHeitht = rcClient.bottom - rcClient.top ;
+
+		if (bm.bmWidth + 20 < clientWidth &&  bm.bmHeight + 20 < clientHeitht)
+		{
+			point.x = (clientWidth - bm.bmWidth - 20) / 2 ;
+			point.y = (clientHeitht - bm.bmHeight - 20) / 2 ;
+			// draw the border of the picture first
+			Rectangle(hdcClient, point.x - 1, point.y - 1, point.x + bm.bmWidth + 1, point.y + bm.bmHeight + 1) ; 
+			// draw the bitmap
+			BitBlt(hdcClient, point.x, point.y, bm.bmWidth, bm.bmHeight,  hdcMem, 0, 0, SRCCOPY) ;
+		}
+		else
+		{			
+			if ((float)bm.bmWidth / (float)clientWidth < (float)bm.bmHeight / (float)clientHeitht)
+			{
+				Height = clientHeitht - 20 ;
+				rate = (float)Height / (float)bm.bmHeight ;
+				Width = bm.bmWidth * rate ;
+				point.x = (clientWidth - Width - 10) / 2 ;
+				point.y = 10 ;
+			}
+			else
+			{
+				Width = clientWidth - 20 ;
+				rate = (float)Width / (float)bm.bmWidth ;
+				Height = bm.bmHeight * rate ;
+				point.x = 10 ;
+				point.y = (clientHeitht - Height - 10) / 2 ;
+			}
+			// draw the border of the picture first
+			Rectangle(hdcClient, point.x - 1, point.y - 1, point.x + Width + 1, point.y + Height + 1) ; 
+			// draw the bitmap
+			StretchBlt (hdcClient, point.x, point.y, Width, Height, hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
+		}		
+
 		DeleteDC (hdcMem) ;
 		EndPaint (m_hwnd, &ps);
 	}	
