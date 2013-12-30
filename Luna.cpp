@@ -132,7 +132,7 @@ void CDerivedWindow::OnPaint ()
 			{
 				Height = clientHeitht - 20 ;
 				rate = (float)Height / (float)bm.bmHeight ;
-				Width = bm.bmWidth * rate ;
+				Width = (int)(bm.bmWidth * rate) ;
 				point.x = (clientWidth - Width - 10) / 2 ;
 				point.y = 10 ;
 			}
@@ -140,7 +140,7 @@ void CDerivedWindow::OnPaint ()
 			{
 				Width = clientWidth - 20 ;
 				rate = (float)Width / (float)bm.bmWidth ;
-				Height = bm.bmHeight * rate ;
+				Height = (int)(bm.bmHeight * rate) ;
 				point.x = 10 ;
 				point.y = (clientHeitht - Height - 10) / 2 ;
 			}
@@ -174,7 +174,7 @@ void CDerivedWindow::OnCaptureAnyArea ()
 	/*
 	TODO: wait for Luna disapear gracefully
 	*/
-	Sleep (100) ;
+	Sleep (500) ;
 	TrasparentWindow pTrasparentWindow (hInstance) ;
 	pTrasparentWindow.RegisterWindow () ;
 	pTrasparentWindow.Create () ;
