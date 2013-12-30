@@ -26,8 +26,7 @@ public:
 	};		
 	Capture * capture ;
 	MouseHook *cpMouseHook ;
-
-	void OnCreate();
+	
 	void OnPaint();
 	void OnLButtonDown (WPARAM wParam, LPARAM lParam) ;	
 	void OnCaptureAnyArea () ;
