@@ -35,8 +35,7 @@ public:
 	void SaveFile () ;
 
 protected:	
-	HBITMAP	hBitmap;
-
+	HBITMAP	hBitmap;	
 	LRESULT CALLBACK WinMsgHandler (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) ;	
 };
 

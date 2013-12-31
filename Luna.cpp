@@ -1,6 +1,29 @@
 #include "Luna.h"
 #include "MouseHook.h"
 
+LRESULT CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{	
+	case WM_COMMAND:
+		switch (LOWORD (wParam)) 
+        {		
+		case IDOK: 
+			EndDialog(hwndDlg, wParam) ; 
+			break ;
+		default: 
+			break ; 
+		} 
+		return 0 ; 	
+	case WM_DESTROY:
+		EndDialog(hwndDlg, wParam) ; 
+		break ;
+	default:
+		return DefWindowProc(hwndDlg, uMsg, wParam, lParam) ;
+	}
+	return DefWindowProc(hwndDlg, uMsg, wParam, lParam) ;
+}
+
 LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	capture->hwndClient = hwnd ;
@@ -34,7 +57,10 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 		case ID_EXIT: 
 			exit (0) ;
 		case ID_HELP_ABOUT:
-			MessageBox (hwnd, "Copyright@Phiso Hu 2013", "About Luna", MB_OK) ;			
+			{	
+				HWND hAbout = CreateDialog(hInstance, MAKEINTRESOURCE (IDD_ABOUT_DIALOG), NULL, (DLGPROC)DialogProc) ; 
+				ShowWindow(hAbout, SW_SHOW) ;
+			}
 			break ;
 		default: 
 			break ; 
