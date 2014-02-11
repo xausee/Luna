@@ -54,16 +54,33 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 		case ID_CAPTURER_ANYAREA:
 			 OnCaptureAnyArea () ;
             break ; 
-		case ID_EXIT: 
-			exit (0) ;
 		case ID_EDIT:
 			CreateToolbar() ;
 			break ;
+		case ID_EXIT: 
+			exit (0) ;		
 		case ID_HELP_ABOUT:
 			{	
 				HWND hAbout = CreateDialog(hInstance, MAKEINTRESOURCE (IDD_ABOUT_DIALOG), NULL, (DLGPROC)DialogProc) ; 
 				ShowWindow(hAbout, SW_SHOW) ;
 			}
+			break ;		
+		case ID_RECTANGLE:
+			SetCapture (hwnd) ;
+	        SetCursor (LoadCursor (NULL, IDC_CROSS)) ;
+			SetCursor (LoadCursor (NULL, IDC_CROSS)) ;
+			break ;
+		case ID_SYCLE:			
+			break ;
+		case ID_TEXT:
+			break ;
+		case ID_LINE:			
+			break ;
+		case ID_LINE_SIZE_ONE:			
+			break ;
+		case ID_LINE_SIZE_TWO:			
+			break ;
+		case ID_LINE_SIZE_THREE:			
 			break ;
 		default: 
 			break ; 
@@ -218,13 +235,13 @@ void CDerivedWindow::CreateToolbar ()
 
     TBBUTTON button[7] =
 	{
-		{0, IDR_TOOLBAR, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{1, IDR_TOOLBAR, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{2, IDR_TOOLBAR, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{3, IDR_TOOLBAR, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{4, IDR_TOOLBAR, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{5, IDR_TOOLBAR, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{6, IDR_TOOLBAR, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0}
+		{0, ID_RECTANGLE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+		{1, ID_SYCLE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+		{2, ID_TEXT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+		{3, ID_LINE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+		{4, ID_LINE_SIZE_ONE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+		{5, ID_LINE_SIZE_TWO, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+		{6, ID_LINE_SIZE_THREE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0}
 	};
  
     HWND hWndToolbar = CreateToolbarEx (m_hwnd, WS_CHILD | WS_VISIBLE | WS_BORDER, IDR_TOOLBAR,
