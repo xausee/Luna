@@ -56,6 +56,9 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
             break ; 
 		case ID_EXIT: 
 			exit (0) ;
+		case ID_EDIT:
+			CreateToolbar() ;
+			break ;
 		case ID_HELP_ABOUT:
 			{	
 				HWND hAbout = CreateDialog(hInstance, MAKEINTRESOURCE (IDD_ABOUT_DIALOG), NULL, (DLGPROC)DialogProc) ; 
@@ -203,6 +206,65 @@ int CDerivedWindow::GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 
    free(pImageCodecInfo);
    return -1;  // Failure
+}
+
+void CDerivedWindow::CreateToolbar ()
+{
+	//// Load toolbar bitmap. (48 pixel wide, 16 high)
+	//HBITMAP hbmTool = (HBITMAP)LoadImage(hInstance, "toolbar.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
+ // 
+ //   // blah blah, setup buttons..
+
+ //   HWND hWnd = CreateWindowEx (m_hwnd, WS_CHILD | WS_VISIBLE, IDTB_MAIN,  3, NULL, (UINT)hbmTool, tbButtons,			  
+ //                               3, 16, 16, 16, 16, sizeof(TBBUTTON)); 
+
+
+	HIMAGELIST g_hImageList = NULL;
+	// Declare and initialize local constants.
+    const int ImageListID    = 0;
+    const int numButtons     = 3;
+    const int bitmapSize     = 16;
+    
+    const DWORD buttonStyles = BTNS_AUTOSIZE;
+
+    // Create the toolbar.
+    HWND hWndToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, NULL, 
+                                      WS_CHILD | TBSTYLE_WRAPABLE, 0, 0, 0, 0, 
+                                      m_hwnd, NULL, hInstance, NULL);
+        
+    if (hWndToolbar == NULL)
+        return ;
+
+    // Create the image list.
+    g_hImageList = ImageList_Create(bitmapSize, bitmapSize,   // Dimensions of individual bitmaps.
+                                    ILC_COLOR16 | ILC_MASK,   // Ensures transparent background.
+                                    numButtons, 0);
+
+    // Set the image list.
+    SendMessage(hWndToolbar, TB_SETIMAGELIST, (WPARAM)ImageListID, (LPARAM)g_hImageList);
+
+    // Load the button images.
+    SendMessage(hWndToolbar, TB_LOADIMAGES, (WPARAM)IDB_STD_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
+
+    // Initialize button info.
+    // IDM_NEW, IDM_OPEN, and IDM_SAVE are application-defined command constants.
+    
+    TBBUTTON tbButtons[numButtons] = 
+    {
+        { /*MAKEINTRESOURCEW(IDR_TOOLBAR)*/MAKELONG(STD_FILENEW,  ImageListID), ID_EDIT,  TBSTATE_ENABLED, buttonStyles, {0}, 0, (INT_PTR)L"New" },
+        { MAKELONG(IDR_TOOLBAR, ImageListID), ID_EDIT, TBSTATE_ENABLED, buttonStyles, {0}, 0, (INT_PTR)L"Open"},
+        { MAKELONG(STD_FILESAVE, ImageListID), ID_EDIT, 0,               buttonStyles, {0}, 0, (INT_PTR)L"Save"}
+    };
+
+    // Add buttons.
+    SendMessage(hWndToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+    SendMessage(hWndToolbar, TB_ADDBUTTONS,       (WPARAM)numButtons,       (LPARAM)&tbButtons);
+
+    // Resize the toolbar, and then show it.
+    SendMessage(hWndToolbar, TB_AUTOSIZE, 0, 0); 
+    ShowWindow(hWndToolbar,  TRUE);
+    
+    return /*hWndToolbar*/;
 }
 
 void CDerivedWindow::SaveFile () 

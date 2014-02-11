@@ -63,5 +63,8 @@
     <None Include="icon.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="toolbar.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
