@@ -38,21 +38,26 @@ public:
 	
 	void OnPaint();
 	void OnLButtonDown (WPARAM wParam, LPARAM lParam) ;	
+	void OnLButtonUP (WPARAM wParam, LPARAM lParam) ;
+	void OnMouseMove (WPARAM wParam, LPARAM lParam) ;
 	void OnCaptureAnyArea () ;
 	void OnCaptureSpecifiedWindow () ;
 	int  GetEncoderClsid (const WCHAR* format, CLSID* pClsid) ;
 	void CreateToolbar () ;
 	void SaveFile () ;
+	void DrawRectangle (HWND hwnd, POINT pBeg, POINT pEnd) ;
 
 protected:	
-	HBITMAP	hBitmap;
-	bool	hSelection;
-	bool	hPenRectangle;
-	bool	hPenCycle;
-	bool	hPenText;
-	bool	hPenLine;
-	int	    hPenSize;
-	int  	hPenColor;
+	HBITMAP	hBitmap ;
+	bool	hSelection ;
+	bool	hPenRectangle ;
+	bool	hPenCycle ;
+	bool	hPenText ;
+	bool	hPenLine ;
+	int	    hPenSize ;
+	int  	hPenColor ;
+	POINT   pBeg ;
+	POINT   pEnd ;
 	LRESULT CALLBACK WinMsgHandler (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) ;	
 };
 

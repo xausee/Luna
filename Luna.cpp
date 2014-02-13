@@ -39,6 +39,12 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 	case WM_LBUTTONDOWN:		
 		OnLButtonDown (wParam, lParam) ;
 		return 0 ;	
+	case WM_LBUTTONUP:		
+		OnLButtonUP (wParam, lParam) ;
+		return 0 ;	
+	case WM_MOUSEMOVE:
+		OnMouseMove (wParam, lParam) ;
+		break;
 	case WM_COMMAND:
 		switch (LOWORD (wParam)) 
         {
@@ -66,29 +72,39 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 			}
 			break ;
 		case ID_SELECT:
+			hSelection = true ;
 			break ;
 		case ID_RECTANGLE:
-			SetCapture (hwnd) ;
-	        SetCursor (LoadCursor (NULL, IDC_CROSS)) ;
-			SetCursor (LoadCursor (NULL, IDC_CROSS)) ;
+			hPenRectangle = true ;
+			//SetCapture (hwnd) ;	        
+			//SetCursor (LoadCursor (NULL, IDC_CROSS)) ;
 			break ;
-		case ID_CYCLE:			
+		case ID_CYCLE:	
+			hPenCycle = true ;
 			break ;
 		case ID_TEXT:
+			hPenText = true ;
 			break ;
-		case ID_LINE:			
+		case ID_LINE:	
+			hPenLine = true ;
 			break ;
-		case ID_LINE_SIZE_ONE:			
+		case ID_LINE_SIZE_ONE:
+			hPenSize = 1 ;
 			break ;
-		case ID_LINE_SIZE_TWO:			
+		case ID_LINE_SIZE_TWO:	
+			hPenSize = 2 ;
 			break ;
-		case ID_LINE_SIZE_THREE:			
+		case ID_LINE_SIZE_THREE:		
+			hPenSize = 3 ;
 			break ;
 		case ID_COLOR_RED:
+			hPenColor = 1 ;
 			break;
 		case ID_COLOR_GREEN:
+			hPenColor = 2 ;
 			break;
-		case ID_COLOR_BLUE:                  
+		case ID_COLOR_BLUE:   
+			hPenColor = 3 ;
 			break;
 		default: 
 			break ; 
@@ -101,6 +117,25 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 		return DefWindowProc(hwnd, uMsg, wParam, lParam) ;
 	}
 	return 0 ;
+}
+
+void Luna::DrawRectangle(HWND hwnd, POINT pBeg, POINT pEnd)
+{	
+	HDC hdc = GetDC (hwnd) ;
+	HPEN hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
+	SelectObject (hdc, hpen) ;
+
+	MoveToEx (hdc, pBeg.x, pBeg.y, (LPPOINT) NULL); 
+	LineTo (hdc, pEnd.x, pBeg.y) ; 
+	MoveToEx (hdc, pEnd.x, pBeg.y, (LPPOINT) NULL) ; 
+	LineTo (hdc, pEnd.x, pEnd.y) ; 
+	MoveToEx (hdc, pEnd.x, pEnd.y, (LPPOINT) NULL) ; 
+	LineTo (hdc, pBeg.x, pEnd.y) ; 
+	MoveToEx (hdc, pBeg.x, pEnd.y, (LPPOINT) NULL) ; 
+	LineTo (hdc, pBeg.x, pBeg.y) ; 	
+					
+	DeleteObject (hpen) ;
+	ReleaseDC (hwnd, hdc) ;
 }
 
 void Luna::OnPaint ()
@@ -160,6 +195,12 @@ void Luna::OnPaint ()
 		}		
 
 		DeleteDC (hdcMem) ;
+
+
+		if  (hPenRectangle)
+		{			
+			DrawRectangle (m_hwnd, pBeg, pEnd ) ;
+		}
 		EndPaint (m_hwnd, &ps);
 	}	
 }	
@@ -174,7 +215,31 @@ void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 		hBitmap = capture->CaptureSpecifiedWindow (hwndPointNow) ;
 		capture->bSpecifiedWindow = false ;
 		cpMouseHook->UnHook () ;			
-	}	
+	}
+
+	if (hPenRectangle)
+	{		
+		GetCursorPos (&pBeg) ;
+	}
+}
+
+void Luna::OnLButtonUP (WPARAM wParam, LPARAM lParam)
+{
+	if (hPenRectangle)
+	{		
+		hPenRectangle =  false ;
+		GetCursorPos (&pEnd) ;
+	}
+}
+
+void Luna::OnMouseMove (WPARAM wParam, LPARAM lParam)
+{	
+	if (hPenRectangle)
+	{
+		pEnd.x = LOWORD (lParam) ;
+		pEnd.y = HIWORD (lParam) ;
+		InvalidateRect(m_hwnd, NULL, false) ;
+	}
 }
 
 void Luna::OnCaptureAnyArea ()
