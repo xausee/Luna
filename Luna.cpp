@@ -24,7 +24,7 @@ LRESULT CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 	return DefWindowProc(hwndDlg, uMsg, wParam, lParam) ;
 }
 
-LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	capture->hwndClient = hwnd ;
 	capture->hwndScreen = GetDesktopWindow () ;	
@@ -64,7 +64,9 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 				HWND hAbout = CreateDialog(hInstance, MAKEINTRESOURCE (IDD_ABOUT_DIALOG), NULL, (DLGPROC)DialogProc) ; 
 				ShowWindow(hAbout, SW_SHOW) ;
 			}
-			break ;		
+			break ;
+		case ID_SELECT:
+			break ;
 		case ID_RECTANGLE:
 			SetCapture (hwnd) ;
 	        SetCursor (LoadCursor (NULL, IDC_CROSS)) ;
@@ -82,6 +84,12 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 			break ;
 		case ID_LINE_SIZE_THREE:			
 			break ;
+		case ID_COLOR_RED:
+			break;
+		case ID_COLOR_GREEN:
+			break;
+		case ID_COLOR_BLUE:                  
+			break;
 		default: 
 			break ; 
 		} 
@@ -95,7 +103,7 @@ LRESULT CALLBACK CDerivedWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPar
 	return 0 ;
 }
 
-void CDerivedWindow::OnPaint ()
+void Luna::OnPaint ()
 {
 	if (hBitmap)
 	{
@@ -156,7 +164,7 @@ void CDerivedWindow::OnPaint ()
 	}	
 }	
 
-void CDerivedWindow::OnLButtonDown (WPARAM wParam, LPARAM lParam)
+void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 {
 	if (capture->bSpecifiedWindow)
 	{
@@ -169,7 +177,7 @@ void CDerivedWindow::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 	}	
 }
 
-void CDerivedWindow::OnCaptureAnyArea ()
+void Luna::OnCaptureAnyArea ()
 {
 	ShowWindow (m_hwnd, SW_HIDE) ;
 	/*
@@ -185,7 +193,7 @@ void CDerivedWindow::OnCaptureAnyArea ()
 	ShowWindow (m_hwnd,SW_SHOW) ;	
 }
 
-void CDerivedWindow::OnCaptureSpecifiedWindow ()
+void Luna::OnCaptureSpecifiedWindow ()
 {	
 	capture->bSpecifiedWindow = true ;
 
@@ -194,7 +202,7 @@ void CDerivedWindow::OnCaptureSpecifiedWindow ()
 	cpMouseHook->SetHook ();	
 }
 
-int CDerivedWindow::GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
+int Luna::GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 {
    UINT  num = 0;          // number of image encoders
    UINT  size = 0;         // size of the image encoder array in bytes
@@ -225,7 +233,7 @@ int CDerivedWindow::GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
    return -1;  // Failure
 }
 
-void CDerivedWindow::CreateToolbar ()
+void Luna::CreateToolbar ()
 {
 	INITCOMMONCONTROLSEX initctrs;
 	initctrs.dwSize = sizeof (INITCOMMONCONTROLSEX);
@@ -235,7 +243,7 @@ void CDerivedWindow::CreateToolbar ()
 
     TBBUTTON button[11] =
 	{
-		{0, ID_SELECTE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+		{0, ID_SELECT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
 		{1, ID_RECTANGLE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
 		{2, ID_CYCLE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
 		{3, ID_TEXT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
@@ -259,7 +267,7 @@ void CDerivedWindow::CreateToolbar ()
 		);
 }
 
-void CDerivedWindow::SaveFile () 
+void Luna::SaveFile () 
 {
 	char szFileName[512] ;
 	strcpy (szFileName,"ScreenShot") ;

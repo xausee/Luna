@@ -4,7 +4,7 @@
 int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {	
 	DWORD dwError = 0 ; 	
-	CDerivedWindow mainWnd (hInstance) ;
+	Luna mainWnd (hInstance) ;
 	
 	WNDCLASSEX wcx;
 	wcx.cbSize              = sizeof (WNDCLASSEX) ;							        // size of structure 

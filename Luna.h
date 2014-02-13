@@ -1,8 +1,8 @@
 // this is a window derived form CBaseWindow
 // just to show that inheritance is possible
 
-#ifndef _DERIVEDWINDOW_H_
-#define _DERIVEDWINDOW_H_
+#ifndef _LUNA_H_
+#define _LUNA_H_
 #include "BaseWindow.h"
 #include "TrasparentWindow.h"
 #include "Capture.h"
@@ -16,13 +16,20 @@ using namespace Gdiplus;
 #pragma comment (lib,"Gdiplus.lib")
 #pragma comment (lib,"Comctl32.lib")
 
-class CDerivedWindow : public CBaseWindow
+class Luna : public CBaseWindow
 {
 public:	
-	CDerivedWindow (HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL) 
-		:CBaseWindow(hInst, wcx)
+	Luna (HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL) : CBaseWindow(hInst, wcx)
 	{ 
 		hBitmap = NULL ;  
+		hSelection = false ;
+		hPenRectangle = false ;
+		hPenCycle = false ;
+		hPenText = false ;
+		hPenLine = false ;
+	    hPenSize = 0 ;
+	  	hPenColor = 0 ;
+
 		capture = new(Capture);		
 		SetWindowTitle ("Luna") ;
 	};		
@@ -38,7 +45,14 @@ public:
 	void SaveFile () ;
 
 protected:	
-	HBITMAP	hBitmap;	
+	HBITMAP	hBitmap;
+	bool	hSelection;
+	bool	hPenRectangle;
+	bool	hPenCycle;
+	bool	hPenText;
+	bool	hPenLine;
+	int	    hPenSize;
+	int  	hPenColor;
 	LRESULT CALLBACK WinMsgHandler (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) ;	
 };
 
