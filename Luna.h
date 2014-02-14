@@ -22,13 +22,14 @@ public:
 	Luna (HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL) : CBaseWindow(hInst, wcx)
 	{ 
 		hBitmap = NULL ;  
-		hSelection = false ;
-		hPenRectangle = false ;
-		hPenCycle = false ;
-		hPenText = false ;
-		hPenLine = false ;
-	    hPenSize = 0 ;
-	  	hPenColor = 0 ;
+		bSelection = false ;
+		bPenRectangle = false ;
+		bPenCycle = false ;
+		bPenText = false ;
+		bPenLine = false ;
+	    iPenSize = 0 ;
+	  	iPenColor = 0 ;
+		bDrawing = false ;
 
 		capture = new(Capture);		
 		SetWindowTitle ("Luna") ;
@@ -48,14 +49,16 @@ public:
 	void DrawRectangle (HWND hwnd, POINT pBeg, POINT pEnd) ;
 
 protected:	
+	HWND    hWndToolbar ;
 	HBITMAP	hBitmap ;
-	bool	hSelection ;
-	bool	hPenRectangle ;
-	bool	hPenCycle ;
-	bool	hPenText ;
-	bool	hPenLine ;
-	int	    hPenSize ;
-	int  	hPenColor ;
+	bool	bSelection ;
+	bool	bDrawing ;
+	bool	bPenRectangle ;	
+	bool	bPenCycle ;
+	bool	bPenText ;
+	bool	bPenLine ;
+	int	    iPenSize ;
+	int  	iPenColor ;
 	POINT   pBeg ;
 	POINT   pEnd ;
 	LRESULT CALLBACK WinMsgHandler (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) ;	

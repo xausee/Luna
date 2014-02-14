@@ -72,39 +72,39 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 			}
 			break ;
 		case ID_SELECT:
-			hSelection = true ;
+			bSelection = true ;
 			break ;
 		case ID_RECTANGLE:
-			hPenRectangle = true ;
+			bPenRectangle = true ;
 			//SetCapture (hwnd) ;	        
 			//SetCursor (LoadCursor (NULL, IDC_CROSS)) ;
 			break ;
 		case ID_CYCLE:	
-			hPenCycle = true ;
+			bPenCycle = true ;
 			break ;
 		case ID_TEXT:
-			hPenText = true ;
+			bPenText = true ;
 			break ;
 		case ID_LINE:	
-			hPenLine = true ;
+			bPenLine = true ;
 			break ;
 		case ID_LINE_SIZE_ONE:
-			hPenSize = 1 ;
+			iPenSize = 1 ;
 			break ;
 		case ID_LINE_SIZE_TWO:	
-			hPenSize = 2 ;
+			iPenSize = 2 ;
 			break ;
 		case ID_LINE_SIZE_THREE:		
-			hPenSize = 3 ;
+			iPenSize = 3 ;
 			break ;
 		case ID_COLOR_RED:
-			hPenColor = 1 ;
+			iPenColor = 1 ;
 			break;
 		case ID_COLOR_GREEN:
-			hPenColor = 2 ;
+			iPenColor = 2 ;
 			break;
 		case ID_COLOR_BLUE:   
-			hPenColor = 3 ;
+			iPenColor = 3 ;
 			break;
 		default: 
 			break ; 
@@ -194,15 +194,14 @@ void Luna::OnPaint ()
 			StretchBlt (hdcClient, point.x, point.y, Width, Height, hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
 		}		
 
-		DeleteDC (hdcMem) ;
-
-
-		if  (hPenRectangle)
-		{			
-			DrawRectangle (m_hwnd, pBeg, pEnd ) ;
-		}
+		DeleteDC (hdcMem) ;		
 		EndPaint (m_hwnd, &ps);
 	}	
+
+	if  (bPenRectangle)
+	{
+		DrawRectangle (m_hwnd, pBeg, pEnd ) ;
+	}
 }	
 
 void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
@@ -217,29 +216,34 @@ void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 		cpMouseHook->UnHook () ;			
 	}
 
-	if (hPenRectangle)
-	{		
-		GetCursorPos (&pBeg) ;
+	if (bPenRectangle)
+	{	
+		bDrawing = true ;		
+		pBeg.x = LOWORD (lParam) ;
+		pBeg.y = HIWORD (lParam) ;
+		pEnd.x = LOWORD (lParam) ;
+		pEnd.y = HIWORD (lParam) ;		
 	}
 }
 
 void Luna::OnLButtonUP (WPARAM wParam, LPARAM lParam)
 {
-	if (hPenRectangle)
+	if (bPenRectangle && bDrawing)
 	{		
-		hPenRectangle =  false ;
-		GetCursorPos (&pEnd) ;
+		bPenRectangle =  false ;
+		pEnd.x = LOWORD (lParam) ;
+		pEnd.y = HIWORD (lParam) ;			
 	}
 }
 
 void Luna::OnMouseMove (WPARAM wParam, LPARAM lParam)
 {	
-	if (hPenRectangle)
+	if (bPenRectangle && bDrawing)
 	{
 		pEnd.x = LOWORD (lParam) ;
-		pEnd.y = HIWORD (lParam) ;
-		InvalidateRect(m_hwnd, NULL, false) ;
-	}
+		pEnd.y = HIWORD (lParam) ;		
+		InvalidateRect(m_hwnd, NULL, true) ;			
+	}	
 }
 
 void Luna::OnCaptureAnyArea ()
@@ -321,7 +325,7 @@ void Luna::CreateToolbar ()
 		{10, ID_COLOR_BLUE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0}
 	};
  
-    HWND hWndToolbar = CreateToolbarEx (m_hwnd, WS_CHILD | WS_VISIBLE | WS_BORDER, IDR_TOOLBAR,
+    hWndToolbar = CreateToolbarEx (m_hwnd, WS_CHILD | WS_VISIBLE | WS_BORDER, IDR_TOOLBAR,
 		1,
 		hInstance,
 		IDR_TOOLBAR,  // IDB_BIT is the Bitmap resource.
