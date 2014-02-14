@@ -106,6 +106,9 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 		case ID_COLOR_BLUE:   
 			iPenColor = 3 ;
 			break;
+		case ID_CLOSE:
+			CloseToolbar () ;			
+			break ;
 		default: 
 			break ; 
 		} 
@@ -140,6 +143,11 @@ void Luna::DrawRectangle(HWND hwnd, POINT pBeg, POINT pEnd)
 
 void Luna::OnPaint ()
 {
+	if (hWndToolbar)
+	{
+		UpdateWindow (m_hwnd) ;
+	}
+	
 	if (hBitmap)
 	{
 		BITMAP             bm ;
@@ -310,10 +318,11 @@ void Luna::CreateToolbar ()
 	INITCOMMONCONTROLSEX initctrs;
 	initctrs.dwSize = sizeof (INITCOMMONCONTROLSEX);
 	initctrs.dwICC = ICC_BAR_CLASSES;
-
     InitCommonControlsEx(&initctrs);
 
-    TBBUTTON button[11] =
+	const int buttonCount = 12 ;
+
+    TBBUTTON button[buttonCount] =
 	{
 		{0, ID_SELECT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
 		{1, ID_RECTANGLE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
@@ -325,19 +334,36 @@ void Luna::CreateToolbar ()
 		{7, ID_LINE_SIZE_THREE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},	
 		{8, ID_COLOR_RED, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
 		{9, ID_COLOR_GREEN, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{10, ID_COLOR_BLUE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0}
+		{10, ID_COLOR_BLUE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+		{11, ID_CLOSE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0}
 	};
- 
-    hWndToolbar = CreateToolbarEx (m_hwnd, WS_CHILD | WS_VISIBLE | WS_BORDER, IDR_TOOLBAR,
+
+	if (hWndToolbar)
+		ShowWindow (hWndToolbar, SW_SHOW) ;
+	else
+	{ 
+		hWndToolbar = CreateToolbarEx (m_hwnd, WS_CHILD | WS_VISIBLE | WS_BORDER, IDR_TOOLBAR,
 		1,
 		hInstance,
 		IDR_TOOLBAR,  // IDB_BIT is the Bitmap resource.
 		button,
-		11,
+		buttonCount,
 		16,16,16,16,
 		sizeof (TBBUTTON)
 		);
+	}
 
+	UpdateWindow (m_hwnd) ;
+}
+
+void Luna::CloseToolbar ()
+{
+	DestroyWindow (hWndToolbar) ;
+	//CloseHandle (hWndToolbar) ;
+	if (hWndToolbar)
+	{
+		hWndToolbar = NULL ;
+	}	
 	UpdateWindow (m_hwnd) ;
 }
 

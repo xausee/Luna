@@ -30,6 +30,7 @@ public:
 	    iPenSize = 0 ;
 	  	iPenColor = 0 ;
 		bDrawing = false ;
+		hWndToolbar = NULL ;
 
 		capture = new(Capture);		
 		SetWindowTitle ("Luna") ;
@@ -45,6 +46,7 @@ public:
 	void OnCaptureSpecifiedWindow () ;
 	int  GetEncoderClsid (const WCHAR* format, CLSID* pClsid) ;
 	void CreateToolbar () ;
+	void CloseToolbar () ;
 	void SaveFile () ;
 	void DrawRectangle (HWND hwnd, POINT pBeg, POINT pEnd) ;
 
