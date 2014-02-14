@@ -337,6 +337,8 @@ void Luna::CreateToolbar ()
 		16,16,16,16,
 		sizeof (TBBUTTON)
 		);
+
+	UpdateWindow (m_hwnd) ;
 }
 
 void Luna::SaveFile () 
