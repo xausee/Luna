@@ -198,10 +198,11 @@ void Luna::OnPaint ()
 		EndPaint (m_hwnd, &ps);
 	}	
 
-	if  (bPenRectangle)
+	/*if  (bPenRectangle)
 	{
 		DrawRectangle (m_hwnd, pBeg, pEnd ) ;
-	}
+	}*/
+	DrawRectangle (m_hwnd, pBeg, pEnd ) ;
 }	
 
 void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
@@ -228,9 +229,11 @@ void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 
 void Luna::OnLButtonUP (WPARAM wParam, LPARAM lParam)
 {
-	if (bPenRectangle && bDrawing)
-	{		
+	if (bDrawing && bPenRectangle)
+	{	
+		bDrawing = false ;
 		bPenRectangle =  false ;
+		
 		pEnd.x = LOWORD (lParam) ;
 		pEnd.y = HIWORD (lParam) ;			
 	}
@@ -238,7 +241,7 @@ void Luna::OnLButtonUP (WPARAM wParam, LPARAM lParam)
 
 void Luna::OnMouseMove (WPARAM wParam, LPARAM lParam)
 {	
-	if (bPenRectangle && bDrawing)
+	if (bDrawing && bPenRectangle)
 	{
 		pEnd.x = LOWORD (lParam) ;
 		pEnd.y = HIWORD (lParam) ;		
