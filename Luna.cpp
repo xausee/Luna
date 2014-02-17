@@ -124,17 +124,16 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 
 void Luna::DrawRectangle(HWND hwnd, POINT pBeg, POINT pEnd)
 {
+	HPEN hpen ;
+	int oldRop ;
     HDC hdc = GetDC (hwnd) ;
-			
-	//C: Set the current drawing mode to XOR, this will allow us	
-	//   to add the rubber band, and later remove it by sending the
-	//   exact same drawing command.
-	SetROP2(hdc, R2_NOT) ;
-	HPEN hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
-	SelectObject (hdc, hpen) ;
-	//C: Select a NULL Brush into the DC so that no fill is performed.	
+
+	oldRop = SetROP2 (hdc, R2_NOTXORPEN) ;
+	hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
+	SelectObject (hdc, hpen) ;	
 	SelectObject(hdc, GetStockObject(NULL_BRUSH));	
 	Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
+	SetROP2 (hdc, oldRop) ;	
 
 	DeleteObject (hpen) ;
 	ReleaseDC(hwnd, hdc);
