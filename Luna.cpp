@@ -123,22 +123,21 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 }
 
 void Luna::DrawRectangle(HWND hwnd, POINT pBeg, POINT pEnd)
-{	
-	HDC hdc = GetDC (hwnd) ;
+{
+    HDC hdc = GetDC (hwnd) ;
+			
+	//C: Set the current drawing mode to XOR, this will allow us	
+	//   to add the rubber band, and later remove it by sending the
+	//   exact same drawing command.
+	SetROP2(hdc, R2_NOT) ;
 	HPEN hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
 	SelectObject (hdc, hpen) ;
+	//C: Select a NULL Brush into the DC so that no fill is performed.	
+	SelectObject(hdc, GetStockObject(NULL_BRUSH));	
+	Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
 
-	MoveToEx (hdc, pBeg.x, pBeg.y, (LPPOINT) NULL); 
-	LineTo (hdc, pEnd.x, pBeg.y) ; 
-	MoveToEx (hdc, pEnd.x, pBeg.y, (LPPOINT) NULL) ; 
-	LineTo (hdc, pEnd.x, pEnd.y) ; 
-	MoveToEx (hdc, pEnd.x, pEnd.y, (LPPOINT) NULL) ; 
-	LineTo (hdc, pBeg.x, pEnd.y) ; 
-	MoveToEx (hdc, pBeg.x, pEnd.y, (LPPOINT) NULL) ; 
-	LineTo (hdc, pBeg.x, pBeg.y) ; 	
-					
 	DeleteObject (hpen) ;
-	ReleaseDC (hwnd, hdc) ;
+	ReleaseDC(hwnd, hdc);
 }
 
 void Luna::OnPaint ()
@@ -205,12 +204,6 @@ void Luna::OnPaint ()
 		DeleteDC (hdcMem) ;		
 		EndPaint (m_hwnd, &ps);
 	}	
-
-	/*if  (bPenRectangle)
-	{
-		DrawRectangle (m_hwnd, pBeg, pEnd ) ;
-	}*/
-	DrawRectangle (m_hwnd, pBeg, pEnd ) ;
 }	
 
 void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
@@ -251,9 +244,10 @@ void Luna::OnMouseMove (WPARAM wParam, LPARAM lParam)
 {	
 	if (bDrawing && bPenRectangle)
 	{
+		DrawRectangle (m_hwnd, pBeg, pEnd ) ;
 		pEnd.x = LOWORD (lParam) ;
-		pEnd.y = HIWORD (lParam) ;		
-		InvalidateRect(m_hwnd, NULL, true) ;			
+		pEnd.y = HIWORD (lParam) ;	
+		DrawRectangle (m_hwnd, pBeg, pEnd ) ;
 	}	
 }
 
