@@ -48,7 +48,7 @@ public:
 	void CreateToolbar () ;
 	void CloseToolbar () ;
 	void SaveFile () ;
-	void DrawRectangle (HWND hwnd, POINT pBeg, POINT pEnd) ;
+	void DrawRectangle (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 
 protected:	
 	HWND    hWndToolbar ;

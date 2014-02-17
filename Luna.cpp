@@ -122,14 +122,12 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 	return 0 ;
 }
 
-void Luna::DrawRectangle(HWND hwnd, POINT pBeg, POINT pEnd)
+void Luna::DrawRectangle(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 {
-	HPEN hpen ;
-	int oldRop ;
     HDC hdc = GetDC (hwnd) ;
+	int oldRop = SetROP2 (hdc, bModel) ;
+	HPEN hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
 
-	oldRop = SetROP2 (hdc, R2_NOTXORPEN) ;
-	hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
 	SelectObject (hdc, hpen) ;	
 	SelectObject(hdc, GetStockObject(NULL_BRUSH));	
 	Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
@@ -235,7 +233,8 @@ void Luna::OnLButtonUP (WPARAM wParam, LPARAM lParam)
 		bPenRectangle =  false ;
 		
 		pEnd.x = LOWORD (lParam) ;
-		pEnd.y = HIWORD (lParam) ;			
+		pEnd.y = HIWORD (lParam) ;		
+		DrawRectangle (m_hwnd, pBeg, pEnd, R2_COPYPEN) ;		
 	}
 }
 
@@ -243,10 +242,10 @@ void Luna::OnMouseMove (WPARAM wParam, LPARAM lParam)
 {	
 	if (bDrawing && bPenRectangle)
 	{
-		DrawRectangle (m_hwnd, pBeg, pEnd ) ;
+		DrawRectangle (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
 		pEnd.x = LOWORD (lParam) ;
 		pEnd.y = HIWORD (lParam) ;	
-		DrawRectangle (m_hwnd, pBeg, pEnd ) ;
+		DrawRectangle (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
 	}	
 }
 
