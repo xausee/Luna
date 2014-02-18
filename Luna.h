@@ -46,6 +46,7 @@ public:
 	void OnCaptureSpecifiedWindow () ;
 	int  GetEncoderClsid (const WCHAR* format, CLSID* pClsid) ;
 	void CreateToolbar () ;
+	void UpdateToobar() ;
 	void CloseToolbar () ;
 	void SaveFile () ;
 	int  GetLineSize() ;

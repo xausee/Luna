@@ -72,6 +72,7 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 			}
 			break ;
 		case ID_SELECT:
+			UpdateToobar () ;
 			bSelection = true ;
 			break ;
 		case ID_RECTANGLE:
@@ -107,7 +108,7 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 		case ID_COLOR_GREEN:
 			iPenColor = 2 ;
 			break;
-		case ID_COLOR_BLUE:   
+		case ID_COLOR_BLUE:   			
 			iPenColor = 3 ;
 			break;
 		case ID_CLOSE:
@@ -456,6 +457,24 @@ void Luna::CreateToolbar ()
 	}
 
 	UpdateWindow (m_hwnd) ;
+}
+
+void Luna::UpdateToobar()
+{
+	TBBUTTONINFO tbInfo; 
+    
+    tbInfo.cbSize  = sizeof(TBBUTTONINFO);
+    tbInfo.dwMask  = TBIF_TEXT;
+   
+	LRESULT s = SendMessage(m_hwnd, TB_GETBUTTONINFO, 2, (LPARAM)&tbInfo); 
+
+    tbInfo.pszText = "color";
+	tbInfo.fsState = TBSTATE_PRESSED ;
+
+    
+   LRESULT r = SendMessage (m_hwnd, TB_SETBUTTONINFO, 2, (LPARAM)&tbInfo);
+	//UpdateWindow (hWndToolbar) ;
+   int y = 9;
 }
 
 void Luna::CloseToolbar ()
