@@ -48,6 +48,8 @@ public:
 	void CreateToolbar () ;
 	void CloseToolbar () ;
 	void SaveFile () ;
+	int  GetLineSize() ;
+	COLORREF GetColor() ;
 	void DrawRectangle (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 	void DrawEllipse(HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 	void DrawLine(HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;

@@ -126,11 +126,53 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 	return 0 ;
 }
 
+int Luna::GetLineSize()
+{
+	int	size  = 1 ;
+	switch (iPenSize)
+	{
+	case 1:
+		size = 1 ;
+		break ;
+	case 2:
+		size = 3 ;
+		break ;
+	case 3:
+		size = 5 ;
+		break ;
+	default:
+		size  = 1 ;
+		break ;
+	}
+	return size ;
+}
+
+COLORREF Luna::GetColor()
+{
+	COLORREF  color = RGB (0, 0, 0) ;
+	switch (iPenColor)
+	{
+	case 1:
+		color = RGB (255, 0, 0) ;
+		break ;
+	case 2:
+		color = RGB (0, 255, 0) ;
+		break ;
+	case 3:
+		color = RGB (0, 0, 255) ;
+		break ;
+	default:
+		color = RGB (0, 0, 0) ;
+		break ;
+	}
+	return color ;
+}
+
 void Luna::DrawRectangle(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 {
     HDC hdc = GetDC (hwnd) ;
 	int oldRop = SetROP2 (hdc, bModel) ;
-	HPEN hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
+	HPEN hpen = CreatePen (PS_SOLID, GetLineSize(), GetColor()) ;
 
 	SelectObject (hdc, hpen) ;	
 	SelectObject(hdc, GetStockObject(NULL_BRUSH)) ;	
@@ -145,7 +187,7 @@ void Luna::DrawEllipse(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 {
 	 HDC hdc = GetDC (hwnd) ;
 	int oldRop = SetROP2 (hdc, bModel) ;
-	HPEN hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
+	HPEN hpen = CreatePen (PS_SOLID, GetLineSize(), GetColor()) ;
 
 	SelectObject (hdc, hpen) ;	
 	SelectObject(hdc, GetStockObject(NULL_BRUSH)) ;		
@@ -160,7 +202,7 @@ void Luna::DrawLine(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 {
     HDC hdc = GetDC (hwnd) ;
 	int oldRop = SetROP2 (hdc, bModel) ;
-	HPEN hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
+	HPEN hpen = CreatePen (PS_SOLID, GetLineSize(), GetColor()) ;
 
 	SelectObject (hdc, hpen) ;		
 	MoveToEx (hdc, pBeg.x, pBeg.y, (LPPOINT) NULL) ; 
