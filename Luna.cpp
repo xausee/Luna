@@ -76,16 +76,20 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 			break ;
 		case ID_RECTANGLE:
 			bPenRectangle = true ;
-			//SetCapture (hwnd) ;	        
-			//SetCursor (LoadCursor (NULL, IDC_CROSS)) ;
+			bPenCycle = false ;
+			bPenLine = false ;
 			break ;
-		case ID_CYCLE:	
-			bPenCycle = true ;
+		case ID_CYCLE:
+			bPenRectangle = false ;
+			bPenCycle = true ;			
+			bPenLine = false ;
 			break ;
 		case ID_TEXT:
 			bPenText = true ;
 			break ;
 		case ID_LINE:	
+			bPenRectangle = false ;
+			bPenCycle = false ;			
 			bPenLine = true ;
 			break ;
 		case ID_LINE_SIZE_ONE:
@@ -129,12 +133,42 @@ void Luna::DrawRectangle(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 	HPEN hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
 
 	SelectObject (hdc, hpen) ;	
-	SelectObject(hdc, GetStockObject(NULL_BRUSH));	
+	SelectObject(hdc, GetStockObject(NULL_BRUSH)) ;	
 	Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
 	SetROP2 (hdc, oldRop) ;	
 
 	DeleteObject (hpen) ;
+	ReleaseDC(hwnd, hdc) ;
+}
+
+void Luna::DrawEllipse(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
+{
+	 HDC hdc = GetDC (hwnd) ;
+	int oldRop = SetROP2 (hdc, bModel) ;
+	HPEN hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
+
+	SelectObject (hdc, hpen) ;	
+	SelectObject(hdc, GetStockObject(NULL_BRUSH)) ;		
+	Ellipse(hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
+	SetROP2 (hdc, oldRop) ;	
+
+	DeleteObject (hpen) ;
 	ReleaseDC(hwnd, hdc);
+}
+
+void Luna::DrawLine(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
+{
+    HDC hdc = GetDC (hwnd) ;
+	int oldRop = SetROP2 (hdc, bModel) ;
+	HPEN hpen = CreatePen (PS_SOLID, 5, RGB (255, 78, 111)) ;
+
+	SelectObject (hdc, hpen) ;		
+	MoveToEx (hdc, pBeg.x, pBeg.y, (LPPOINT) NULL) ; 
+	LineTo (hdc, pEnd.x, pEnd.y) ;	
+	SetROP2 (hdc, oldRop) ;	
+
+	DeleteObject (hpen) ;
+	ReleaseDC(hwnd, hdc) ;
 }
 
 void Luna::OnPaint ()
@@ -215,38 +249,72 @@ void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 		cpMouseHook->UnHook () ;			
 	}
 
-	if (bPenRectangle)
+	if (bPenRectangle || bPenCycle || bPenLine)
 	{	
 		bDrawing = true ;		
 		pBeg.x = LOWORD (lParam) ;
 		pBeg.y = HIWORD (lParam) ;
 		pEnd.x = LOWORD (lParam) ;
 		pEnd.y = HIWORD (lParam) ;		
-	}
+	}	
 }
 
 void Luna::OnLButtonUP (WPARAM wParam, LPARAM lParam)
 {
-	if (bDrawing && bPenRectangle)
+	if (bDrawing)
 	{	
-		bDrawing = false ;
-		bPenRectangle =  false ;
-		
+		bDrawing = false ;			
 		pEnd.x = LOWORD (lParam) ;
-		pEnd.y = HIWORD (lParam) ;		
-		DrawRectangle (m_hwnd, pBeg, pEnd, R2_COPYPEN) ;		
-	}
+		pEnd.y = HIWORD (lParam) ;
+
+		if (bPenRectangle)		
+		{
+			bPenRectangle =  false ;
+			DrawRectangle (m_hwnd, pBeg, pEnd, R2_COPYPEN) ;
+		}
+
+		if (bPenCycle)		
+		{
+			bPenCycle =  false ;
+			DrawEllipse (m_hwnd, pBeg, pEnd, R2_COPYPEN) ;
+		}
+
+		if (bPenLine)		
+		{
+			bPenLine =  false ;
+			DrawLine (m_hwnd, pBeg, pEnd, R2_COPYPEN) ;		
+		}
+	}	
 }
 
 void Luna::OnMouseMove (WPARAM wParam, LPARAM lParam)
 {	
-	if (bDrawing && bPenRectangle)
+	if (bDrawing)
 	{
-		DrawRectangle (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
-		pEnd.x = LOWORD (lParam) ;
-		pEnd.y = HIWORD (lParam) ;	
-		DrawRectangle (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
-	}	
+		if (bPenRectangle)
+		{
+			DrawRectangle (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
+			pEnd.x = LOWORD (lParam) ;
+			pEnd.y = HIWORD (lParam) ;	
+			DrawRectangle (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
+		}
+
+		if (bPenCycle)
+		{
+			DrawEllipse (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
+			pEnd.x = LOWORD (lParam) ;
+			pEnd.y = HIWORD (lParam) ;
+			DrawEllipse (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
+		}
+		
+		if (bPenLine)
+		{
+			DrawLine (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;	
+			pEnd.x = LOWORD (lParam) ;
+			pEnd.y = HIWORD (lParam) ;	
+			DrawLine (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
+		}				
+	}		
 }
 
 void Luna::OnCaptureAnyArea ()

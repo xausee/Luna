@@ -49,6 +49,8 @@ public:
 	void CloseToolbar () ;
 	void SaveFile () ;
 	void DrawRectangle (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
+	void DrawEllipse(HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
+	void DrawLine(HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 
 protected:	
 	HWND    hWndToolbar ;
