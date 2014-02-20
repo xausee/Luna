@@ -73,6 +73,7 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 			break ;
 		case ID_SELECT:			
 			bSelection = true ;
+			iShape = 5 ;
 			break ;
 		case ID_RECTANGLE:
 			iShape = 1 ;
@@ -186,6 +187,10 @@ void Luna::Shape(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 		break ;
 	case 4:						 
 		Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;		
+		break ;
+	case 5:
+		SelectObject (hdc, hpenDot) ;	
+		Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
 		break ;
 	default:
 		break ;
@@ -367,6 +372,8 @@ void Luna::OnLButtonUP (WPARAM wParam, LPARAM lParam)
 		Shape (m_hwnd, pBeg, pEnd, R2_COPYPEN) ;	
 		if (iShape ==4)
 			CreateEditBox() ;
+		if (bSelection)
+			bSelection = false ;
 	}	
 }
 
@@ -444,28 +451,26 @@ void Luna::CreateToolbar ()
 	initctrs.dwICC = ICC_BAR_CLASSES;
     InitCommonControlsEx(&initctrs);
 
-	const int buttonCount = 15 ;
+	const int buttonCount = 14 ;
 
     TBBUTTON button[buttonCount] =
 	{
-		{0, ID_SELECT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
+		{0, ID_SELECT, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},		
+		{1, ID_RECTANGLE, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},
+		{2, ID_CYCLE, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},		
+		{3, ID_LINE, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},		
+		{4, ID_TEXT, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},
 
-		{1, 50000, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
-		{2, ID_RECTANGLE, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},
-		{3, ID_CYCLE, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},		
-		{4, ID_LINE, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},		
-		{5, ID_TEXT, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},
+		{5, 50000, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
+		{6, ID_LINE_SIZE_ONE, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},
+		{7, ID_LINE_SIZE_TWO, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},
+		{8, ID_LINE_SIZE_THREE, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},
 
-		{6, 50000, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
-		{7, ID_LINE_SIZE_ONE, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},
-		{8, ID_LINE_SIZE_TWO, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},
-		{9, ID_LINE_SIZE_THREE, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},
-
-		{10, 50000, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
-		{11, ID_COLOR_RED, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},		
-		{12, ID_COLOR_GREEN, TBSTATE_ENABLED,  BTNS_CHECKGROUP, 0L, 0},
-		{13, ID_COLOR_BLUE, TBSTATE_ENABLED,  BTNS_CHECKGROUP, 0L, 0},
-		{14, ID_CLOSE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0}
+		{9, 50000, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
+		{10, ID_COLOR_RED, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},		
+		{11, ID_COLOR_GREEN, TBSTATE_ENABLED,  BTNS_CHECKGROUP, 0L, 0},
+		{12, ID_COLOR_BLUE, TBSTATE_ENABLED,  BTNS_CHECKGROUP, 0L, 0},
+		{13, ID_CLOSE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0}
 	};
 
 	if (hWndToolbar)
