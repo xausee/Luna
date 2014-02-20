@@ -22,11 +22,8 @@ public:
 	Luna (HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL) : CBaseWindow(hInst, wcx)
 	{ 
 		hBitmap = NULL ;  
-		bSelection = false ;
-		bPenRectangle = false ;
-		bPenCycle = false ;
-		bPenText = false ;
-		bPenLine = false ;
+		bSelection = false ;		
+		iShape = 0 ;
 	    iPenSize = 0 ;
 	  	iPenColor = 0 ;
 		bDrawing = false ;
@@ -46,23 +43,22 @@ public:
 	void OnCaptureSpecifiedWindow () ;
 	int  GetEncoderClsid (const WCHAR* format, CLSID* pClsid) ;
 	void CreateToolbar () ;
-	void UpdateToobar() ;
+	void UpdateToobar () ;
 	void CloseToolbar () ;
 	void SaveFile () ;
-	int  GetLineSize() ;
-	COLORREF GetColor() ;
+	int  GetLineSize () ;
+	COLORREF GetColor () ;
+	void Shape (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 	void DrawRectangle (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
-	void DrawEllipse(HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
-	void DrawLine(HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
+	void DrawEllipse (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
+	void DrawLine (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 
 protected:	
 	HWND    hWndToolbar ;
 	HBITMAP	hBitmap ;
 	bool	bSelection ;
 	bool	bDrawing ;
-	bool	bPenRectangle ;	
-	bool	bPenCycle ;
-	bool	bPenText ;
+	int 	iShape ;	
 	bool	bPenLine ;
 	int	    iPenSize ;
 	int  	iPenColor ;

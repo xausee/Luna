@@ -71,27 +71,20 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 				ShowWindow(hAbout, SW_SHOW) ;
 			}
 			break ;
-		case ID_SELECT:
-			UpdateToobar () ;
+		case ID_SELECT:			
 			bSelection = true ;
 			break ;
 		case ID_RECTANGLE:
-			bPenRectangle = true ;
-			bPenCycle = false ;
-			bPenLine = false ;
+			iShape = 1 ;
 			break ;
 		case ID_CYCLE:
-			bPenRectangle = false ;
-			bPenCycle = true ;			
-			bPenLine = false ;
+			iShape = 2 ;
+			break ;		
+		case ID_LINE:	
+			iShape = 3 ;
 			break ;
 		case ID_TEXT:
-			bPenText = true ;
-			break ;
-		case ID_LINE:	
-			bPenRectangle = false ;
-			bPenCycle = false ;			
-			bPenLine = true ;
+			iShape = 4 ;
 			break ;
 		case ID_LINE_SIZE_ONE:
 			iPenSize = 1 ;
@@ -167,6 +160,38 @@ COLORREF Luna::GetColor()
 		break ;
 	}
 	return color ;
+}
+
+void Luna::Shape(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
+{
+    HDC hdc = GetDC (hwnd) ;
+	int oldRop = SetROP2 (hdc, bModel) ;
+	HPEN hpen = CreatePen (PS_SOLID, GetLineSize(), GetColor()) ;
+
+	SelectObject (hdc, hpen) ;	
+	SelectObject(hdc, GetStockObject(NULL_BRUSH)) ;	
+
+	switch (iShape)
+	{
+	case 1:
+		Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
+		break ;
+	case 2:
+		Ellipse(hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
+		break ;
+	case 3:
+		MoveToEx (hdc, pBeg.x, pBeg.y, (LPPOINT) NULL) ; 
+		LineTo (hdc, pEnd.x, pEnd.y) ;
+		break ;
+	case 4:
+		break ;
+	default:
+		break ;
+	}	
+	
+	SetROP2 (hdc, oldRop) ;	
+	DeleteObject (hpen) ;
+	ReleaseDC(hwnd, hdc) ;
 }
 
 void Luna::DrawRectangle(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
@@ -292,7 +317,7 @@ void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 		cpMouseHook->UnHook () ;			
 	}
 
-	if (bPenRectangle || bPenCycle || bPenLine)
+	if (hWndToolbar)
 	{	
 		bDrawing = true ;		
 		pBeg.x = LOWORD (lParam) ;
@@ -309,24 +334,7 @@ void Luna::OnLButtonUP (WPARAM wParam, LPARAM lParam)
 		bDrawing = false ;			
 		pEnd.x = LOWORD (lParam) ;
 		pEnd.y = HIWORD (lParam) ;
-
-		if (bPenRectangle)		
-		{
-			bPenRectangle =  false ;
-			DrawRectangle (m_hwnd, pBeg, pEnd, R2_COPYPEN) ;
-		}
-
-		if (bPenCycle)		
-		{
-			bPenCycle =  false ;
-			DrawEllipse (m_hwnd, pBeg, pEnd, R2_COPYPEN) ;
-		}
-
-		if (bPenLine)		
-		{
-			bPenLine =  false ;
-			DrawLine (m_hwnd, pBeg, pEnd, R2_COPYPEN) ;		
-		}
+		Shape (m_hwnd, pBeg, pEnd, R2_COPYPEN) ;			
 	}	
 }
 
@@ -334,30 +342,12 @@ void Luna::OnMouseMove (WPARAM wParam, LPARAM lParam)
 {	
 	if (bDrawing)
 	{
-		if (bPenRectangle)
-		{
-			DrawRectangle (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
-			pEnd.x = LOWORD (lParam) ;
-			pEnd.y = HIWORD (lParam) ;	
-			DrawRectangle (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
-		}
+		Shape (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
+		pEnd.x = LOWORD (lParam) ;
+		pEnd.y = HIWORD (lParam) ;	
+		Shape (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
+	}
 
-		if (bPenCycle)
-		{
-			DrawEllipse (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
-			pEnd.x = LOWORD (lParam) ;
-			pEnd.y = HIWORD (lParam) ;
-			DrawEllipse (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
-		}
-		
-		if (bPenLine)
-		{
-			DrawLine (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;	
-			pEnd.x = LOWORD (lParam) ;
-			pEnd.y = HIWORD (lParam) ;	
-			DrawLine (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
-		}				
-	}		
 }
 
 void Luna::OnCaptureAnyArea ()
@@ -423,22 +413,28 @@ void Luna::CreateToolbar ()
 	initctrs.dwICC = ICC_BAR_CLASSES;
     InitCommonControlsEx(&initctrs);
 
-	const int buttonCount = 12 ;
+	const int buttonCount = 15 ;
 
     TBBUTTON button[buttonCount] =
 	{
 		{0, ID_SELECT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{1, ID_RECTANGLE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{2, ID_CYCLE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{3, ID_TEXT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{4, ID_LINE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{5, ID_LINE_SIZE_ONE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{6, ID_LINE_SIZE_TWO, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{7, ID_LINE_SIZE_THREE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},	
-		{8, ID_COLOR_RED, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{9, ID_COLOR_GREEN, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{10, ID_COLOR_BLUE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0},
-		{11, ID_CLOSE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0}
+
+		{1, 50000, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
+		{2, ID_RECTANGLE, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},
+		{3, ID_CYCLE, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},		
+		{4, ID_LINE, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},		
+		{5, ID_TEXT, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},
+
+		{6, 50000, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
+		{7, ID_LINE_SIZE_ONE, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},
+		{8, ID_LINE_SIZE_TWO, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},
+		{9, ID_LINE_SIZE_THREE, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},
+
+		{10, 50000, TBSTATE_ENABLED, TBSTYLE_SEP, 0L, 0},
+		{11, ID_COLOR_RED, TBSTATE_ENABLED, BTNS_CHECKGROUP, 0L, 0},		
+		{12, ID_COLOR_GREEN, TBSTATE_ENABLED,  BTNS_CHECKGROUP, 0L, 0},
+		{13, ID_COLOR_BLUE, TBSTATE_ENABLED,  BTNS_CHECKGROUP, 0L, 0},
+		{14, ID_CLOSE, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, 0}
 	};
 
 	if (hWndToolbar)
@@ -464,9 +460,10 @@ void Luna::UpdateToobar()
 	TBBUTTONINFO tbInfo; 
     
     tbInfo.cbSize  = sizeof(TBBUTTONINFO);
-    tbInfo.dwMask  = TBIF_TEXT;
+    tbInfo.dwMask  = TBIF_STATE;
    
-	LRESULT s = SendMessage(m_hwnd, TB_GETBUTTONINFO, 2, (LPARAM)&tbInfo); 
+	LRESULT s = SendMessage(hWndToolbar, TB_GETBUTTONINFO, 2, (LPARAM)&tbInfo); 
+	LRESULT ss = SendMessage(m_hwnd, TB_GETBUTTONINFO, 2, (LPARAM)&tbInfo);
 
     tbInfo.pszText = "color";
 	tbInfo.fsState = TBSTATE_PRESSED ;
