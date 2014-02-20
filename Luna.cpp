@@ -184,8 +184,7 @@ void Luna::Shape(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 		MoveToEx (hdc, pBeg.x, pBeg.y, (LPPOINT) NULL) ; 
 		LineTo (hdc, pEnd.x, pEnd.y) ;
 		break ;
-	case 4:		 
-		SelectObject (hdc, hpenDot) ;			 
+	case 4:						 
 		Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;		
 		break ;
 	default:
@@ -213,9 +212,8 @@ HWND Luna::CreateEditBox()
 			WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_LEFT,
 			pStart.x, pStart.y, weight, height,	
 			m_hwnd, (HMENU)(101),
-			hInstance, NULL) ; 
-		 
-	//MoveWindow(hwnd_ed_1, 400,400,200,200,true);
+			hInstance, NULL) ; 	 
+	
 	// char array to hold the text from the textbox
 	char szInput[MAX_PATH];
 	// Obtains input from the textbox and puts it into the char array
