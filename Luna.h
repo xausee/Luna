@@ -53,6 +53,7 @@ public:
 	void DrawEllipse (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 	void DrawLine (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 	HWND CreateEditBox() ;
+	LRESULT SetEditBox(WPARAM wParam, LPARAM lParam) ;
 
 protected:	
 	HWND    hWndToolbar ;

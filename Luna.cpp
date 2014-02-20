@@ -45,6 +45,8 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 	case WM_MOUSEMOVE:
 		OnMouseMove (wParam, lParam) ;
 		break;
+	case WM_CTLCOLOREDIT:
+		return SetEditBox (wParam, lParam) ;
 	case WM_COMMAND:
 		switch (LOWORD (wParam)) 
         {
@@ -163,6 +165,15 @@ COLORREF Luna::GetColor()
 	return color ;
 }
 
+LRESULT Luna::SetEditBox(WPARAM wParam, LPARAM lParam)
+{
+	//SetTextColor ((HDC)wParam,GetSysColor(COLOR_WINDOWTEXT));
+	SetTextColor ((HDC)wParam, GetColor());
+	SetBkMode ((HDC)wParam,OPAQUE);
+	SetBkColor ((HDC)wParam,GetSysColor(COLOR_WINDOW));
+	return (LRESULT)CreateSolidBrush(GetSysColor(COLOR_WINDOW));
+}
+
 void Luna::Shape(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 {
     HDC hdc = GetDC (hwnd) ;
@@ -212,13 +223,20 @@ HWND Luna::CreateEditBox()
 	weight = abs (pEnd.x - pBeg.x) ;
 	height = abs (pEnd.y - pBeg.y) ;	
 
+	HDC hdc = GetDC (m_hwnd) ;
+	int iFontSize = GetLineSize() * 16 ;
+	HFONT hFont = CreateFont(iFontSize, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, "Arial") ;
+	SetTextColor (hdc, GetColor()) ;
+
 	// Creates textbox for input
-	HWND hwndEditBox  = CreateWindowEx(NULL, "edit", "",
+	HWND hwndEditBox  = CreateWindowEx(NULL, "EDIT", "",
 			WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_LEFT,
 			pStart.x, pStart.y, weight, height,	
 			m_hwnd, (HMENU)(101),
 			hInstance, NULL) ; 	 
-	
+
+	// Set text font
+	SendMessage (hwndEditBox, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(FALSE, 0)) ;
 	// char array to hold the text from the textbox
 	char szInput[MAX_PATH];
 	// Obtains input from the textbox and puts it into the char array
@@ -227,6 +245,8 @@ HWND Luna::CreateEditBox()
 		return hwndEditBox;
 	else
 		return NULL;
+
+	DeleteObject (hFont) ;
 }
 
 void Luna::DrawRectangle(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
