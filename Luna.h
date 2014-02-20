@@ -52,6 +52,7 @@ public:
 	void DrawRectangle (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 	void DrawEllipse (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 	void DrawLine (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
+	HWND CreateEditBox() ;
 
 protected:	
 	HWND    hWndToolbar ;

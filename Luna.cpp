@@ -167,9 +167,10 @@ void Luna::Shape(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
     HDC hdc = GetDC (hwnd) ;
 	int oldRop = SetROP2 (hdc, bModel) ;
 	HPEN hpen = CreatePen (PS_SOLID, GetLineSize(), GetColor()) ;
+	HPEN hpenDot = CreatePen (PS_DOT, 1, RGB(0, 0, 0)) ; 
 
 	SelectObject (hdc, hpen) ;	
-	SelectObject(hdc, GetStockObject(NULL_BRUSH)) ;	
+	SelectObject(hdc, GetStockObject(NULL_BRUSH)) ;		
 
 	switch (iShape)
 	{
@@ -183,7 +184,9 @@ void Luna::Shape(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 		MoveToEx (hdc, pBeg.x, pBeg.y, (LPPOINT) NULL) ; 
 		LineTo (hdc, pEnd.x, pEnd.y) ;
 		break ;
-	case 4:
+	case 4:		 
+		SelectObject (hdc, hpenDot) ;			 
+		Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;		
 		break ;
 	default:
 		break ;
@@ -191,7 +194,36 @@ void Luna::Shape(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 	
 	SetROP2 (hdc, oldRop) ;	
 	DeleteObject (hpen) ;
-	ReleaseDC(hwnd, hdc) ;
+	DeleteObject (hpenDot) ;
+	ReleaseDC (hwnd, hdc) ;
+}
+
+HWND Luna::CreateEditBox()
+{
+	POINT pStart ;
+	int weight, height ;
+
+	pStart.x = pBeg.x < pEnd.x ? pBeg.x : pEnd.x ;
+	pStart.y = pBeg.y < pEnd.y ? pBeg.y : pEnd.y ;
+	weight = abs (pEnd.x - pBeg.x) ;
+	height = abs (pEnd.y - pBeg.y) ;	
+
+	// Creates textbox for input
+	HWND hwndEditBox  = CreateWindowEx(NULL, "edit", "",
+			WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_LEFT,
+			pStart.x, pStart.y, weight, height,	
+			m_hwnd, (HMENU)(101),
+			hInstance, NULL) ; 
+		 
+	//MoveWindow(hwnd_ed_1, 400,400,200,200,true);
+	// char array to hold the text from the textbox
+	char szInput[MAX_PATH];
+	// Obtains input from the textbox and puts it into the char array
+	GetWindowText(GetDlgItem(m_hwnd, 101), szInput, MAX_PATH);
+	if (hwndEditBox)
+		return hwndEditBox;
+	else
+		return NULL;
 }
 
 void Luna::DrawRectangle(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
@@ -334,7 +366,9 @@ void Luna::OnLButtonUP (WPARAM wParam, LPARAM lParam)
 		bDrawing = false ;			
 		pEnd.x = LOWORD (lParam) ;
 		pEnd.y = HIWORD (lParam) ;
-		Shape (m_hwnd, pBeg, pEnd, R2_COPYPEN) ;			
+		Shape (m_hwnd, pBeg, pEnd, R2_COPYPEN) ;	
+		if (iShape ==4)
+			CreateEditBox() ;
 	}	
 }
 
@@ -347,7 +381,6 @@ void Luna::OnMouseMove (WPARAM wParam, LPARAM lParam)
 		pEnd.y = HIWORD (lParam) ;	
 		Shape (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
 	}
-
 }
 
 void Luna::OnCaptureAnyArea ()
