@@ -229,7 +229,7 @@ HWND Luna::CreateEditBox()
 	SetTextColor (hdc, GetColor()) ;
 
 	// Creates textbox for input
-	HWND hwndEditBox  = CreateWindowEx(NULL, "EDIT", "",
+	hwndEditBox  = CreateWindowEx(NULL, "EDIT", "",
 			WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_LEFT,
 			pStart.x, pStart.y, weight, height,	
 			m_hwnd, (HMENU)(101),
@@ -370,7 +370,10 @@ void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 		hBitmap = capture->CaptureSpecifiedWindow (hwndPointNow) ;
 		capture->bSpecifiedWindow = false ;
 		cpMouseHook->UnHook () ;			
-	}
+	}	
+	
+	POINT pTextStart = pBeg ; 
+	POINT pTextEnd = pEnd ;
 
 	if (hWndToolbar)
 	{	
@@ -380,6 +383,22 @@ void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 		pEnd.x = LOWORD (lParam) ;
 		pEnd.y = HIWORD (lParam) ;		
 	}	
+	
+	if (hwndEditBox)
+	{		
+		char szInput[MAX_PATH];		
+		GetWindowText(GetDlgItem(m_hwnd, 101), szInput, MAX_PATH);
+		HDC hdc = GetDC (m_hwnd) ;	
+		int iFontSize = GetLineSize() * 16 ;
+		HFONT hFont = CreateFont(iFontSize, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, "Arial") ;
+		SelectObject (hdc, hFont) ;
+		SetTextColor (hdc, GetColor()) ;
+		DestroyWindow (hwndEditBox) ;
+		hwndEditBox = NULL ;
+		Rectangle (hdc, pTextStart.x, pTextStart.y, pTextEnd.x, pTextEnd.y) ;		
+		TextOut (hdc, pTextStart.x + 2, pTextStart.y + 2, szInput, strlen(szInput)) ;			
+	}
+	
 }
 
 void Luna::OnLButtonUP (WPARAM wParam, LPARAM lParam)
@@ -390,7 +409,7 @@ void Luna::OnLButtonUP (WPARAM wParam, LPARAM lParam)
 		pEnd.x = LOWORD (lParam) ;
 		pEnd.y = HIWORD (lParam) ;
 		Shape (m_hwnd, pBeg, pEnd, R2_COPYPEN) ;	
-		if (iShape ==4)
+		if (iShape == 4)
 			CreateEditBox() ;
 		if (bSelection)
 			bSelection = false ;

@@ -28,6 +28,7 @@ public:
 	  	iPenColor = 0 ;
 		bDrawing = false ;
 		hWndToolbar = NULL ;
+		hwndEditBox = NULL ;
 
 		capture = new(Capture);		
 		SetWindowTitle ("Luna") ;
@@ -57,6 +58,7 @@ public:
 
 protected:	
 	HWND    hWndToolbar ;
+	HWND    hwndEditBox ;
 	HBITMAP	hBitmap ;
 	bool	bSelection ;
 	bool	bDrawing ;
