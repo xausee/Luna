@@ -320,6 +320,29 @@ void Luna::OnPaint ()
 	{
 		UpdateWindow (m_hwnd) ;
 	}
+
+	/* 
+	if (hBitmap)
+	{
+	HDC hdc = GetDC(m_hwnd); 
+	HDC hdcCompat = CreateCompatibleDC(hdc); 
+	SelectObject(hdcCompat, hBitmap);
+	RECT rcBmp;
+	COLORREF crBkgnd = GetBkColor(hdc); 
+    HBRUSH       hbrBkgnd = CreateSolidBrush(crBkgnd); 
+    ReleaseDC(m_hwnd, hdc); 
+	SetRect(&rcBmp, 1, 1, 500, 500);
+
+	PAINTSTRUCT ps;
+	BeginPaint(m_hwnd, &ps);
+	Rectangle(ps.hdc, rcBmp.left, rcBmp.top, rcBmp.right, rcBmp.bottom); 
+	StretchBlt(ps.hdc, rcBmp.left + 1, rcBmp.top + 1, 
+		(rcBmp.right - rcBmp.left) - 2, 
+		(rcBmp.bottom - rcBmp.top) - 2, hdcCompat, 
+		0, 0, 500, 500, SRCCOPY); 
+	EndPaint(m_hwnd, &ps); 
+	}*/
+	
 	
 	if (hBitmap)
 	{
@@ -347,7 +370,8 @@ void Luna::OnPaint ()
 			point.x = (clientWidth - bm.bmWidth - 20) / 2 ;
 			point.y = (clientHeitht - bm.bmHeight - 20) / 2 ;
 			// draw the border of the picture first
-			Rectangle(hdcClient, point.x - 1, point.y - 1, point.x + bm.bmWidth + 1, point.y + bm.bmHeight + 1) ; 
+			SetRect (&rBitmapRect, point.x - 1, point.y - 1, point.x + bm.bmWidth + 1, point.y + bm.bmHeight + 1) ;
+			Rectangle(hdcClient, rBitmapRect.left, rBitmapRect.top, rBitmapRect.right, rBitmapRect.bottom) ; 
 			// draw the bitmap
 			BitBlt(hdcClient, point.x, point.y, bm.bmWidth, bm.bmHeight,  hdcMem, 0, 0, SRCCOPY) ;
 		}
@@ -370,7 +394,8 @@ void Luna::OnPaint ()
 				point.y = (clientHeitht - Height - 10) / 2 ;
 			}
 			// draw the border of the picture first
-			Rectangle(hdcClient, point.x - 1, point.y - 1, point.x + Width + 1, point.y + Height + 1) ; 
+			SetRect (&rBitmapRect, point.x - 1, point.y - 1, point.x + Width + 1, point.y + Height + 1) ;
+			Rectangle(hdcClient, rBitmapRect.left, rBitmapRect.top, rBitmapRect.right, rBitmapRect.bottom) ;
 			// draw the bitmap
 			StretchBlt (hdcClient, point.x, point.y, Width, Height, hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
 		}		

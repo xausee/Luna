@@ -69,6 +69,7 @@ protected:
 	int  	iPenColor ;
 	POINT   pBeg ;
 	POINT   pEnd ;
+	RECT    rBitmapRect ;
 	LRESULT CALLBACK WinMsgHandler (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) ;	
 };
 
