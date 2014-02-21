@@ -230,7 +230,7 @@ HWND Luna::CreateEditBox()
 
 	// Creates textbox for input
 	hwndEditBox  = CreateWindowEx(NULL, "EDIT", "",
-			WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_LEFT,
+			WS_CHILD | WS_VISIBLE | ES_MULTILINE | WS_TABSTOP | WS_BORDER | ES_LEFT,
 			pStart.x, pStart.y, weight, height,	
 			m_hwnd, (HMENU)(101),
 			hInstance, NULL) ; 	 
@@ -247,6 +247,24 @@ HWND Luna::CreateEditBox()
 		return NULL;
 
 	DeleteObject (hFont) ;
+}
+
+void Luna::TextOutFromEditBoxToCanvas()
+{
+	if (hwndEditBox)
+	{		
+		char szInput[MAX_PATH];		
+		GetWindowText(GetDlgItem(m_hwnd, 101), szInput, MAX_PATH);
+		HDC hdc = GetDC (m_hwnd) ;	
+		int iFontSize = GetLineSize() * 16 ;
+		HFONT hFont = CreateFont(iFontSize, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, "Arial") ;
+		SelectObject (hdc, hFont) ;
+		SetTextColor (hdc, GetColor()) ;
+		DestroyWindow (hwndEditBox) ;
+		hwndEditBox = NULL ;
+		Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;		
+		TextOut (hdc, pBeg.x + 2, pBeg.y + 2, szInput, strlen(szInput)) ;			
+	}	
 }
 
 void Luna::DrawRectangle(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
@@ -358,6 +376,8 @@ void Luna::OnPaint ()
 		DeleteDC (hdcMem) ;		
 		EndPaint (m_hwnd, &ps);
 	}	
+
+	//TextOutFromEditBoxToCanvas () ;
 }	
 
 void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
@@ -372,8 +392,7 @@ void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 		cpMouseHook->UnHook () ;			
 	}	
 	
-	POINT pTextStart = pBeg ; 
-	POINT pTextEnd = pEnd ;
+	//TextOutFromEditBoxToCanvas () ;
 
 	if (hWndToolbar)
 	{	
@@ -382,23 +401,7 @@ void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 		pBeg.y = HIWORD (lParam) ;
 		pEnd.x = LOWORD (lParam) ;
 		pEnd.y = HIWORD (lParam) ;		
-	}	
-	
-	if (hwndEditBox)
-	{		
-		char szInput[MAX_PATH];		
-		GetWindowText(GetDlgItem(m_hwnd, 101), szInput, MAX_PATH);
-		HDC hdc = GetDC (m_hwnd) ;	
-		int iFontSize = GetLineSize() * 16 ;
-		HFONT hFont = CreateFont(iFontSize, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, "Arial") ;
-		SelectObject (hdc, hFont) ;
-		SetTextColor (hdc, GetColor()) ;
-		DestroyWindow (hwndEditBox) ;
-		hwndEditBox = NULL ;
-		Rectangle (hdc, pTextStart.x, pTextStart.y, pTextEnd.x, pTextEnd.y) ;		
-		TextOut (hdc, pTextStart.x + 2, pTextStart.y + 2, szInput, strlen(szInput)) ;			
 	}
-	
 }
 
 void Luna::OnLButtonUP (WPARAM wParam, LPARAM lParam)

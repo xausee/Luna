@@ -55,6 +55,7 @@ public:
 	void DrawLine (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 	HWND CreateEditBox() ;
 	LRESULT SetEditBox(WPARAM wParam, LPARAM lParam) ;
+	void TextOutFromEditBoxToCanvas () ;
 
 protected:	
 	HWND    hWndToolbar ;
