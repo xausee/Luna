@@ -196,7 +196,9 @@ void Luna::Shape(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 		MoveToEx (hdc, pBeg.x, pBeg.y, (LPPOINT) NULL) ; 
 		LineTo (hdc, pEnd.x, pEnd.y) ;
 		break ;
-	case 4:						 
+	case 4:	
+		//use fixed pen when draw text rectangele
+		SelectObject (hdc, CreatePen(PS_SOLID, 1,  RGB (0, 0, 0))) ; 
 		Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;		
 		break ;
 	case 5:
