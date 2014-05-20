@@ -63,6 +63,7 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 			 OnCaptureAnyArea () ;
             break ; 
 		case ID_EDIT:
+			isEdit = true;
 			CreateToolbar() ;
 			break ;
 		case ID_EXIT: 
@@ -172,6 +173,38 @@ LRESULT Luna::SetEditBox(WPARAM wParam, LPARAM lParam)
 	SetBkMode ((HDC)wParam,OPAQUE);
 	SetBkColor ((HDC)wParam,GetSysColor(COLOR_WINDOW));
 	return (LRESULT)CreateSolidBrush(GetSysColor(COLOR_WINDOW));
+}
+
+void Luna::CreateContainer ()
+{
+	if (!hBitmap)
+		return ;
+
+	if (isEdit)
+	{	
+		BITMAP bm ;		
+		HDC hdc = GetDC (m_hwnd); 
+	    HDC hdcCompat = CreateCompatibleDC (hdc); 
+	    SelectObject (hdcCompat, hBitmap);	
+		GetObject (hBitmap, sizeof (BITMAP), (PSTR) &bm) ;
+	    COLORREF crBkgnd = GetBkColor (hdc); 
+        HBRUSH   hbrBkgnd = CreateSolidBrush (crBkgnd);		
+        ReleaseDC (m_hwnd, hdc); 
+
+		RECT rcBmp;
+		SetRect (&rcBmp, 40, 40, bm.bmWidth + 42, bm.bmHeight + 42);
+
+	    PAINTSTRUCT ps;
+	    BeginPaint (m_hwnd, &ps);
+	    Rectangle (ps.hdc, rcBmp.left, rcBmp.top, rcBmp.right, rcBmp.bottom); 
+	    BitBlt (ps.hdc, rcBmp.left + 1, rcBmp.top + 1, 
+		           (rcBmp.right - rcBmp.left) - 2, 
+		           (rcBmp.bottom - rcBmp.top) - 2, hdcCompat, 
+		           0, 0, SRCCOPY); 
+
+		DeleteDC (hdcCompat) ;	
+	    EndPaint (m_hwnd, &ps); 
+	}
 }
 
 void Luna::Shape(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
@@ -320,89 +353,68 @@ void Luna::OnPaint ()
 	{
 		UpdateWindow (m_hwnd) ;
 	}
-
-	/* 
-	if (hBitmap)
-	{
-	HDC hdc = GetDC(m_hwnd); 
-	HDC hdcCompat = CreateCompatibleDC(hdc); 
-	SelectObject(hdcCompat, hBitmap);
-	RECT rcBmp;
-	COLORREF crBkgnd = GetBkColor(hdc); 
-    HBRUSH       hbrBkgnd = CreateSolidBrush(crBkgnd); 
-    ReleaseDC(m_hwnd, hdc); 
-	SetRect(&rcBmp, 1, 1, 500, 500);
-
-	PAINTSTRUCT ps;
-	BeginPaint(m_hwnd, &ps);
-	Rectangle(ps.hdc, rcBmp.left, rcBmp.top, rcBmp.right, rcBmp.bottom); 
-	StretchBlt(ps.hdc, rcBmp.left + 1, rcBmp.top + 1, 
-		(rcBmp.right - rcBmp.left) - 2, 
-		(rcBmp.bottom - rcBmp.top) - 2, hdcCompat, 
-		0, 0, 500, 500, SRCCOPY); 
-	EndPaint(m_hwnd, &ps); 
-	}*/
+	
+	CreateContainer () ;
 	
 	
-	if (hBitmap)
-	{
-		BITMAP             bm ;
-		RECT               rcClient;
-		PAINTSTRUCT        ps;	
-		HDC                hdcClient, hdcMem;
-		
-		GetClientRect (m_hwnd, &rcClient) ;
-		hdcClient = BeginPaint(m_hwnd, &ps);
-		GetClientRect(m_hwnd, &rcClient) ;
-		hdcMem = CreateCompatibleDC (hdcClient) ;
-		SelectObject (hdcMem, hBitmap) ;
-		GetObject (hBitmap, sizeof (BITMAP), (PSTR) &bm) ;
-		SetStretchBltMode (hdcClient, COLORONCOLOR) ;
+	//if (hBitmap)
+	//{
+	//	BITMAP             bm ;
+	//	RECT               rcClient;
+	//	PAINTSTRUCT        ps;	
+	//	HDC                hdcClient, hdcMem;
+	//	
+	//	GetClientRect (m_hwnd, &rcClient) ;
+	//	hdcClient = BeginPaint(m_hwnd, &ps);
+	//	hdcMem = CreateCompatibleDC (hdcClient) ;
+	//	SelectObject (hdcMem, hBitmap) ;
+	//	GetObject (hBitmap, sizeof (BITMAP), (PSTR) &bm) ;
+	//	SetStretchBltMode (hdcClient, COLORONCOLOR) ;
 
-		POINT point  ;
-		float rate ;
-		int clientWidth, clientHeitht , Width, Height;
-		clientWidth = rcClient.right - rcClient.left ;
-		clientHeitht = rcClient.bottom - rcClient.top ;
+	//	POINT point  ;
+	//	float rate ;
+	//	int clientWidth, clientHeitht , Width, Height;
+	//	clientWidth = rcClient.right - rcClient.left ;
+	//	clientHeitht = rcClient.bottom - rcClient.top ;
 
-		if (bm.bmWidth + 20 < clientWidth &&  bm.bmHeight + 20 < clientHeitht)
-		{
-			point.x = (clientWidth - bm.bmWidth - 20) / 2 ;
-			point.y = (clientHeitht - bm.bmHeight - 20) / 2 ;
-			// draw the border of the picture first
-			SetRect (&rBitmapRect, point.x - 1, point.y - 1, point.x + bm.bmWidth + 1, point.y + bm.bmHeight + 1) ;
-			Rectangle(hdcClient, rBitmapRect.left, rBitmapRect.top, rBitmapRect.right, rBitmapRect.bottom) ; 
-			// draw the bitmap
-			BitBlt(hdcClient, point.x, point.y, bm.bmWidth, bm.bmHeight,  hdcMem, 0, 0, SRCCOPY) ;
-		}
-		else
-		{			
-			if ((float)bm.bmWidth / (float)clientWidth < (float)bm.bmHeight / (float)clientHeitht)
-			{
-				Height = clientHeitht - 20 ;
-				rate = (float)Height / (float)bm.bmHeight ;
-				Width = (int)(bm.bmWidth * rate) ;
-				point.x = (clientWidth - Width - 10) / 2 ;
-				point.y = 10 ;
-			}
-			else
-			{
-				Width = clientWidth - 20 ;
-				rate = (float)Width / (float)bm.bmWidth ;
-				Height = (int)(bm.bmHeight * rate) ;
-				point.x = 10 ;
-				point.y = (clientHeitht - Height - 10) / 2 ;
-			}
-			// draw the border of the picture first
-			SetRect (&rBitmapRect, point.x - 1, point.y - 1, point.x + Width + 1, point.y + Height + 1) ;
-			Rectangle(hdcClient, rBitmapRect.left, rBitmapRect.top, rBitmapRect.right, rBitmapRect.bottom) ;
-			// draw the bitmap
-			StretchBlt (hdcClient, point.x, point.y, Width, Height, hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
-		}		
+	//	if (bm.bmWidth + 20 < clientWidth &&  bm.bmHeight + 20 < clientHeitht)
+	//	{
+	//		point.x = (clientWidth - bm.bmWidth - 20) / 2 ;
+	//		point.y = (clientHeitht - bm.bmHeight - 20) / 2 ;
+	//		// draw the border of the picture first
+	//		SetRect (&rBitmapRect, point.x - 1, point.y - 1, point.x + bm.bmWidth + 1, point.y + bm.bmHeight + 1) ;
+	//		Rectangle(hdcClient, rBitmapRect.left, rBitmapRect.top, rBitmapRect.right, rBitmapRect.bottom) ; 
+	//		// draw the bitmap
+	//		BitBlt(hdcClient, point.x, point.y, bm.bmWidth, bm.bmHeight,  hdcMem, 0, 0, SRCCOPY) ;
+	//	}
+	//	else
+	//	{			
+	//		if ((float)bm.bmWidth / (float)clientWidth < (float)bm.bmHeight / (float)clientHeitht)
+	//		{
+	//			Height = clientHeitht - 20 ;
+	//			rate = (float)Height / (float)bm.bmHeight ;
+	//			Width = (int)(bm.bmWidth * rate) ;
+	//			point.x = (clientWidth - Width - 10) / 2 ;
+	//			point.y = 10 ;
+	//		}
+	//		else
+	//		{
+	//			Width = clientWidth - 20 ;
+	//			rate = (float)Width / (float)bm.bmWidth ;
+	//			Height = (int)(bm.bmHeight * rate) ;
+	//			point.x = 10 ;
+	//			point.y = (clientHeitht - Height - 10) / 2 ;
+	//		}
+	//		// draw the border of the picture first
+	//		SetRect (&rBitmapRect, point.x - 1, point.y - 1, point.x + Width + 1, point.y + Height + 1) ;
+	//		Rectangle(hdcClient, rBitmapRect.left, rBitmapRect.top, rBitmapRect.right, rBitmapRect.bottom) ;
+	//		// draw the bitmap
+	//		StretchBlt (hdcClient, point.x, point.y, Width, Height, hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
+	//	}		
 
-		DeleteDC (hdcMem) ;		
-		EndPaint (m_hwnd, &ps);
-	}	
+	//	DeleteDC (hdcMem) ;		
+	//	EndPaint (m_hwnd, &ps);
+	//}	
 
 	//TextOutFromEditBoxToCanvas () ;
 }	

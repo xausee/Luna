@@ -22,6 +22,7 @@ public:
 	Luna (HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL) : CBaseWindow(hInst, wcx)
 	{ 
 		hBitmap = NULL ;  
+		isEdit = false ;
 		bSelection = false ;		
 		iShape = 0 ;
 	    iPenSize = 0 ;
@@ -49,6 +50,7 @@ public:
 	void SaveFile () ;
 	int  GetLineSize () ;
 	COLORREF GetColor () ;
+	void CreateContainer () ;
 	void Shape (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 	void DrawRectangle (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 	void DrawEllipse (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
@@ -61,6 +63,7 @@ protected:
 	HWND    hWndToolbar ;
 	HWND    hwndEditBox ;
 	HBITMAP	hBitmap ;
+	bool    isEdit ;
 	bool	bSelection ;
 	bool	bDrawing ;
 	int 	iShape ;	

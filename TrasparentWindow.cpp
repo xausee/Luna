@@ -75,8 +75,7 @@ void TrasparentWindow::OnPaint ()
 		HDC                hdcClient, hdcMem;
 		
 		GetClientRect (m_hwnd, &rcClient) ;
-		hdcClient = BeginPaint(m_hwnd, &ps);
-		GetClientRect(m_hwnd, &rcClient) ;
+		hdcClient = BeginPaint(m_hwnd, &ps);		
 		hdcMem = CreateCompatibleDC (hdcClient) ;
 		SelectObject (hdcMem, hBitmap) ;
 		GetObject (hBitmap, sizeof (BITMAP), (PSTR) &bm) ;
