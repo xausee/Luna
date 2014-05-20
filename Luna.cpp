@@ -595,23 +595,32 @@ void Luna::SaveFile ()
 	char szFileName[512] ;
 	strcpy (szFileName,"ScreenShot") ;
 
-	/*char  filesFilter[250];
-	char * pBitmapStr  = "Bitmap Files (*.bmp)\0*.bmp\0" ;
-	char * pPngStr     = "PNG Files (*.png)\0*.png\0" ;
-	char * pJpgStr     = "JPG Files (*.jpg)\0*.jpg\0" ;
-	char * pGifStr     = "GIF Files (*.gif)\0*.gif\0" ;
-	char * pTiffStr    = "TIFF Files (*.tif)\0*.tif\0" ;
-	strcat (filesFilter, pBitmapStr) ;
-	strcat (filesFilter, pPngStr) ;
+	char  filesFilter[250] = "";	
+	char * pJpgStr     = "JPG Files (*.jpg)|*.jpg|" ;
+	char * pBitmapStr  = "Bitmap Files (*.bmp)|*.bmp|" ;
+	char * pPngStr     = "PNG Files (*.png)|*.png|" ;	
+	char * pGifStr     = "GIF Files (*.gif)|*.gif|" ;
+	char * pTiffStr    = "TIFF Files (*.tif)|*.tif|" ;
 	strcat (filesFilter, pJpgStr) ;
+	strcat (filesFilter, pBitmapStr) ;
+	strcat (filesFilter, pPngStr) ;	
 	strcat (filesFilter, pGifStr) ;
-	strcat (filesFilter, pTiffStr) ;*/
+	strcat (filesFilter, pTiffStr) ;
+
+	char *str = filesFilter ;
+	while (*str != '\0') {
+        if (*str == '|') {
+            *str++ = '\0';			
+        }
+		*str++;
+    }
+	// "JPG Files (*.jpg)\0*.jpg\0Bitmap Files (*.bmp)\0*.bmp\0PNG Files (*.png)\0*.png\0GIF Files (*.gif)\0*.gif\0TIFF Files (*.tif)\0*.tif\0" ;
 
 	OPENFILENAME	    ofn ;	
     ZeroMemory (&ofn,sizeof (ofn)) ;
     ofn.lStructSize = sizeof (OPENFILENAME) ;
     ofn.Flags = OFN_HIDEREADONLY|OFN_PATHMUSTEXIST ;
-    ofn.lpstrFilter = "JPG Files (*.jpg)\0*.jpg\0Bitmap Files (*.bmp)\0*.bmp\0PNG Files (*.png)\0*.png\0GIF Files (*.gif)\0*.gif\0TIFF Files (*.tif)\0*.tif\0" ;
+    ofn.lpstrFilter = filesFilter;
     ofn.lpstrDefExt = "jpg" ;
     ofn.lpstrFile = szFileName ;
     ofn.nMaxFile = 512 ;	
