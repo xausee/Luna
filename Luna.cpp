@@ -287,7 +287,7 @@ void Luna::Shape(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 
 	if (hBitmap)
 	{
-	  // restrict the shape is in bitmap rectangle
+	  // restrict the shape in bitmap rectangle
 	  if (pBeg.x < rBitmapRect.left)
 		  pBeg.x = rBitmapRect.left ;
 	  if (pBeg.x > rBitmapRect.right)
@@ -342,6 +342,28 @@ HWND Luna::CreateEditBox()
 {
 	POINT pStart ;
 	int weight, height ;
+
+	if (hBitmap)
+	{
+	  // restrict Edit Box in bitmap rectangle
+	  if (pBeg.x < rBitmapRect.left)
+		  pBeg.x = rBitmapRect.left ;
+	  if (pBeg.x > rBitmapRect.right)
+		  pBeg.x = rBitmapRect.right ;
+	  if (pBeg.y < rBitmapRect.top)
+		  pBeg.y = rBitmapRect.top ;
+	  if (pBeg.y > rBitmapRect.bottom)
+		  pBeg.y = rBitmapRect.bottom ;
+
+	  if (pEnd.x < rBitmapRect.left)
+		  pEnd.x = rBitmapRect.left ;
+	  if (pEnd.x > rBitmapRect.right)
+		  pEnd.x = rBitmapRect.right ;
+	  if (pEnd.y < rBitmapRect.top)
+		  pEnd.y = rBitmapRect.top ;
+	  if (pEnd.y > rBitmapRect.bottom)
+		  pEnd.y = rBitmapRect.bottom ;
+	}
 
 	pStart.x = pBeg.x < pEnd.x ? pBeg.x : pEnd.x ;
 	pStart.y = pBeg.y < pEnd.y ? pBeg.y : pEnd.y ;
