@@ -280,10 +280,32 @@ void Luna::Shape(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
     HDC hdc = GetDC (hwnd) ;
 	int oldRop = SetROP2 (hdc, bModel) ;
 	HPEN hpen = CreatePen (PS_SOLID, GetLineSize(), GetColor()) ;
-	HPEN hpenDot = CreatePen (PS_DOT, 1, RGB(0, 0, 0)) ; 
+	HPEN hpenDot = CreatePen (PS_DOT, 1, RGB(0, 0, 0)) ;
 
 	SelectObject (hdc, hpen) ;	
-	SelectObject(hdc, GetStockObject(NULL_BRUSH)) ;		
+	SelectObject(hdc, GetStockObject(NULL_BRUSH)) ;	
+
+	if (hBitmap)
+	{
+	  // restrict the shape is in bitmap rectangle
+	  if (pBeg.x < rBitmapRect.left)
+		  pBeg.x = rBitmapRect.left ;
+	  if (pBeg.x > rBitmapRect.right)
+		  pBeg.x = rBitmapRect.right ;
+	  if (pBeg.y < rBitmapRect.top)
+		  pBeg.y = rBitmapRect.top ;
+	  if (pBeg.y > rBitmapRect.bottom)
+		  pBeg.y = rBitmapRect.bottom ;
+
+	  if (pEnd.x < rBitmapRect.left)
+		  pEnd.x = rBitmapRect.left ;
+	  if (pEnd.x > rBitmapRect.right)
+		  pEnd.x = rBitmapRect.right ;
+	  if (pEnd.y < rBitmapRect.top)
+		  pEnd.y = rBitmapRect.top ;
+	  if (pEnd.y > rBitmapRect.bottom)
+		  pEnd.y = rBitmapRect.bottom ;
+	}
 
 	switch (iShape)
 	{
