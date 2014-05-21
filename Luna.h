@@ -50,7 +50,8 @@ public:
 	void SaveFile () ;
 	int  GetLineSize () ;
 	COLORREF GetColor () ;
-	void CreateContainer () ;
+	void ShowPictureInEditModel () ;
+	void ShowPictureInViewModel () ;
 	void Shape (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 	void DrawRectangle (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 	void DrawEllipse (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
