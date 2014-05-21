@@ -211,9 +211,7 @@ void Luna::ShowPictureInEditModel ()
     // clean up
     DeleteDC (hdcCompat) ;	
     DeleteObject(bgRgn);
-    DeleteObject(hBrush);
-
-	hBitmap = SaveBitmapToMemory () ;
+    DeleteObject(hBrush);	
 
 	EndPaint (m_hwnd, &ps); 	
 }
@@ -337,13 +335,17 @@ void Luna::Shape(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 	SetROP2 (hdc, oldRop) ;	
 	DeleteObject (hpen) ;
 	DeleteObject (hpenDot) ;
-	ReleaseDC (hwnd, hdc) ;
+	ReleaseDC (hwnd, hdc) ;	
 }
 
 HWND Luna::CreateEditBox()
 {
 	POINT pStart ;
 	int weight, height ;
+
+	// destroy the old edit box
+	if (hwndEditBox)
+		DestroyWindow (hwndEditBox) ;
 
 	if (hBitmap)
 	{
@@ -463,17 +465,27 @@ void Luna::DrawLine(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 
 HBITMAP Luna::SaveBitmapToMemory ()
 {	
-   if (hBitmap)
+  /* if (hBitmap)
    {
 	   DeleteObject (hBitmap) ;
 	   hBitmap = NULL ;
-   }
+   }*/
 
-   HDC hdc = GetDC (m_hwnd) ;
+   BITMAP bm ;		
+   HDC hdc = GetDC (m_hwnd);
+
+   // create compatible DC
+   HDC hdcCompat = CreateCompatibleDC (hdc); 
+   SelectObject (hdcCompat, hBitmap);	
+
+   // get BITMAP object
+   GetObject (hBitmap, sizeof (BITMAP), (PSTR) &bm) ;
+
+   // get new bitmap
    HDC hdcMem = CreateCompatibleDC (hdc) ;
-   hBitmap = CreateCompatibleBitmap (hdc, abs (pEnd.x - pBeg.x), abs (pEnd.y - pBeg.y)) ;
+   hBitmap = CreateCompatibleBitmap (hdc, bm.bmWidth, bm.bmHeight) ;
    SelectObject (hdcMem, hBitmap) ;
-   StretchBlt (hdcMem, 0, 0, abs (pEnd.x - pBeg.x), abs (pEnd.y - pBeg.y), hdc, pBeg.x, pBeg.y, pEnd.x - pBeg.x, pEnd.y - pBeg.y, SRCCOPY) ;
+   StretchBlt (hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdc, 41, 41, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
 		
    DeleteDC (hdcMem) ;
    ReleaseDC (m_hwnd, hdc) ;
@@ -531,7 +543,11 @@ void Luna::OnLButtonUP (WPARAM wParam, LPARAM lParam)
 		bDrawing = false ;			
 		pEnd.x = LOWORD (lParam) ;
 		pEnd.y = HIWORD (lParam) ;
+		// drawing shapes: rectangle, Ellipse or line
 		Shape (m_hwnd, pBeg, pEnd, R2_COPYPEN) ;	
+		// save new bitmap after drawing
+		hBitmap = SaveBitmapToMemory () ;
+		// select part or full bitmap
 		if (iShape == 4)
 			CreateEditBox() ;
 		if (bSelection)
