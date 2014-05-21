@@ -177,39 +177,42 @@ LRESULT Luna::SetEditBox(WPARAM wParam, LPARAM lParam)
 void Luna::ShowPictureInEditModel ()
 {	
     BITMAP bm ;		
-    HDC hdc = GetDC (m_hwnd); 
+    HDC hdc = GetDC (m_hwnd);
+
+	// create compatible DC
     HDC hdcCompat = CreateCompatibleDC (hdc); 
     SelectObject (hdcCompat, hBitmap);	
+
+	// get BITMAP object
     GetObject (hBitmap, sizeof (BITMAP), (PSTR) &bm) ;
+
     COLORREF crBkgnd = GetBkColor (hdc); 
-    HBRUSH   hbrBkgnd = CreateSolidBrush (crBkgnd);		
-    ReleaseDC (m_hwnd, hdc);                
-    
-    RECT rcBmp;
-    SetRect (&rcBmp, 40, 40, bm.bmWidth + 42, bm.bmHeight + 42);
-    
-    PAINTSTRUCT ps;  
-    // Fill the client area with a brush
+    HBRUSH   hbrBkgnd = CreateSolidBrush (crBkgnd);	
+
+    ReleaseDC (m_hwnd, hdc); 
+
+	PAINTSTRUCT        ps;  
     RECT               clientRect;
     hdc = BeginPaint(m_hwnd, &ps);
-    GetClientRect (m_hwnd, &clientRect) ;
-    GetClientRect(m_hwnd, &clientRect);
+
+	// Fill the client area with a brush
+    GetClientRect (m_hwnd, &clientRect) ;   
     HRGN  bgRgn = CreateRectRgnIndirect(&clientRect);
     HBRUSH  hBrush = CreateSolidBrush(RGB(200,200,200));
-    FillRgn(hdc, bgRgn, hBrush);
+    FillRgn (hdc, bgRgn, hBrush);    
     
-    
-    // draw bitmap and the bolder
-    Rectangle (ps.hdc, rcBmp.left, rcBmp.top, rcBmp.right, rcBmp.bottom); 
-    BitBlt (ps.hdc, rcBmp.left + 1, rcBmp.top + 1, 
-               (rcBmp.right - rcBmp.left) - 2, 
-               (rcBmp.bottom - rcBmp.top) - 2, hdcCompat, 
-               0, 0, SRCCOPY); 
+    // draw bolder of the bitmap
+	SetRect (&rBitmapRect, 40, 40, bm.bmWidth + 42, bm.bmHeight + 42) ;
+    Rectangle (ps.hdc, rBitmapRect.left, rBitmapRect.top, rBitmapRect.right, rBitmapRect.bottom); 
+
+	// draw bitmap
+	BitBlt(ps.hdc, rBitmapRect.left + 1, rBitmapRect.top + 1, bm.bmWidth, bm.bmHeight, hdcCompat, 0, 0, SRCCOPY) ;  
     
     // clean up
     DeleteDC (hdcCompat) ;	
     DeleteObject(bgRgn);
     DeleteObject(hBrush);
+
 	EndPaint (m_hwnd, &ps); 	
 }
 
@@ -241,7 +244,7 @@ void Luna::ShowPictureInViewModel ()
     	SetRect (&rBitmapRect, point.x - 1, point.y - 1, point.x + bm.bmWidth + 1, point.y + bm.bmHeight + 1) ;
     	Rectangle(hdcClient, rBitmapRect.left, rBitmapRect.top, rBitmapRect.right, rBitmapRect.bottom) ; 
     	// draw the bitmap
-    	BitBlt(hdcClient, point.x, point.y, bm.bmWidth, bm.bmHeight,  hdcMem, 0, 0, SRCCOPY) ;
+    	BitBlt(hdcClient, point.x, point.y, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCCOPY) ;
     }
     else
     {			
