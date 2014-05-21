@@ -213,6 +213,8 @@ void Luna::ShowPictureInEditModel ()
     DeleteObject(bgRgn);
     DeleteObject(hBrush);
 
+	hBitmap = SaveBitmapToMemory () ;
+
 	EndPaint (m_hwnd, &ps); 	
 }
 
@@ -457,6 +459,27 @@ void Luna::DrawLine(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 
 	DeleteObject (hpen) ;
 	ReleaseDC(hwnd, hdc) ;
+}
+
+HBITMAP Luna::SaveBitmapToMemory ()
+{	
+   if (hBitmap)
+   {
+	   DeleteObject (hBitmap) ;
+	   hBitmap = NULL ;
+   }
+
+   HDC hdc = GetDC (m_hwnd) ;
+   HDC hdcMem = CreateCompatibleDC (hdc) ;
+   hBitmap = CreateCompatibleBitmap (hdc, abs (pEnd.x - pBeg.x), abs (pEnd.y - pBeg.y)) ;
+   SelectObject (hdcMem, hBitmap) ;
+   StretchBlt (hdcMem, 0, 0, abs (pEnd.x - pBeg.x), abs (pEnd.y - pBeg.y), hdc, pBeg.x, pBeg.y, pEnd.x - pBeg.x, pEnd.y - pBeg.y, SRCCOPY) ;
+		
+   DeleteDC (hdcMem) ;
+   ReleaseDC (m_hwnd, hdc) ;
+   //InvalidateRect (m_hwnd, NULL, TRUE) ;
+
+   return hBitmap ;
 }
 
 void Luna::OnPaint ()

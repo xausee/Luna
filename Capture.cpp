@@ -31,7 +31,7 @@ HBITMAP Capture::CaptureFullScreen ()
     HDC hDesktopDC = GetDC (hDesktopWnd) ;    
 	HDC hBmpFileDC = CreateCompatibleDC (hDesktopDC) ;
 
-    hBitmap = CreateCompatibleBitmap (hDesktopDC,nWidth,nHeight) ;
+    hBitmap = CreateCompatibleBitmap (hDesktopDC, nWidth, nHeight) ;
     HBITMAP hOldBitmap = (HBITMAP) SelectObject (hBmpFileDC, hBitmap) ;
     BitBlt (hBmpFileDC, 0, 0, nWidth, nHeight, hDesktopDC, 0, 0, SRCCOPY|CAPTUREBLT) ;
     SelectObject (hBmpFileDC,hOldBitmap) ; 

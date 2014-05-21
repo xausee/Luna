@@ -47,6 +47,7 @@ public:
 	void CreateToolbar () ;
 	void UpdateToobar () ;
 	void CloseToolbar () ;
+	HBITMAP SaveBitmapToMemory () ;
 	void SaveFile () ;
 	int  GetLineSize () ;
 	COLORREF GetColor () ;
