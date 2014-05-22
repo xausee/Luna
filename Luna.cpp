@@ -218,6 +218,10 @@ void Luna::ShowPictureInEditModel ()
 
 void Luna::ShowPictureInViewModel ()
 {	
+	// destroy the edit box if have
+	if (hwndEditBox)
+		DestroyWindow (hwndEditBox) ;
+
     BITMAP             bm ;
     RECT               rcClient;
     PAINTSTRUCT        ps;	
@@ -465,12 +469,6 @@ void Luna::DrawLine(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 
 HBITMAP Luna::SaveBitmapToMemory ()
 {	
-  /* if (hBitmap)
-   {
-	   DeleteObject (hBitmap) ;
-	   hBitmap = NULL ;
-   }*/
-
    BITMAP bm ;		
    HDC hdc = GetDC (m_hwnd);
 
@@ -488,8 +486,7 @@ HBITMAP Luna::SaveBitmapToMemory ()
    StretchBlt (hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdc, 41, 41, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
 		
    DeleteDC (hdcMem) ;
-   ReleaseDC (m_hwnd, hdc) ;
-   //InvalidateRect (m_hwnd, NULL, TRUE) ;
+   ReleaseDC (m_hwnd, hdc) ;  
 
    return hBitmap ;
 }
