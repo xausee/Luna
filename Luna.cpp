@@ -47,6 +47,12 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 		break;
 	case WM_CTLCOLOREDIT:
 		return SetEditBox (wParam, lParam) ;
+	case WM_HSCROLL:
+		OnHScroll (wParam, lParam) ;
+		break ;
+	case WM_VSCROLL:
+		OnVScroll (wParam, lParam) ;
+		break ;
 	case WM_COMMAND:
 		switch (LOWORD (wParam)) 
         {
@@ -64,6 +70,8 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
             break ; 
 		case ID_EDIT:			
 			CreateToolbar() ;
+			InitializeHScroll () ;
+			InitializeVScroll () ;
 			break ;
 		case ID_EXIT: 
 			exit (0) ;		
@@ -561,6 +569,46 @@ void Luna::OnMouseMove (WPARAM wParam, LPARAM lParam)
 		pEnd.y = HIWORD (lParam) ;	
 		Shape (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
 	}
+}
+
+void Luna::InitializeHScroll ()
+{	
+	/*int   xNewSize = LOWORD (lParam);    
+	xMaxScroll = max (bmp.bmWidth - xNewSize, 0); 
+	xCurrentScroll = min (xCurrentScroll, xMaxScroll); 
+	
+	SCROLLINFO si;
+	si.cbSize = sizeof (si) ; 
+	si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS ; 
+	si.nMin   = xMinScroll ; 
+	si.nMax   = bmp.bmWidth ; 
+	si.nPage  = xNewSize ; 
+	si.nPos   = xCurrentScroll ; 
+	SetScrollInfo (hwnd, SB_HORZ, &si, TRUE) ; */
+}
+
+void Luna::InitializeVScroll ()
+{		
+	/*int   yNewSize = HIWORD (lParam);
+	yMaxScroll = max (bmp.bmHeight - yNewSize, 0);
+	yCurrentScroll = min (yCurrentScroll, yMaxScroll) ; 
+
+	SCROLLINFO si;
+	si.cbSize = sizeof(si) ; 
+	si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS ; 
+	si.nMin   = yMinScroll ; 
+	si.nMax   = bmp.bmHeight ; 
+	si.nPage  = yNewSize ; 
+	si.nPos   = yCurrentScroll ; 
+	SetScrollInfo(hwnd, SB_VERT, &si, TRUE); */
+}
+
+void Luna::OnHScroll (WPARAM wParam, LPARAM lParam)
+{		
+}
+
+void Luna::OnVScroll (WPARAM wParam, LPARAM lParam)
+{		
 }
 
 void Luna::OnCaptureAnyArea ()

@@ -41,6 +41,10 @@ public:
 	void OnLButtonDown (WPARAM wParam, LPARAM lParam) ;	
 	void OnLButtonUP (WPARAM wParam, LPARAM lParam) ;
 	void OnMouseMove (WPARAM wParam, LPARAM lParam) ;
+	void InitializeHScroll () ;
+	void InitializeVScroll () ;
+	void OnHScroll (WPARAM wParam, LPARAM lParam) ;
+	void OnVScroll (WPARAM wParam, LPARAM lParam) ;
 	void OnCaptureAnyArea () ;
 	void OnCaptureSpecifiedWindow () ;
 	int  GetEncoderClsid (const WCHAR* format, CLSID* pClsid) ;
