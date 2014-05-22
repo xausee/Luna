@@ -622,7 +622,25 @@ int Luna::GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 void Luna::CreateToolbar ()
 {
 	isEdit = true;
-	InvalidateRect (m_hwnd, NULL, TRUE) ;
+	// add horizontal and verticle scroll bar from window style
+	LONG_PTR style = GetWindowLongPtr (m_hwnd, GWL_STYLE) ;
+	SetWindowLongPtr (m_hwnd, GWL_STYLE, style | WS_HSCROLL | WS_VSCROLL) ;
+
+	RECT winRect;
+	GetWindowRect (m_hwnd, &winRect) ;
+
+	// Show the new style window immediately 	
+	// seems if width and height are the same as old, SetWindowPos not work
+	// so just expend width and height by 1 pixel, then change it back
+	SetWindowPos (m_hwnd, HWND_TOP, winRect.left, winRect.top,
+		          winRect.right - winRect.left + 1, 
+		          winRect.bottom - winRect.top + 1, 
+				  SWP_SHOWWINDOW/*SWP_NOMOVE*/) ;
+	// Change back
+	SetWindowPos (m_hwnd, HWND_TOP, winRect.left, winRect.top,
+		          winRect.right - winRect.left, 
+		          winRect.bottom - winRect.top, 
+				  SWP_SHOWWINDOW/*SWP_NOMOVE*/) ;	
 
 	INITCOMMONCONTROLSEX initctrs;
 	initctrs.dwSize = sizeof (INITCOMMONCONTROLSEX);
@@ -666,6 +684,7 @@ void Luna::CreateToolbar ()
 		);
 	}
 
+	InvalidateRect (m_hwnd, NULL, TRUE) ;
 	UpdateWindow (m_hwnd) ;
 }
 
@@ -691,14 +710,34 @@ void Luna::UpdateToobar()
 void Luna::CloseToolbar ()
 {
 	isEdit = false;
-	InvalidateRect (m_hwnd, NULL, TRUE) ;
+	DestroyWindow (hWndToolbar) ;	
 
-	DestroyWindow (hWndToolbar) ;
-	//CloseHandle (hWndToolbar) ;
+	// remove horizontal and verticle scroll bar from window style
+	LONG_PTR style = GetWindowLongPtr (m_hwnd, GWL_STYLE) ;
+	style &= ~(WS_HSCROLL | WS_VSCROLL);
+	SetWindowLongPtr (m_hwnd, GWL_STYLE, style) ;
+
+	RECT winRect;
+	GetWindowRect (m_hwnd, &winRect) ;
+
+	// Show the new style window immediately 	
+	// seems if width and height are the same as old, SetWindowPos not work
+	// so just expend width and height by 1 pixel, then change it back
+	SetWindowPos (m_hwnd, HWND_TOP, winRect.left, winRect.top,
+		          winRect.right - winRect.left + 1, 
+		          winRect.bottom - winRect.top + 1, 
+				  SWP_SHOWWINDOW/*SWP_NOMOVE*/) ;
+	// Change back
+	SetWindowPos (m_hwnd, HWND_TOP, winRect.left, winRect.top,
+		          winRect.right - winRect.left, 
+		          winRect.bottom - winRect.top, 
+				  SWP_SHOWWINDOW/*SWP_NOMOVE*/) ;
+	
 	if (hWndToolbar)
 	{
 		hWndToolbar = NULL ;
 	}	
+	InvalidateRect (m_hwnd, NULL, TRUE) ;
 	UpdateWindow (m_hwnd) ;
 }
 
