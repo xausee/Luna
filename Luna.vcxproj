@@ -81,6 +81,7 @@
     <ClInclude Include="Luna.h" />
     <ClInclude Include="MouseHook.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Structs.h" />
     <ClInclude Include="TrasparentWindow.h" />
   </ItemGroup>
   <ItemGroup>

@@ -32,7 +32,11 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 	switch (uMsg)
 	{
 	case WM_CREATE:		
-		break ;		
+		break ;	
+	case WM_SIZE: 
+		InitializeHScroll (wParam, lParam) ;
+		InitializeVScroll (wParam, lParam) ;
+		break ;
 	case WM_PAINT:
 		OnPaint () ;
 		break ;
@@ -70,8 +74,8 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
             break ; 
 		case ID_EDIT:			
 			CreateToolbar() ;
-			InitializeHScroll () ;
-			InitializeVScroll () ;
+			InitializeHScroll (wParam, lParam) ;
+			InitializeVScroll (wParam, lParam) ;
 			break ;
 		case ID_EXIT: 
 			exit (0) ;		
@@ -571,36 +575,42 @@ void Luna::OnMouseMove (WPARAM wParam, LPARAM lParam)
 	}
 }
 
-void Luna::InitializeHScroll ()
+void Luna::InitializeHScroll (WPARAM wParam, LPARAM lParam)
 {	
-	/*int   xNewSize = LOWORD (lParam);    
-	xMaxScroll = max (bmp.bmWidth - xNewSize, 0); 
-	xCurrentScroll = min (xCurrentScroll, xMaxScroll); 
+	BITMAP             bm ;    
+    GetObject (hBitmap, sizeof (BITMAP), (PSTR) &bm) ;	
+
+	int   xNewSize = LOWORD (lParam);   
+	hScroll.xMaxScroll = max (bm.bmWidth - xNewSize, 0); 
+	hScroll.xCurrentScroll = min (hScroll.xCurrentScroll, hScroll.xMaxScroll); 
 	
 	SCROLLINFO si;
 	si.cbSize = sizeof (si) ; 
 	si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS ; 
-	si.nMin   = xMinScroll ; 
-	si.nMax   = bmp.bmWidth ; 
+	si.nMin   = hScroll.xMinScroll ; 
+	si.nMax   = bm.bmWidth ; 
 	si.nPage  = xNewSize ; 
-	si.nPos   = xCurrentScroll ; 
-	SetScrollInfo (hwnd, SB_HORZ, &si, TRUE) ; */
+	si.nPos   = hScroll.xCurrentScroll ; 
+	SetScrollInfo (m_hwnd, SB_HORZ, &si, TRUE) ; 	
 }
 
-void Luna::InitializeVScroll ()
-{		
-	/*int   yNewSize = HIWORD (lParam);
-	yMaxScroll = max (bmp.bmHeight - yNewSize, 0);
-	yCurrentScroll = min (yCurrentScroll, yMaxScroll) ; 
+void Luna::InitializeVScroll (WPARAM wParam, LPARAM lParam)
+{	
+	BITMAP             bm ;    
+    GetObject (hBitmap, sizeof (BITMAP), (PSTR) &bm) ;
+
+	int   yNewSize = HIWORD (lParam);
+	vScroll.yMaxScroll = max (bm.bmHeight - yNewSize, 0);
+	vScroll.yCurrentScroll = min (vScroll.yCurrentScroll, vScroll.yMaxScroll) ; 
 
 	SCROLLINFO si;
 	si.cbSize = sizeof(si) ; 
 	si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS ; 
-	si.nMin   = yMinScroll ; 
-	si.nMax   = bmp.bmHeight ; 
+	si.nMin   = vScroll.yMinScroll ; 
+	si.nMax   = bm.bmHeight ; 
 	si.nPage  = yNewSize ; 
-	si.nPos   = yCurrentScroll ; 
-	SetScrollInfo(hwnd, SB_VERT, &si, TRUE); */
+	si.nPos   = vScroll.yCurrentScroll ; 
+	SetScrollInfo(m_hwnd, SB_VERT, &si, TRUE); 
 }
 
 void Luna::OnHScroll (WPARAM wParam, LPARAM lParam)

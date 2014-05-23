@@ -6,6 +6,7 @@
 #include "BaseWindow.h"
 #include "TrasparentWindow.h"
 #include "Capture.h"
+#include "Structs.h"
 #include "resource.h"
 #include <windows.h>
 #include <Commctrl.h>
@@ -30,6 +31,12 @@ public:
 		bDrawing = false ;
 		hWndToolbar = NULL ;
 		hwndEditBox = NULL ;
+		hScroll.xCurrentScroll = 0 ;
+		hScroll.xCurrentScroll = 0;
+		hScroll.xMinScroll = 0 ;
+		vScroll.yCurrentScroll = 0 ;
+		vScroll.yMaxScroll = 0 ;
+		vScroll.yMinScroll = 0 ;
 
 		capture = new(Capture);		
 		SetWindowTitle ("Luna") ;
@@ -41,8 +48,8 @@ public:
 	void OnLButtonDown (WPARAM wParam, LPARAM lParam) ;	
 	void OnLButtonUP (WPARAM wParam, LPARAM lParam) ;
 	void OnMouseMove (WPARAM wParam, LPARAM lParam) ;
-	void InitializeHScroll () ;
-	void InitializeVScroll () ;
+	void InitializeHScroll (WPARAM wParam, LPARAM lParam) ;
+	void InitializeVScroll (WPARAM wParam, LPARAM lParam) ;
 	void OnHScroll (WPARAM wParam, LPARAM lParam) ;
 	void OnVScroll (WPARAM wParam, LPARAM lParam) ;
 	void OnCaptureAnyArea () ;
@@ -69,6 +76,8 @@ protected:
 	HWND    hWndToolbar ;
 	HWND    hwndEditBox ;
 	HBITMAP	hBitmap ;
+	HScroll hScroll ;
+	VScroll vScroll ;
 	bool    isEdit ;
 	bool	bSelection ;
 	bool	bDrawing ;
