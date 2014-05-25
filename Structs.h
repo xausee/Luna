@@ -1,3 +1,5 @@
+#ifndef _STRUCTS_H_
+#define _STRUCTS_H_
 
 struct HScroll
 {	
@@ -14,3 +16,5 @@ struct VScroll
     int yCurrentScroll;   // current vertical scroll value 
     int yMaxScroll;       // maximum vertical scroll value 
 };
+
+#endif

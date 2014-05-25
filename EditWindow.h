@@ -1,12 +1,9 @@
-﻿// this is a window derived form CBaseWindow
+// this is a window derived form CBaseWindow
 // just to show that inheritance is possible
 
-#ifndef _LUNA_H_
-#define _LUNA_H_
+#ifndef _EDITWINDOW_H_
+#define _EDITWINDOW_H_
 #include "BaseWindow.h"
-#include "TrasparentWindow.h"
-#include "EditWindow.h"
-#include "Capture.h"
 #include "Structs.h"
 #include "resource.h"
 #include <windows.h>
@@ -18,10 +15,10 @@ using namespace Gdiplus;
 #pragma comment (lib,"Gdiplus.lib")
 #pragma comment (lib,"Comctl32.lib")
 
-class Luna : public CBaseWindow
+class EditWindow : public CBaseWindow
 {
 public:	
-	Luna (HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL) : CBaseWindow(hInst, wcx)
+	EditWindow (HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL) : CBaseWindow(hInst, wcx)
 	{ 
 		hBitmap = NULL ;  
 		isEdit = false ;
@@ -29,24 +26,16 @@ public:
 		iShape = 0 ;
 	    iPenSize = 0 ;
 	  	iPenColor = 0 ;
-		bDrawing = false ;
-		hWndToolbar = NULL ;
+		bDrawing = false ;		
 		hwndEditBox = NULL ;
-		hwndEditWindow = NULL ;
 		fScroll = false ;
 		hScroll.xCurrentScroll = 0 ;
 		hScroll.xCurrentScroll = 0;
 		hScroll.xMinScroll = 0 ;
 		vScroll.yCurrentScroll = 0 ;
 		vScroll.yMaxScroll = 0 ;
-		vScroll.yMinScroll = 0 ;
-
-		capture = new(Capture);			
-		SetWindowTitle ("Luna") ;
+		vScroll.yMinScroll = 0 ;	
 	};		
-	Capture * capture ;
-	EditWindow * editWindow ;
-	MouseHook *cpMouseHook ;
 	
 	void OnPaint();
 	void OnLButtonDown (WPARAM wParam, LPARAM lParam) ;	
@@ -56,33 +45,22 @@ public:
 	void InitializeVScroll (WPARAM wParam, LPARAM lParam) ;
 	void OnHScroll (WPARAM wParam, LPARAM lParam) ;
 	void OnVScroll (WPARAM wParam, LPARAM lParam) ;
-	void OnCaptureAnyArea () ;
-	void OnCaptureSpecifiedWindow () ;
-	int  GetEncoderClsid (const WCHAR* format, CLSID* pClsid) ;
-	int  CreateChildWindow () ;
-	void CreateToolbar () ;
-	void UpdateToobar () ;
-	void CloseToolbar () ;
-	HBITMAP SaveBitmapToMemory () ;
-	void SaveFile () ;
 	int  GetLineSize () ;
 	COLORREF GetColor () ;
 	void ShowPictureInEditModel () ;
-	void ShowPictureInViewModel () ;
 	void Shape (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
-	void DrawRectangle (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
-	void DrawEllipse (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
-	void DrawLine (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
+	void DrawLine(HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 	HWND CreateEditBox() ;
 	LRESULT SetEditBox(WPARAM wParam, LPARAM lParam) ;
 	void TextOutFromEditBoxToCanvas () ;
-    //DWORD WINAPI EditPictureProc(LPVOID lpParameter) ;
+	void DrawRectangle(HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
+	void DrawEllipse(HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
+	HBITMAP EditWindow::SaveBitmapToMemory () ;
+	HWND GetHwnd () ;
 
-protected:	
-	HWND    hWndToolbar ;
-	HWND    hwndEditBox ;
-	HWND    hwndEditWindow ;
+protected:		
 	HBITMAP	hBitmap ;
+	HWND    hwndEditBox ;
 	bool    fScroll ;
 	HScroll hScroll ;
 	VScroll vScroll ;

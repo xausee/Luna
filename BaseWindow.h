@@ -27,6 +27,7 @@ public:
 	// 2 ways to create
 	virtual BOOL Create();
 	virtual BOOL Create(DWORD dwStyles, RECT* rect);
+	virtual BOOL Create(DWORD dwStyles, RECT* rect, HWND hwndParent);
 
 	void MsgLoop();
 	BOOL IsWindowClosed() { return bWindowClosed; };

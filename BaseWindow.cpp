@@ -114,6 +114,17 @@ BOOL CBaseWindow::Create(DWORD dwStyles, RECT* rect)
 	return (m_hwnd != NULL);
 } 
 
+BOOL CBaseWindow::Create(DWORD dwStyles, RECT* rect, HWND hwndParent)
+{ 
+	// Create the window	
+	// send the this pointer as the window creation parameter
+	m_hwnd = CreateWindow(szClassName, szWindowTitle, dwStyles, rect->left, rect->top, 
+		rect->right - rect->left, rect->bottom - rect->top, hwndParent, NULL, hInstance, 
+		(void *)this);
+
+	return (m_hwnd != NULL);
+} 
+
 void CBaseWindow::MsgLoop()
 {
   MSG msg;

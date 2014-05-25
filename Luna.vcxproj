@@ -70,6 +70,7 @@
   <ItemGroup>
     <ClCompile Include="BaseWindow.cpp" />
     <ClCompile Include="Capture.cpp" />
+    <ClCompile Include="EditWindow.cpp" />
     <ClCompile Include="Luna.cpp" />
     <ClCompile Include="MouseHook.cpp" />
     <ClCompile Include="TrasparentWindow.cpp" />
@@ -78,6 +79,7 @@
   <ItemGroup>
     <ClInclude Include="BaseWindow.h" />
     <ClInclude Include="Capture.h" />
+    <ClInclude Include="EditWindow.h" />
     <ClInclude Include="Luna.h" />
     <ClInclude Include="MouseHook.h" />
     <ClInclude Include="resource.h" />
