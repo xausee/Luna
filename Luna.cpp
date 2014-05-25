@@ -80,14 +80,12 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 			 OnCaptureAnyArea () ;
             break ; 
 		case ID_EDIT:
-			InitializeHScroll (wParam, lParam) ;
-			InitializeVScroll (wParam, lParam) ;
+			//InitializeHScroll (wParam, lParam) ;
+			//InitializeVScroll (wParam, lParam) ;
 			CreateToolbar() ;	
-			if (!hwndEditWindow)
+			if (!hwndEditWindow && !EditPictureThread)
 			{
-				CreateThread (NULL,0, EditPictureProc, (void*)this, 0, NULL) ;
-				if (hwndEditWindow)
-					UpdateWindow (hwndEditWindow) ;
+				EditPictureThread = CreateThread (NULL,0, EditPictureProc, (void*)this, 0, NULL) ;				
 			}
 			break ;
 		case ID_EXIT: 
@@ -134,13 +132,11 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 			break;
 		case ID_CLOSE:	
 			{
-			int e = DestroyWindow (hwndEditWindow) ;
-			hwndEditWindow = NULL ;
-			SendMessage (hwndEditWindow, WM_DESTROY, 0, 0) ;
-			UpdateWindow (hwndEditWindow) ;
-			InvalidateRect (m_hwnd, NULL, TRUE) ;
-	UpdateWindow (m_hwnd) ;
-			CloseToolbar () ;
+				SendMessage (hwndEditWindow, WM_DESTROY, 0, 0) ;
+				hwndEditWindow = NULL ;	
+				CloseHandle (EditPictureThread) ;
+				EditPictureThread = NULL ;
+				CloseToolbar () ;
 			}
 			break ;
 		default: 

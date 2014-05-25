@@ -33,6 +33,7 @@ public:
 		hWndToolbar = NULL ;
 		hwndEditBox = NULL ;
 		hwndEditWindow = NULL ;
+		EditPictureThread = NULL ;
 		fScroll = false ;
 		hScroll.xCurrentScroll = 0 ;
 		hScroll.xCurrentScroll = 0;
@@ -82,6 +83,7 @@ protected:
 	HWND    hWndToolbar ;
 	HWND    hwndEditBox ;
 	HWND    hwndEditWindow ;
+	HANDLE  EditPictureThread;
 	HBITMAP	hBitmap ;
 	bool    fScroll ;
 	HScroll hScroll ;
