@@ -42,13 +42,29 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 		break ;	
 	case WM_SIZE:
 		{
-			RECT winRect;			
-			GetClientRect (m_hwnd, &winRect) ;
-			SetWindowPos (hwndEditWindow, HWND_TOP, winRect.left, winRect.top + 30,
-				winRect.right - winRect.left,
-				winRect.bottom - winRect.top - 30, 
-				SWP_SHOWWINDOW) ;	
-			//UpdateWindow (hwndEditWindow) ;
+			RECT winRect, ToolbarWindowRect;			
+			GetClientRect (m_hwnd, &winRect) ;			
+			GetWindowRect (hWndToolbar, &ToolbarWindowRect) ;	
+			
+			int width = winRect.right - winRect.left ;	
+			int height = 30;//ToolbarWindowRect.bottom -ToolbarWindowRect.top ;
+
+			if (hWndToolbar)
+			{	
+				SetWindowPos (hWndToolbar, HWND_TOP, 0, 0, width, height, SWP_SHOWWINDOW) ;	
+				UpdateWindow (hWndToolbar) ;
+			}
+
+			if (hwndEditWindow)
+			{
+				SetWindowPos (hwndEditWindow, HWND_TOP, winRect.left, winRect.top + height,
+					winRect.right - winRect.left,
+					winRect.bottom - winRect.top - height,
+					SWP_SHOWWINDOW) ;
+				UpdateWindow (hwndEditWindow) ;
+				//SendMessage (hwndEditWindow, WM_PAINT, wParam, lParam) ;
+			}
+			UpdateWindow (m_hwnd) ;
 		}
 		break ;
 	case WM_PAINT:
@@ -239,16 +255,7 @@ HBITMAP Luna::SaveBitmapToMemory ()
 void Luna::OnPaint ()
 {
 	if (hWndToolbar)
-	{
-		UpdateWindow (m_hwnd) ;		
-		/*RECT clientRect ;
-		GetClientRect (m_hwnd, &clientRect) ;
-		clientRect.top += 30 ;
-		InvalidateRect (m_hwnd, &clientRect, TRUE) ;*/
-		//ShowWindow (hWndToolbar,  SW_SHOW) ;
-		//ShowWindow (m_hwnd,  SW_SHOW) ;
-		/*if (hwndEditWindow)
-			ShowWindow (hwndEditWindow,  SW_SHOW) ;*/
+	{			
 		return ;
 	}
 	

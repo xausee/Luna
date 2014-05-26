@@ -6,7 +6,7 @@ LRESULT CALLBACK EditWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, 
 	{
 	case WM_CREATE:			
 		break ;	
-	case WM_SIZE: 
+	case WM_SIZE: 		
 		InitializeHScroll (wParam, lParam) ;
 		InitializeVScroll (wParam, lParam) ;
 		break ;
