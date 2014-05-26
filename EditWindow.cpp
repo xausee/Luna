@@ -171,7 +171,7 @@ void EditWindow::ShowPictureInEditModel ()
 	// Fill the client area with a brush
     GetClientRect (m_hwnd, &clientRect) ;   
     HRGN  bgRgn = CreateRectRgnIndirect(&clientRect);
-    HBRUSH  hBrush = CreateSolidBrush(RGB(0,0,0));
+    HBRUSH  hBrush = CreateSolidBrush(RGB(53, 78, 85));
     FillRgn (hdc, bgRgn, hBrush);    
     
     // draw bolder of the bitmap
