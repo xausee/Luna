@@ -4,7 +4,7 @@ LRESULT CALLBACK EditWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, 
 {
 	switch (uMsg)
 	{
-	case WM_CREATE:		
+	case WM_CREATE:			
 		break ;	
 	case WM_SIZE: 
 		InitializeHScroll (wParam, lParam) ;
@@ -83,6 +83,17 @@ LRESULT CALLBACK EditWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, 
 HWND EditWindow::GetHwnd ()
 {
 	return m_hwnd ;
+}
+
+HBITMAP EditWindow::SetBitmap (HBITMAP	srcHBitmap)
+{
+	hBitmap = srcHBitmap ; 
+	return hBitmap ;
+}
+
+HBITMAP EditWindow::GetBitmap ()
+{	
+	return hBitmap ;
 }
 
 int EditWindow::GetLineSize()
@@ -417,8 +428,7 @@ HBITMAP EditWindow::SaveBitmapToMemory ()
 }
 
 void EditWindow::OnPaint ()
-{	
-	
+{		
 	if (!hBitmap)
 		return ;
 	ShowPictureInEditModel () ;

@@ -24,7 +24,7 @@ LRESULT CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 	return DefWindowProc(hwndDlg, uMsg, wParam, lParam) ;
 }
 
-DWORD WINAPI EditPictureProc(LPVOID lpParameter)//thread data
+DWORD WINAPI EditPictureProc(LPVOID lpParameter)
 {
 	Luna *luna = (Luna*)lpParameter ;
 	luna->CreateChildWindow () ;
@@ -40,9 +40,16 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 	{
 	case WM_CREATE:			
 		break ;	
-	case WM_SIZE: 
-		InitializeHScroll (wParam, lParam) ;
-		InitializeVScroll (wParam, lParam) ;
+	case WM_SIZE:
+		{
+			RECT winRect;			
+			GetClientRect (m_hwnd, &winRect) ;
+			SetWindowPos (hwndEditWindow, HWND_TOP, winRect.left, winRect.top + 30,
+				winRect.right - winRect.left,
+				winRect.bottom - winRect.top - 30, 
+				SWP_SHOWWINDOW) ;	
+			UpdateWindow (hwndEditWindow) ;
+		}
 		break ;
 	case WM_PAINT:
 		OnPaint () ;
@@ -57,13 +64,7 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 		OnMouseMove (wParam, lParam) ;
 		break;
 	case WM_CTLCOLOREDIT:
-		return SetEditBox (wParam, lParam) ;
-	case WM_HSCROLL:
-		OnHScroll (wParam, lParam) ;
-		break ;
-	case WM_VSCROLL:
-		OnVScroll (wParam, lParam) ;
-		break ;
+		return SetEditBox (wParam, lParam) ;	
 	case WM_COMMAND:
 		switch (LOWORD (wParam)) 
         {
@@ -79,13 +80,11 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 		case ID_CAPTURER_ANYAREA:
 			 OnCaptureAnyArea () ;
             break ; 
-		case ID_EDIT:
-			//InitializeHScroll (wParam, lParam) ;
-			//InitializeVScroll (wParam, lParam) ;
+		case ID_EDIT:			
 			CreateToolbar() ;	
 			if (!hwndEditWindow && !EditPictureThread)
 			{
-				EditPictureThread = CreateThread (NULL,0, EditPictureProc, (void*)this, 0, NULL) ;				
+				EditPictureThread = CreateThread (NULL,0, EditPictureProc, (void*)this, 0, NULL) ;					
 			}
 			break ;
 		case ID_EXIT: 
@@ -557,9 +556,9 @@ void Luna::OnPaint ()
 		return ;
 
 	if (isEdit)	
-		ShowPictureInEditModel () ;
-	else
-		ShowPictureInViewModel () ;
+		return ;
+	
+	ShowPictureInViewModel () ;
 
 	//TextOutFromEditBoxToCanvas () ;
 }	
@@ -616,186 +615,6 @@ void Luna::OnMouseMove (WPARAM wParam, LPARAM lParam)
 		pEnd.y = HIWORD (lParam) ;	
 		Shape (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
 	}
-}
-
-void Luna::InitializeHScroll (WPARAM wParam, LPARAM lParam)
-{	
-	BITMAP             bm ;    
-    GetObject (hBitmap, sizeof (BITMAP), (PSTR) &bm) ;	
-
-	int   xNewSize = LOWORD (lParam);   
-	hScroll.xMaxScroll = max (bm.bmWidth - xNewSize, 0); 
-	hScroll.xCurrentScroll = min (hScroll.xCurrentScroll, hScroll.xMaxScroll); 
-	
-	SCROLLINFO si;
-	si.cbSize = sizeof (si) ; 
-	si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS ; 
-	si.nMin   = hScroll.xMinScroll ; 
-	si.nMax   = bm.bmWidth ; 
-	si.nPage  = xNewSize ; 
-	si.nPos   = hScroll.xCurrentScroll ; 
-	SetScrollInfo (m_hwnd, SB_HORZ, &si, TRUE) ; 	
-}
-
-void Luna::InitializeVScroll (WPARAM wParam, LPARAM lParam)
-{	
-	BITMAP             bm ;    
-    GetObject (hBitmap, sizeof (BITMAP), (PSTR) &bm) ;
-
-	int   yNewSize = HIWORD (lParam);
-	vScroll.yMaxScroll = max (bm.bmHeight - yNewSize, 0);
-	vScroll.yCurrentScroll = min (vScroll.yCurrentScroll, vScroll.yMaxScroll) ; 
-
-	SCROLLINFO si;
-	si.cbSize = sizeof(si) ; 
-	si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS ; 
-	si.nMin   = vScroll.yMinScroll ; 
-	si.nMax   = bm.bmHeight ; 
-	si.nPage  = yNewSize ; 
-	si.nPos   = vScroll.yCurrentScroll ; 
-	SetScrollInfo(m_hwnd, SB_VERT, &si, TRUE); 
-}
-
-void Luna::OnHScroll (WPARAM wParam, LPARAM lParam)
-{
-	int xDelta;     // xDelta = new_pos - current_pos  
-    int xNewPos;    // new position 
-    int yDelta = 0; 
-    
-    switch (LOWORD(wParam)) 
-    { 
-        // User clicked the scroll bar shaft left of the scroll box. 
-        case SB_PAGEUP: 
-            xNewPos = hScroll.xCurrentScroll - 50; 
-            break; 
-    
-        // User clicked the scroll bar shaft right of the scroll box. 
-        case SB_PAGEDOWN: 
-            xNewPos = hScroll.xCurrentScroll + 50; 
-            break; 
-    
-        // User clicked the left arrow. 
-        case SB_LINEUP: 
-            xNewPos = hScroll.xCurrentScroll - 5; 
-            break; 
-    
-        // User clicked the right arrow. 
-        case SB_LINEDOWN: 
-            xNewPos = hScroll.xCurrentScroll + 5; 
-            break; 
-    
-        // User dragged the scroll box. 
-        case SB_THUMBPOSITION: 
-            xNewPos = HIWORD(wParam); 
-            break; 
-    
-        default: 
-            xNewPos = hScroll.xCurrentScroll; 
-    } 
-    
-    // New position must be between 0 and the screen width. 
-    xNewPos = max(0, xNewPos); 
-    xNewPos = min(hScroll.xMaxScroll, xNewPos); 
-    
-    // If the current position does not change, do not scroll.
-    if (xNewPos == hScroll.xCurrentScroll) 
-        return ;
-    
-    // Set the scroll flag to TRUE. 
-    fScroll = true; 
-    
-    // Determine the amount scrolled (in pixels). 
-    xDelta = xNewPos - hScroll.xCurrentScroll; 
-    
-    // Reset the current scroll position. 
-    hScroll.xCurrentScroll = xNewPos; 
-    
-    // Scroll the window. (The system repaints most of the 
-    // client area when ScrollWindowEx is called; however, it is 
-    // necessary to call UpdateWindow in order to repaint the 
-    // rectangle of pixels that were invalidated.) 
-    ScrollWindowEx(m_hwnd, -xDelta, -yDelta, (CONST RECT *) NULL, 
-        (CONST RECT *) NULL, (HRGN) NULL, (PRECT) NULL, 
-        SW_INVALIDATE); 
-    UpdateWindow(m_hwnd); 
-    
-    // Reset the scroll bar. 
-	SCROLLINFO si;
-    si.cbSize = sizeof(si); 
-    si.fMask  = SIF_POS; 
-    si.nPos   = hScroll.xCurrentScroll; 
-    SetScrollInfo(m_hwnd, SB_HORZ, &si, TRUE); 
-}
-
-void Luna::OnVScroll (WPARAM wParam, LPARAM lParam)
-{	
-    int xDelta = 0; 
-    int yDelta;     // yDelta = new_pos - current_pos 
-    int yNewPos;    // new position 
-    
-    switch (LOWORD(wParam)) 
-    { 
-        // User clicked the scroll bar shaft above the scroll box. 
-        case SB_PAGEUP: 
-            yNewPos = vScroll.yCurrentScroll - 50; 
-            break; 
-    
-        // User clicked the scroll bar shaft below the scroll box. 
-        case SB_PAGEDOWN: 
-            yNewPos = vScroll.yCurrentScroll + 50; 
-            break; 
-    
-        // User clicked the top arrow. 
-        case SB_LINEUP: 
-            yNewPos = vScroll.yCurrentScroll - 5; 
-            break; 
-    
-        // User clicked the bottom arrow. 
-        case SB_LINEDOWN: 
-            yNewPos = vScroll.yCurrentScroll + 5; 
-            break; 
-    
-        // User dragged the scroll box. 
-        case SB_THUMBPOSITION: 
-            yNewPos = HIWORD(wParam); 
-            break; 
-    
-        default: 
-            yNewPos = vScroll.yCurrentScroll; 
-    } 
-    
-    // New position must be between 0 and the screen height. 
-    yNewPos = max(0, yNewPos); 
-    yNewPos = min(vScroll.yMaxScroll, yNewPos); 
-    
-    // If the current position does not change, do not scroll.
-    if (yNewPos == vScroll.yCurrentScroll) 
-        return ;
-    
-    // Set the scroll flag to TRUE. 
-    fScroll = true; 
-    
-    // Determine the amount scrolled (in pixels). 
-    yDelta = yNewPos - vScroll.yCurrentScroll; 
-    
-    // Reset the current scroll position. 
-    vScroll.yCurrentScroll = yNewPos; 
-    
-    // Scroll the window. (The system repaints most of the 
-    // client area when ScrollWindowEx is called; however, it is 
-    // necessary to call UpdateWindow in order to repaint the 
-    // rectangle of pixels that were invalidated.) 
-    ScrollWindowEx(m_hwnd, -xDelta, -yDelta, (CONST RECT *) NULL, 
-        (CONST RECT *) NULL, (HRGN) NULL, (PRECT) NULL, 
-        SW_INVALIDATE); 
-    UpdateWindow(m_hwnd); 
-    
-    // Reset the scroll bar. 
-	SCROLLINFO si;
-    si.cbSize = sizeof(si); 
-    si.fMask  = SIF_POS; 
-    si.nPos   = vScroll.yCurrentScroll; 
-    SetScrollInfo(m_hwnd, SB_VERT, &si, TRUE);
 }
 
 void Luna::OnCaptureAnyArea ()
@@ -880,7 +699,10 @@ int Luna::CreateChildWindow ()
 	clientRect.top += 30; 
 
 	if (window.RegisterWindow (&wcx))
-	{				
+	{		
+		if (hBitmap)
+			window.SetBitmap (hBitmap) ;
+
 		if (window.Create (WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL, &clientRect, m_hwnd))
 		{	
 			hwndEditWindow = window.GetHwnd () ;
@@ -889,7 +711,23 @@ int Luna::CreateChildWindow ()
 		else
 			dwError = GetLastError () ;
 	}
-	dwError = GetLastError () ;		
+	dwError = GetLastError () ;
+
+	// already registered
+	if (dwError == 1410)
+	{
+		if (hBitmap)
+			window.SetBitmap (hBitmap) ;
+
+		if (window.Create (WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL, &clientRect, m_hwnd))
+		{	
+			hwndEditWindow = window.GetHwnd () ;
+			window.MsgLoop () ;			
+		}
+		else
+			dwError = GetLastError () ;
+	}
+
 	return dwError ;
 }
 

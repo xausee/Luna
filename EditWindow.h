@@ -57,6 +57,8 @@ public:
 	void DrawEllipse(HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 	HBITMAP EditWindow::SaveBitmapToMemory () ;
 	HWND GetHwnd () ;
+	HBITMAP SetBitmap (HBITMAP	srcHBitmap) ;
+	HBITMAP GetBitmap () ;
 
 protected:		
 	HBITMAP	hBitmap ;

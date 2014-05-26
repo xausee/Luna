@@ -52,11 +52,7 @@ public:
 	void OnPaint();
 	void OnLButtonDown (WPARAM wParam, LPARAM lParam) ;	
 	void OnLButtonUP (WPARAM wParam, LPARAM lParam) ;
-	void OnMouseMove (WPARAM wParam, LPARAM lParam) ;
-	void InitializeHScroll (WPARAM wParam, LPARAM lParam) ;
-	void InitializeVScroll (WPARAM wParam, LPARAM lParam) ;
-	void OnHScroll (WPARAM wParam, LPARAM lParam) ;
-	void OnVScroll (WPARAM wParam, LPARAM lParam) ;
+	void OnMouseMove (WPARAM wParam, LPARAM lParam) ;	
 	void OnCaptureAnyArea () ;
 	void OnCaptureSpecifiedWindow () ;
 	int  GetEncoderClsid (const WCHAR* format, CLSID* pClsid) ;
@@ -77,7 +73,6 @@ public:
 	HWND CreateEditBox() ;
 	LRESULT SetEditBox(WPARAM wParam, LPARAM lParam) ;
 	void TextOutFromEditBoxToCanvas () ;
-    //DWORD WINAPI EditPictureProc(LPVOID lpParameter) ;
 
 protected:	
 	HWND    hWndToolbar ;
