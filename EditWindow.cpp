@@ -171,16 +171,15 @@ void EditWindow::ShowPictureInEditModel ()
 	// Fill the client area with a brush
     GetClientRect (m_hwnd, &clientRect) ;   
     HRGN  bgRgn = CreateRectRgnIndirect(&clientRect);
-    HBRUSH  hBrush = CreateSolidBrush(RGB(200,200,200));
+    HBRUSH  hBrush = CreateSolidBrush(RGB(0,0,0));
     FillRgn (hdc, bgRgn, hBrush);    
     
     // draw bolder of the bitmap
-	//SetRect (&rBitmapRect, 40, 40, bm.bmWidth + 42, bm.bmHeight + 42) ;
-    //Rectangle (ps.hdc, rBitmapRect.left, rBitmapRect.top, rBitmapRect.right, rBitmapRect.bottom); 
+	SetRect (&rBitmapRect, 0, 0, bm.bmWidth + 2, bm.bmHeight + 2) ;
+    Rectangle (ps.hdc, rBitmapRect.left, rBitmapRect.top, rBitmapRect.right, rBitmapRect.bottom); 
 
 	// draw bitmap
-	//BitBlt(ps.hdc, rBitmapRect.left + 1, rBitmapRect.top + 1, bm.bmWidth, bm.bmHeight, hdcCompat, 0, 0, SRCCOPY) ;  
-    BitBlt(ps.hdc, 0, 0, bm.bmWidth, bm.bmHeight, hdcCompat, 0, 0, SRCCOPY) ;  
+	BitBlt(ps.hdc, rBitmapRect.left + 1, rBitmapRect.top + 1, bm.bmWidth, bm.bmHeight, hdcCompat, 0, 0, SRCCOPY) ;      
 
 	// If scrolling has occurred, use the following call to
     // BitBlt to paint the invalid rectangle. 

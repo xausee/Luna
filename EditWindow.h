@@ -20,8 +20,7 @@ class EditWindow : public CBaseWindow
 public:	
 	EditWindow (HINSTANCE hInst, CONST WNDCLASSEX* wcx = NULL) : CBaseWindow(hInst, wcx)
 	{ 
-		hBitmap = NULL ;  
-		isEdit = false ;
+		hBitmap = NULL ;  		
 		bSelection = false ;		
 		iShape = 0 ;
 	    iPenSize = 0 ;
@@ -63,12 +62,11 @@ public:
 protected:		
 	HBITMAP	hBitmap ;
 	HWND    hwndEditBox ;
+	bool	bDrawing ;
 	bool    fScroll ;
 	HScroll hScroll ;
-	VScroll vScroll ;
-	bool    isEdit ;
+	VScroll vScroll ;	
 	bool	bSelection ;
-	bool	bDrawing ;
 	int 	iShape ;	
 	bool	bPenLine ;
 	int	    iPenSize ;

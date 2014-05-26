@@ -48,7 +48,7 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 				winRect.right - winRect.left,
 				winRect.bottom - winRect.top - 30, 
 				SWP_SHOWWINDOW) ;	
-			UpdateWindow (hwndEditWindow) ;
+			//UpdateWindow (hwndEditWindow) ;
 		}
 		break ;
 	case WM_PAINT:
@@ -63,8 +63,6 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 	case WM_MOUSEMOVE:
 		OnMouseMove (wParam, lParam) ;
 		break;
-	case WM_CTLCOLOREDIT:
-		return SetEditBox (wParam, lParam) ;	
 	case WM_COMMAND:
 		switch (LOWORD (wParam)) 
         {
@@ -95,39 +93,38 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 				ShowWindow(hAbout, SW_SHOW) ;
 			}
 			break ;
-		case ID_SELECT:			
-			bSelection = true ;
-			iShape = 5 ;
+		case ID_SELECT:	
+			SendMessage (hwndEditWindow, WM_COMMAND, ID_SELECT, 0) ;
 			break ;
-		case ID_RECTANGLE:
-			iShape = 1 ;
+		case ID_RECTANGLE:			
+			SendMessage (hwndEditWindow, WM_COMMAND, ID_RECTANGLE, 0) ;
 			break ;
-		case ID_CYCLE:
-			iShape = 2 ;
+		case ID_CYCLE:			
+			SendMessage (hwndEditWindow, WM_COMMAND, ID_CYCLE, 0) ;
 			break ;		
-		case ID_LINE:	
-			iShape = 3 ;
+		case ID_LINE:			
+			SendMessage (hwndEditWindow, WM_COMMAND, ID_LINE, 0) ;
 			break ;
-		case ID_TEXT:
-			iShape = 4 ;
+		case ID_TEXT:			
+			SendMessage (hwndEditWindow, WM_COMMAND, ID_TEXT, 0) ;
 			break ;
-		case ID_LINE_SIZE_ONE:
-			iPenSize = 1 ;
+		case ID_LINE_SIZE_ONE:			
+			SendMessage (hwndEditWindow, WM_COMMAND, ID_LINE_SIZE_ONE, 0) ;
 			break ;
-		case ID_LINE_SIZE_TWO:	
-			iPenSize = 2 ;
+		case ID_LINE_SIZE_TWO:				
+			SendMessage (hwndEditWindow, WM_COMMAND, ID_LINE_SIZE_TWO, 0) ;
 			break ;
-		case ID_LINE_SIZE_THREE:		
-			iPenSize = 3 ;
+		case ID_LINE_SIZE_THREE:			
+			SendMessage (hwndEditWindow, WM_COMMAND, ID_LINE_SIZE_THREE, 0) ;
 			break ;
-		case ID_COLOR_RED:
-			iPenColor = 1 ;
+		case ID_COLOR_RED:			
+			SendMessage (hwndEditWindow, WM_COMMAND, ID_COLOR_RED, 0) ;
 			break;
-		case ID_COLOR_GREEN:
-			iPenColor = 2 ;
+		case ID_COLOR_GREEN:			
+			SendMessage (hwndEditWindow, WM_COMMAND, ID_COLOR_GREEN, 0) ;
 			break;
-		case ID_COLOR_BLUE:   			
-			iPenColor = 3 ;
+		case ID_COLOR_BLUE:
+			SendMessage (hwndEditWindow, WM_COMMAND, ID_COLOR_BLUE, 0) ;
 			break;
 		case ID_CLOSE:	
 			{
@@ -151,124 +148,6 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 	return 0 ;
 }
 
-int Luna::GetLineSize()
-{
-	int	size  = 1 ;
-	switch (iPenSize)
-	{
-	case 1:
-		size = 1 ;
-		break ;
-	case 2:
-		size = 3 ;
-		break ;
-	case 3:
-		size = 5 ;
-		break ;
-	default:
-		size  = 1 ;
-		break ;
-	}
-	return size ;
-}
-
-COLORREF Luna::GetColor()
-{
-	COLORREF  color = RGB (0, 0, 0) ;
-	switch (iPenColor)
-	{
-	case 1:
-		color = RGB (255, 0, 0) ;
-		break ;
-	case 2:
-		color = RGB (0, 255, 0) ;
-		break ;
-	case 3:
-		color = RGB (0, 0, 255) ;
-		break ;
-	default:
-		color = RGB (0, 0, 0) ;
-		break ;
-	}
-	return color ;
-}
-
-LRESULT Luna::SetEditBox(WPARAM wParam, LPARAM lParam)
-{
-	//SetTextColor ((HDC)wParam,GetSysColor(COLOR_WINDOWTEXT));
-	SetTextColor ((HDC)wParam, GetColor());
-	SetBkMode ((HDC)wParam,OPAQUE);
-	SetBkColor ((HDC)wParam,GetSysColor(COLOR_WINDOW));
-	return (LRESULT)CreateSolidBrush(GetSysColor(COLOR_WINDOW));
-}
-
-void Luna::ShowPictureInEditModel ()
-{	
-    BITMAP bm ;		
-    HDC hdc = GetDC (m_hwnd);
-
-	// create compatible DC
-    HDC hdcCompat = CreateCompatibleDC (hdc); 
-    SelectObject (hdcCompat, hBitmap);	
-
-	// get BITMAP object
-    GetObject (hBitmap, sizeof (BITMAP), (PSTR) &bm) ;
-
-    COLORREF crBkgnd = GetBkColor (hdc); 
-    HBRUSH   hbrBkgnd = CreateSolidBrush (crBkgnd);	
-
-    ReleaseDC (m_hwnd, hdc); 
-
-	PAINTSTRUCT        ps;  
-    RECT               clientRect;
-    hdc = BeginPaint(m_hwnd, &ps);
-
-	// Fill the client area with a brush
-    GetClientRect (m_hwnd, &clientRect) ;   
-    HRGN  bgRgn = CreateRectRgnIndirect(&clientRect);
-    HBRUSH  hBrush = CreateSolidBrush(RGB(200,200,200));
-    FillRgn (hdc, bgRgn, hBrush);    
-    
-    // draw bolder of the bitmap
-	//SetRect (&rBitmapRect, 40, 40, bm.bmWidth + 42, bm.bmHeight + 42) ;
-    //Rectangle (ps.hdc, rBitmapRect.left, rBitmapRect.top, rBitmapRect.right, rBitmapRect.bottom); 
-
-	// draw bitmap
-	//BitBlt(ps.hdc, rBitmapRect.left + 1, rBitmapRect.top + 1, bm.bmWidth, bm.bmHeight, hdcCompat, 0, 0, SRCCOPY) ;  
-    BitBlt(ps.hdc, 0, 0, bm.bmWidth, bm.bmHeight, hdcCompat, 0, 0, SRCCOPY) ;  
-
-	// If scrolling has occurred, use the following call to
-    // BitBlt to paint the invalid rectangle. 
-    // 
-    // The coordinates of this rectangle are specified in the 
-    // RECT structure to which prect points. 
-    // 
-    // Note that it is necessary to increment the seventh 
-    // argument (prect->left) by xCurrentScroll and the 
-    // eighth argument (prect->top) by yCurrentScroll in 
-    // order to map the correct pixels from the source bitmap. 
-	PRECT prect;
-    if (fScroll) 
-    { 
-		prect = &ps.rcPaint;
-		BitBlt(ps.hdc, 
-			prect->left, prect->top, 
-			(prect->right - prect->left), 
-			(prect->bottom - prect->top), 
-			hdcCompat, 
-			prect->left + hScroll.xCurrentScroll, 
-			prect->top + vScroll.yCurrentScroll, 
-			SRCCOPY); 
-		fScroll = FALSE; 
-	} 
-
-    // clean up
-    DeleteDC (hdcCompat) ;	
-    DeleteObject(bgRgn);
-    DeleteObject(hBrush);	
-
-	EndPaint (m_hwnd, &ps); 	
-}
 
 void Luna::ShowPictureInViewModel ()
 {	
@@ -333,194 +212,6 @@ void Luna::ShowPictureInViewModel ()
     EndPaint (m_hwnd, &ps);		
 }
 
-void Luna::Shape(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
-{
-    HDC hdc = GetDC (hwnd) ;
-	int oldRop = SetROP2 (hdc, bModel) ;
-	HPEN hpen = CreatePen (PS_SOLID, GetLineSize(), GetColor()) ;
-	HPEN hpenDot = CreatePen (PS_DOT, 1, RGB(0, 0, 0)) ;
-
-	SelectObject (hdc, hpen) ;	
-	SelectObject(hdc, GetStockObject(NULL_BRUSH)) ;	
-
-	if (hBitmap)
-	{
-	  // restrict the shape in bitmap rectangle
-	  if (pBeg.x < rBitmapRect.left)
-		  pBeg.x = rBitmapRect.left ;
-	  if (pBeg.x > rBitmapRect.right)
-		  pBeg.x = rBitmapRect.right ;
-	  if (pBeg.y < rBitmapRect.top)
-		  pBeg.y = rBitmapRect.top ;
-	  if (pBeg.y > rBitmapRect.bottom)
-		  pBeg.y = rBitmapRect.bottom ;
-
-	  if (pEnd.x < rBitmapRect.left)
-		  pEnd.x = rBitmapRect.left ;
-	  if (pEnd.x > rBitmapRect.right)
-		  pEnd.x = rBitmapRect.right ;
-	  if (pEnd.y < rBitmapRect.top)
-		  pEnd.y = rBitmapRect.top ;
-	  if (pEnd.y > rBitmapRect.bottom)
-		  pEnd.y = rBitmapRect.bottom ;
-	}
-
-	switch (iShape)
-	{
-	case 1:
-		Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
-		break ;
-	case 2:
-		Ellipse(hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
-		break ;
-	case 3:
-		MoveToEx (hdc, pBeg.x, pBeg.y, (LPPOINT) NULL) ; 
-		LineTo (hdc, pEnd.x, pEnd.y) ;
-		break ;
-	case 4:	
-		//use fixed pen when draw text rectangele
-		SelectObject (hdc, CreatePen(PS_SOLID, 1,  RGB (0, 0, 0))) ; 
-		Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;		
-		break ;
-	case 5:
-		SelectObject (hdc, hpenDot) ;	
-		Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
-		break ;
-	default:
-		break ;
-	}	
-	
-	SetROP2 (hdc, oldRop) ;	
-	DeleteObject (hpen) ;
-	DeleteObject (hpenDot) ;
-	ReleaseDC (hwnd, hdc) ;	
-}
-
-HWND Luna::CreateEditBox()
-{
-	POINT pStart ;
-	int weight, height ;
-
-	// destroy the old edit box
-	if (hwndEditBox)
-		DestroyWindow (hwndEditBox) ;
-
-	if (hBitmap)
-	{
-	  // restrict Edit Box in bitmap rectangle
-	  if (pBeg.x < rBitmapRect.left)
-		  pBeg.x = rBitmapRect.left ;
-	  if (pBeg.x > rBitmapRect.right)
-		  pBeg.x = rBitmapRect.right ;
-	  if (pBeg.y < rBitmapRect.top)
-		  pBeg.y = rBitmapRect.top ;
-	  if (pBeg.y > rBitmapRect.bottom)
-		  pBeg.y = rBitmapRect.bottom ;
-
-	  if (pEnd.x < rBitmapRect.left)
-		  pEnd.x = rBitmapRect.left ;
-	  if (pEnd.x > rBitmapRect.right)
-		  pEnd.x = rBitmapRect.right ;
-	  if (pEnd.y < rBitmapRect.top)
-		  pEnd.y = rBitmapRect.top ;
-	  if (pEnd.y > rBitmapRect.bottom)
-		  pEnd.y = rBitmapRect.bottom ;
-	}
-
-	pStart.x = pBeg.x < pEnd.x ? pBeg.x : pEnd.x ;
-	pStart.y = pBeg.y < pEnd.y ? pBeg.y : pEnd.y ;
-	weight = abs (pEnd.x - pBeg.x) ;
-	height = abs (pEnd.y - pBeg.y) ;	
-
-	HDC hdc = GetDC (m_hwnd) ;
-	int iFontSize = GetLineSize() * 16 ;
-	HFONT hFont = CreateFont(iFontSize, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, "Arial") ;
-	SetTextColor (hdc, GetColor()) ;
-
-	// Creates textbox for input
-	hwndEditBox  = CreateWindowEx(NULL, "EDIT", "",
-			WS_CHILD | WS_VISIBLE | ES_MULTILINE | WS_TABSTOP | WS_BORDER | ES_LEFT,
-			pStart.x, pStart.y, weight, height,	
-			m_hwnd, (HMENU)(101),
-			hInstance, NULL) ; 	 
-
-	// Set text font
-	SendMessage (hwndEditBox, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(FALSE, 0)) ;
-	// char array to hold the text from the textbox
-	char szInput[MAX_PATH];
-	// Obtains input from the textbox and puts it into the char array
-	GetWindowText(GetDlgItem(m_hwnd, 101), szInput, MAX_PATH);
-	if (hwndEditBox)
-		return hwndEditBox;
-	else
-		return NULL;
-
-	DeleteObject (hFont) ;
-}
-
-void Luna::TextOutFromEditBoxToCanvas()
-{
-	if (hwndEditBox)
-	{		
-		char szInput[MAX_PATH];		
-		GetWindowText(GetDlgItem(m_hwnd, 101), szInput, MAX_PATH);
-		HDC hdc = GetDC (m_hwnd) ;	
-		int iFontSize = GetLineSize() * 16 ;
-		HFONT hFont = CreateFont(iFontSize, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, "Arial") ;
-		SelectObject (hdc, hFont) ;
-		SetTextColor (hdc, GetColor()) ;
-		DestroyWindow (hwndEditBox) ;
-		hwndEditBox = NULL ;
-		Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;		
-		TextOut (hdc, pBeg.x + 2, pBeg.y + 2, szInput, strlen(szInput)) ;			
-	}	
-}
-
-void Luna::DrawRectangle(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
-{
-    HDC hdc = GetDC (hwnd) ;
-	int oldRop = SetROP2 (hdc, bModel) ;
-	HPEN hpen = CreatePen (PS_SOLID, GetLineSize(), GetColor()) ;
-
-	SelectObject (hdc, hpen) ;	
-	SelectObject(hdc, GetStockObject(NULL_BRUSH)) ;	
-	Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
-	SetROP2 (hdc, oldRop) ;	
-
-	DeleteObject (hpen) ;
-	ReleaseDC(hwnd, hdc) ;
-}
-
-void Luna::DrawEllipse(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
-{
-	 HDC hdc = GetDC (hwnd) ;
-	int oldRop = SetROP2 (hdc, bModel) ;
-	HPEN hpen = CreatePen (PS_SOLID, GetLineSize(), GetColor()) ;
-
-	SelectObject (hdc, hpen) ;	
-	SelectObject(hdc, GetStockObject(NULL_BRUSH)) ;		
-	Ellipse(hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
-	SetROP2 (hdc, oldRop) ;	
-
-	DeleteObject (hpen) ;
-	ReleaseDC(hwnd, hdc);
-}
-
-void Luna::DrawLine(HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
-{
-    HDC hdc = GetDC (hwnd) ;
-	int oldRop = SetROP2 (hdc, bModel) ;
-	HPEN hpen = CreatePen (PS_SOLID, GetLineSize(), GetColor()) ;
-
-	SelectObject (hdc, hpen) ;		
-	MoveToEx (hdc, pBeg.x, pBeg.y, (LPPOINT) NULL) ; 
-	LineTo (hdc, pEnd.x, pEnd.y) ;	
-	SetROP2 (hdc, oldRop) ;	
-
-	DeleteObject (hpen) ;
-	ReleaseDC(hwnd, hdc) ;
-}
-
 HBITMAP Luna::SaveBitmapToMemory ()
 {	
    BITMAP bm ;		
@@ -549,18 +240,22 @@ void Luna::OnPaint ()
 {
 	if (hWndToolbar)
 	{
-		UpdateWindow (m_hwnd) ;
+		UpdateWindow (m_hwnd) ;		
+		/*RECT clientRect ;
+		GetClientRect (m_hwnd, &clientRect) ;
+		clientRect.top += 30 ;
+		InvalidateRect (m_hwnd, &clientRect, TRUE) ;*/
+		//ShowWindow (hWndToolbar,  SW_SHOW) ;
+		//ShowWindow (m_hwnd,  SW_SHOW) ;
+		/*if (hwndEditWindow)
+			ShowWindow (hwndEditWindow,  SW_SHOW) ;*/
+		return ;
 	}
 	
 	if (!hBitmap)
-		return ;
-
-	if (isEdit)	
-		return ;
+		return ;	
 	
-	ShowPictureInViewModel () ;
-
-	//TextOutFromEditBoxToCanvas () ;
+	ShowPictureInViewModel () ;	
 }	
 
 void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
@@ -574,47 +269,14 @@ void Luna::OnLButtonDown (WPARAM wParam, LPARAM lParam)
 		capture->bSpecifiedWindow = false ;
 		cpMouseHook->UnHook () ;			
 	}	
-	
-	//TextOutFromEditBoxToCanvas () ;
-
-	if (hWndToolbar)
-	{	
-		bDrawing = true ;		
-		pBeg.x = LOWORD (lParam) ;
-		pBeg.y = HIWORD (lParam) ;
-		pEnd.x = LOWORD (lParam) ;
-		pEnd.y = HIWORD (lParam) ;		
-	}
 }
 
 void Luna::OnLButtonUP (WPARAM wParam, LPARAM lParam)
-{
-	if (bDrawing)
-	{	
-		bDrawing = false ;			
-		pEnd.x = LOWORD (lParam) ;
-		pEnd.y = HIWORD (lParam) ;
-		// drawing shapes: rectangle, Ellipse or line
-		Shape (m_hwnd, pBeg, pEnd, R2_COPYPEN) ;	
-		// save new bitmap after drawing
-		//hBitmap = SaveBitmapToMemory () ;
-		// select part or full bitmap
-		if (iShape == 4)
-			CreateEditBox() ;
-		if (bSelection)
-			bSelection = false ;
-	}	
+{	
 }
 
 void Luna::OnMouseMove (WPARAM wParam, LPARAM lParam)
-{	
-	if (bDrawing)
-	{
-		Shape (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
-		pEnd.x = LOWORD (lParam) ;
-		pEnd.y = HIWORD (lParam) ;	
-		Shape (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
-	}
+{		
 }
 
 void Luna::OnCaptureAnyArea ()
@@ -630,7 +292,7 @@ void Luna::OnCaptureAnyArea ()
 	pTrasparentWindow.MsgLoop () ;	
 	hBitmap = pTrasparentWindow.hBitmap ;
 
-	ShowWindow (m_hwnd,SW_SHOW) ;	
+	ShowWindow (m_hwnd, SW_SHOW) ;	
 }
 
 void Luna::OnCaptureSpecifiedWindow ()
@@ -702,9 +364,10 @@ int Luna::CreateChildWindow ()
 	{		
 		if (hBitmap)
 			window.SetBitmap (hBitmap) ;
+		//window.bDrawing = true ;
 
 		if (window.Create (WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL, &clientRect, m_hwnd))
-		{	
+		{				
 			hwndEditWindow = window.GetHwnd () ;
 			window.MsgLoop () ;			
 		}
@@ -720,7 +383,7 @@ int Luna::CreateChildWindow ()
 			window.SetBitmap (hBitmap) ;
 
 		if (window.Create (WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL, &clientRect, m_hwnd))
-		{	
+		{				
 			hwndEditWindow = window.GetHwnd () ;
 			window.MsgLoop () ;			
 		}
@@ -733,27 +396,6 @@ int Luna::CreateChildWindow ()
 
 void Luna::CreateToolbar ()
 {	
-	isEdit = true;
-	//// add horizontal and verticle scroll bar from window style
-	//LONG_PTR style = GetWindowLongPtr (m_hwnd, GWL_STYLE) ;
-	//SetWindowLongPtr (m_hwnd, GWL_STYLE, style | WS_HSCROLL | WS_VSCROLL) ;
-
-	//RECT winRect;
-	//GetWindowRect (m_hwnd, &winRect) ;
-
-	//// Show the new style window immediately 	
-	//// seems if width and height are the same as old, SetWindowPos not work
-	//// so just expend width and height by 1 pixel, then change it back
-	//SetWindowPos (m_hwnd, HWND_TOP, winRect.left, winRect.top,
-	//	          winRect.right - winRect.left + 1, 
-	//	          winRect.bottom - winRect.top + 1, 
-	//			  SWP_SHOWWINDOW/*SWP_NOMOVE*/) ;
-	//// Change back
-	//SetWindowPos (m_hwnd, HWND_TOP, winRect.left, winRect.top,
-	//	          winRect.right - winRect.left, 
-	//	          winRect.bottom - winRect.top, 
-	//			  SWP_SHOWWINDOW/*SWP_NOMOVE*/) ;	
-
 	INITCOMMONCONTROLSEX initctrs;
 	initctrs.dwSize = sizeof (INITCOMMONCONTROLSEX);
 	initctrs.dwICC = ICC_BAR_CLASSES;
@@ -822,29 +464,7 @@ void Luna::UpdateToobar()
 
 void Luna::CloseToolbar ()
 {
-	isEdit = false;
-	DestroyWindow (hWndToolbar) ;	
-
-	//// remove horizontal and verticle scroll bar from window style
-	//LONG_PTR style = GetWindowLongPtr (m_hwnd, GWL_STYLE) ;
-	//style &= ~(WS_HSCROLL | WS_VSCROLL);
-	//SetWindowLongPtr (m_hwnd, GWL_STYLE, style) ;
-
-	//RECT winRect;
-	//GetWindowRect (m_hwnd, &winRect) ;
-
-	//// Show the new style window immediately 	
-	//// seems if width and height are the same as old, SetWindowPos not work
-	//// so just expend width and height by 1 pixel, then change it back
-	//SetWindowPos (m_hwnd, HWND_TOP, winRect.left, winRect.top,
-	//	          winRect.right - winRect.left + 1, 
-	//	          winRect.bottom - winRect.top + 1, 
-	//			  SWP_SHOWWINDOW/*SWP_NOMOVE*/) ;
-	//// Change back
-	//SetWindowPos (m_hwnd, HWND_TOP, winRect.left, winRect.top,
-	//	          winRect.right - winRect.left, 
-	//	          winRect.bottom - winRect.top, 
-	//			  SWP_SHOWWINDOW/*SWP_NOMOVE*/) ;
+	DestroyWindow (hWndToolbar) ;
 	
 	if (hWndToolbar)
 	{
