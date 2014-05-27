@@ -61,10 +61,15 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 					winRect.right - winRect.left,
 					winRect.bottom - winRect.top - height,
 					SWP_SHOWWINDOW) ;
-				UpdateWindow (hwndEditWindow) ;
-				//SendMessage (hwndEditWindow, WM_PAINT, wParam, lParam) ;
+				UpdateWindow (hwndEditWindow) ;				
 			}
 			UpdateWindow (m_hwnd) ;
+		}
+		break ;
+	case WM_MOVE:
+		{
+			UpdateWindow (hwndEditWindow) ;
+			ShowWindow (hwndEditWindow, SW_SHOW) ;
 		}
 		break ;
 	case WM_PAINT:

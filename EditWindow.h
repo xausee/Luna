@@ -40,6 +40,7 @@ public:
 	void OnLButtonDown (WPARAM wParam, LPARAM lParam) ;	
 	void OnLButtonUP (WPARAM wParam, LPARAM lParam) ;
 	void OnMouseMove (WPARAM wParam, LPARAM lParam) ;
+	void InitializeScrolls (HWND hwnd, int cx, int cy) ;
 	void InitializeHScroll (WPARAM wParam, LPARAM lParam) ;
 	void InitializeVScroll (WPARAM wParam, LPARAM lParam) ;
 	void OnHScroll (WPARAM wParam, LPARAM lParam) ;

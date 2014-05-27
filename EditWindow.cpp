@@ -4,7 +4,15 @@ LRESULT CALLBACK EditWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, 
 {
 	switch (uMsg)
 	{
-	case WM_CREATE:			
+	case WM_CREATE:
+		{
+			LPCREATESTRUCT winInfo ;
+			winInfo = (LPCREATESTRUCT)lParam ;
+			//SendMessage (hwnd, WM_SIZE, wParam,  winInfo->cx ) ;
+			/*InitializeHScroll (wParam, winInfo->cx) ;
+			InitializeVScroll (wParam, winInfo->cy) ;*/
+			InitializeScroll (hwnd, winInfo->cx, winInfo->cy) ;
+		}
 		break ;	
 	case WM_SIZE: 		
 		InitializeHScroll (wParam, lParam) ;
@@ -473,6 +481,40 @@ void EditWindow::OnMouseMove (WPARAM wParam, LPARAM lParam)
 		pEnd.y = HIWORD (lParam) ;	
 		Shape (m_hwnd, pBeg, pEnd, R2_NOTXORPEN) ;
 	}
+}
+
+void EditWindow::InitializeScrolls (HWND hwnd, int cx, int cy) 
+{
+	BITMAP             bm ;    
+    GetObject (hBitmap, sizeof (BITMAP), (PSTR) &bm) ;	
+
+	// initialize horizonal scroll bar
+	int   xNewSize = cx;   
+	hScroll.xMaxScroll = max (bm.bmWidth - xNewSize, 0); 
+	hScroll.xCurrentScroll = min (hScroll.xCurrentScroll, hScroll.xMaxScroll); 
+	
+	SCROLLINFO si;
+	si.cbSize = sizeof (si) ; 
+	si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS ; 
+	si.nMin   = hScroll.xMinScroll ; 
+	si.nMax   = bm.bmWidth ; 
+	si.nPage  = xNewSize ; 
+	si.nPos   = hScroll.xCurrentScroll ; 
+	SetScrollInfo (hwnd, SB_HORZ, &si, TRUE) ; 
+
+
+	// initialize verticle scroll bar
+	int   yNewSize = cy;
+	vScroll.yMaxScroll = max (bm.bmHeight - yNewSize, 0);
+	vScroll.yCurrentScroll = min (vScroll.yCurrentScroll, vScroll.yMaxScroll) ;
+	
+	si.cbSize = sizeof(si) ; 
+	si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS ; 
+	si.nMin   = vScroll.yMinScroll ; 
+	si.nMax   = bm.bmHeight ; 
+	si.nPage  = yNewSize ; 
+	si.nPos   = vScroll.yCurrentScroll ; 
+	SetScrollInfo(hwnd, SB_VERT, &si, TRUE);
 }
 
 void EditWindow::InitializeHScroll (WPARAM wParam, LPARAM lParam)
