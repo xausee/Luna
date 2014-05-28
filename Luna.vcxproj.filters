@@ -36,7 +36,7 @@
     <ClCompile Include="EditWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TestWindow.cpp">
+    <ClCompile Include="EditPictureWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

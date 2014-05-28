@@ -73,7 +73,7 @@
     <ClCompile Include="EditWindow.cpp" />
     <ClCompile Include="Luna.cpp" />
     <ClCompile Include="MouseHook.cpp" />
-    <ClCompile Include="TestWindow.cpp" />
+    <ClCompile Include="EditPictureWindow.cpp" />
     <ClCompile Include="TrasparentWindow.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
