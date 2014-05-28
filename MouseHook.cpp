@@ -59,8 +59,8 @@ LRESULT CALLBACK MouseHook::MouseMsgHandler(int nCode, WPARAM wParam, LPARAM lPa
 			switch(wParam)
 			{
 			case WM_LBUTTONDOWN:
-				SendMessage (hwndLuna, WM_LBUTTONDOWN, NULL, NULL) ;				
-				break ;
+				SendMessage (hwndLuna, WM_LBUTTONDOWN, NULL, NULL) ;	
+				return 555;				
 			case WM_RBUTTONDOWN: 
 				break ;
 			case WM_LBUTTONDBLCLK:  				
