@@ -165,8 +165,8 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 			{
 				SendMessage (hwndEditWindow, WM_DESTROY, 0, 0) ;
 				hwndEditWindow = NULL ;	
-				CloseHandle (EditPictureThread) ;
-				EditPictureThread = NULL ;
+				//CloseHandle (EditPictureThread) ;
+				//EditPictureThread = NULL ;
 				CloseToolbar () ;
 			}
 			break ;
