@@ -55,7 +55,7 @@ public:
 	void TextOutFromEditBoxToCanvas () ;
 	void DrawRectangle(HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 	void DrawEllipse(HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
-	HBITMAP EditWindow::SaveBitmapToMemory () ;
+	HBITMAP SaveBitmapToMemory () ;
 	HWND GetHwnd () ;
 	HBITMAP SetBitmap (HBITMAP	srcHBitmap) ;
 	HBITMAP GetBitmap () ;

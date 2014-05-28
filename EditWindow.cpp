@@ -7,11 +7,8 @@ LRESULT CALLBACK EditWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, 
 	case WM_CREATE:
 		{
 			LPCREATESTRUCT winInfo ;
-			winInfo = (LPCREATESTRUCT)lParam ;
-			//SendMessage (hwnd, WM_SIZE, wParam,  winInfo->cx ) ;
-			/*InitializeHScroll (wParam, winInfo->cx) ;
-			InitializeVScroll (wParam, winInfo->cy) ;*/
-			InitializeScroll (hwnd, winInfo->cx, winInfo->cy) ;
+			winInfo = (LPCREATESTRUCT)lParam ;			
+			InitializeScrolls (hwnd, winInfo->cx, winInfo->cy) ;
 		}
 		break ;	
 	case WM_SIZE: 		

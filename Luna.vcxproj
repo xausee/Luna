@@ -73,6 +73,7 @@
     <ClCompile Include="EditWindow.cpp" />
     <ClCompile Include="Luna.cpp" />
     <ClCompile Include="MouseHook.cpp" />
+    <ClCompile Include="TestWindow.cpp" />
     <ClCompile Include="TrasparentWindow.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
@@ -84,6 +85,7 @@
     <ClInclude Include="MouseHook.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Structs.h" />
+    <ClInclude Include="EditPictureWindow.h" />
     <ClInclude Include="TrasparentWindow.h" />
   </ItemGroup>
   <ItemGroup>

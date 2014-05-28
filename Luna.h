@@ -6,6 +6,7 @@
 #include "BaseWindow.h"
 #include "TrasparentWindow.h"
 #include "EditWindow.h"
+#include "EditPictureWindow.h"
 #include "Capture.h"
 #include "Structs.h"
 #include "resource.h"
@@ -32,8 +33,7 @@ public:
 		capture = new(Capture);			
 		SetWindowTitle ("Luna") ;
 	};		
-	Capture * capture ;
-	EditWindow * editWindow ;
+	Capture * capture ;	
 	MouseHook *cpMouseHook ;
 	
 	void OnPaint();
@@ -44,6 +44,7 @@ public:
 	void OnCaptureSpecifiedWindow () ;
 	int  GetEncoderClsid (const WCHAR* format, CLSID* pClsid) ;
 	int  CreateChildWindow () ;
+	bool  CreateEditChildWindow () ;
 	void CreateToolbar () ;
 	void UpdateToobar () ;
 	void CloseToolbar () ;

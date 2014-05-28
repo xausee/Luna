@@ -1,6 +1,8 @@
 ﻿#include "Luna.h"
 #include "MouseHook.h"
 
+extern HBITMAP hEditWindowBitmap ;
+
 LRESULT CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
@@ -62,14 +64,16 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 					winRect.bottom - winRect.top - height,
 					SWP_SHOWWINDOW) ;
 				UpdateWindow (hwndEditWindow) ;				
-			}
-			UpdateWindow (m_hwnd) ;
+			}			
 		}
 		break ;
 	case WM_MOVE:
 		{
-			UpdateWindow (hwndEditWindow) ;
-			ShowWindow (hwndEditWindow, SW_SHOW) ;
+			RECT winRect, ToolbarWindowRect;
+			GetWindowRect (hwndEditWindow, &winRect) ;
+			RedrawWindow (hwnd, NULL, NULL, RDW_UPDATENOW | RDW_ALLCHILDREN | RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE ) ; 
+			//RedrawWindow (hwndEditWindow, NULL, NULL, RDW_UPDATENOW | RDW_ALLCHILDREN) ;
+			
 		}
 		break ;
 	case WM_PAINT:
@@ -99,11 +103,21 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 		case ID_CAPTURER_ANYAREA:
 			 OnCaptureAnyArea () ;
             break ; 
-		case ID_EDIT:			
-			CreateToolbar() ;	
-			if (!hwndEditWindow && !EditPictureThread)
+		case ID_EDIT:	
 			{
-				EditPictureThread = CreateThread (NULL,0, EditPictureProc, (void*)this, 0, NULL) ;					
+				CreateToolbar() ;
+				// more display issues in this way: 
+				// (1) can not refesh the window when parent window is moving
+				// (2) dosen't displayed after created
+				// (3) auto refresh issue...			
+				// need to investigate.
+				//if (!hwndEditWindow && !EditPictureThread)
+				//{
+				//	EditPictureThread = CreateThread (NULL,0, EditPictureProc, (void*)this, 0, NULL) ;
+				//}
+
+				// using this way
+				CreateEditChildWindow () ;
 			}
 			break ;
 		case ID_EXIT: 
@@ -403,7 +417,19 @@ int Luna::CreateChildWindow ()
 			dwError = GetLastError () ;
 	}
 
-	return dwError ;
+	return dwError ;	
+}
+
+bool Luna::CreateEditChildWindow ()
+{	
+	hEditWindowBitmap = hBitmap ;
+	RegisterEditPictureChildWindowClass (hInstance);
+	hwndEditWindow = CreateEditPictureChildWindow (hInstance, m_hwnd, SW_SHOW);
+	
+	if (hwndEditWindow)
+		return true ;
+	else
+		return false ;
 }
 
 void Luna::CreateToolbar ()
