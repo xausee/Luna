@@ -4,6 +4,7 @@ LPCSTR     szWindowClass = "EditPictureChildWindow" ;
 HINSTANCE  hInstance ;
 HWND       hEditPictureChildWindow ;
 HBITMAP	   hEditWindowBitmap ;
+int        iToolbarHeight = 30 ;
 HWND       hwndEditWindowEditBox ;
 bool	   bEditWindowDrawing ;
 bool       fEditWindowScroll ;
@@ -59,7 +60,7 @@ HWND CreateEditPictureChildWindow(HINSTANCE g_hInstance, HWND hwndParent, int nC
    RECT clientRect;
    GetClientRect (hwndParent, &clientRect) ;
    // put edit window under tool bar
-   clientRect.top += 30; 
+   clientRect.top += iToolbarHeight ; 
 
    DWORD dwError = 0 ; 	
 
@@ -257,13 +258,13 @@ void ShowPictureInEditModelEditWindow ()
     HRGN  bgRgn = CreateRectRgnIndirect(&clientRect);
     HBRUSH  hBrush = CreateSolidBrush(RGB(53, 78, 85));
     FillRgn (hdc, bgRgn, hBrush);    
-    
-    // draw bolder of the bitmap
-	SetRect (&rEditWindowBitmapRect, 0, 0, bm.bmWidth + 2, bm.bmHeight + 2) ;
-    Rectangle (ps.hdc, rEditWindowBitmapRect.left, rEditWindowBitmapRect.top, rEditWindowBitmapRect.right, rEditWindowBitmapRect.bottom); 
+        
+	SetRect (&rEditWindowBitmapRect, 0, 0, bm.bmWidth, bm.bmHeight) ;
+	// draw bolder of the bitmap
+    //Rectangle (ps.hdc, rEditWindowBitmapRect.left, rEditWindowBitmapRect.top, rEditWindowBitmapRect.right, rEditWindowBitmapRect.bottom); 
 
 	// draw bitmap
-	BitBlt(ps.hdc, rEditWindowBitmapRect.left + 1, rEditWindowBitmapRect.top + 1, bm.bmWidth, bm.bmHeight, hdcCompat, 0, 0, SRCCOPY) ;      
+	BitBlt(ps.hdc, rEditWindowBitmapRect.left, rEditWindowBitmapRect.top, bm.bmWidth, bm.bmHeight, hdcCompat, 0, 0, SRCCOPY) ;      
 
 	// If scrolling has occurred, use the following call to
     // BitBlt to paint the invalid rectangle. 
@@ -488,6 +489,9 @@ void DrawLineEditWindow (HWND hwnd, POINT pEditWindowBeg, POINT pEditWindowEnd, 
 
 HBITMAP SaveBitmapToMemoryEditWindow ()
 {	
+   // update window for avoid some window on top of it, such as input window
+   UpdateWindow (hEditPictureChildWindow) ;
+
    BITMAP bm ;		
    HDC hdc = GetDC (hEditPictureChildWindow);
 
@@ -502,10 +506,10 @@ HBITMAP SaveBitmapToMemoryEditWindow ()
    HDC hdcMem = CreateCompatibleDC (hdc) ;
    hEditWindowBitmap = CreateCompatibleBitmap (hdc, bm.bmWidth, bm.bmHeight) ;
    SelectObject (hdcMem, hEditWindowBitmap) ;
-   StretchBlt (hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdc, 41, 41, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
+   StretchBlt (hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdc, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
 		
    DeleteDC (hdcMem) ;
-   ReleaseDC (hEditPictureChildWindow, hdc) ;  
+   ReleaseDC (hEditPictureChildWindow, hdc) ;     
 
    return hEditWindowBitmap ;
 }
@@ -539,7 +543,9 @@ void OnLButtonUPEditWindow (WPARAM wParam, LPARAM lParam)
 		// drawing shapes: rectangle, Ellipse or line
 		ShapeEditWindow (hEditPictureChildWindow, pEditWindowBeg, pEditWindowEnd, R2_COPYPEN) ;	
 		// save new bitmap after drawing
-		//hEditWindowBitmap = SaveBitmapToMemory () ;
+		hEditWindowBitmap = SaveBitmapToMemoryEditWindow () ;
+		// update window immediatly after saved new bitmap
+		UpdateWindow (hEditPictureChildWindow) ;
 		// select part or full bitmap
 		if (iEditWindowShape == 4)
 			CreateEditBoxEditWindow() ;

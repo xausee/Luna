@@ -2,6 +2,7 @@
 #include "MouseHook.h"
 
 extern HBITMAP hEditWindowBitmap ;
+extern int iToolbarHeight ;
 
 LRESULT CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -49,7 +50,7 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 			GetWindowRect (hWndToolbar, &ToolbarWindowRect) ;	
 			
 			int width = winRect.right - winRect.left ;	
-			int height = 30;//ToolbarWindowRect.bottom -ToolbarWindowRect.top ;
+			int height = iToolbarHeight ;//ToolbarWindowRect.bottom -ToolbarWindowRect.top ;
 
 			if (hWndToolbar)
 			{	
@@ -163,10 +164,11 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 			break;
 		case ID_CLOSE:	
 			{
+				hBitmap = hEditWindowBitmap ;
 				SendMessage (hwndEditWindow, WM_DESTROY, 0, 0) ;
 				hwndEditWindow = NULL ;	
 				//CloseHandle (EditPictureThread) ;
-				//EditPictureThread = NULL ;
+				//EditPictureThread = NULL ;				
 				CloseToolbar () ;
 			}
 			break ;
@@ -384,7 +386,7 @@ int Luna::CreateChildWindow ()
 	GetClientRect (m_hwnd, &clientRect) ;
 	
 	// put edit window under tool bar
-	clientRect.top += 30; 
+	clientRect.top += iToolbarHeight ; 
 
 	if (window.RegisterWindow (&wcx))
 	{		
