@@ -344,8 +344,8 @@ void ShapeEditWindow (HWND hwnd, POINT pEditWindowBeg, POINT pEditWindowEnd, int
 		LineTo (hdc, pEditWindowEnd.x, pEditWindowEnd.y) ;
 		break ;
 	case 4:	
-		//use fixed pen when draw text rectangele
-		SelectObject (hdc, CreatePen(PS_SOLID, 1,  RGB (0, 0, 0))) ; 
+		//use fixed pen when draw text rectangele		
+		SelectObject (hdc, hpenDot) ;
 		Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;		
 		break ;
 	case 5:
@@ -405,8 +405,9 @@ HWND CreateEditBoxEditWindow ()
 
 	// Creates textbox for input
 	hwndEditWindowEditBox  = CreateWindowEx(NULL, "EDIT", "",
-			WS_CHILD | WS_VISIBLE | ES_MULTILINE | WS_TABSTOP | WS_BORDER | ES_LEFT,
-			pStart.x, pStart.y, weight, height,	
+			WS_CHILD | WS_VISIBLE | ES_MULTILINE | WS_TABSTOP | ES_LEFT,
+			// restrict editbox in the dot rectangle drawed when before
+			pStart.x+1, pStart.y+1, weight-2, height-2,	
 			hEditPictureChildWindow, (HMENU)(101),
 			hInstance, NULL) ; 	 
 
@@ -429,16 +430,27 @@ void TextOutFromEditBoxToCanvasEditWindow ()
 	if (hwndEditWindowEditBox)
 	{		
 		char szInput[MAX_PATH];		
-		GetWindowText(GetDlgItem(hEditPictureChildWindow, 101), szInput, MAX_PATH);
+		GetWindowText (GetDlgItem (hEditPictureChildWindow, 101), szInput, MAX_PATH);
 		HDC hdc = GetDC (hEditPictureChildWindow) ;	
-		int iFontSize = GetLineSizeEditWindow() * 16 ;
+		int iFontSize = GetLineSizeEditWindow () * 16 ;
 		HFONT hFont = CreateFont(iFontSize, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, "Arial") ;
 		SelectObject (hdc, hFont) ;
 		SetTextColor (hdc, GetColorEditWindow()) ;
-		DestroyWindow (hwndEditWindowEditBox) ;
+		bool e = DestroyWindow (hwndEditWindowEditBox) ;
 		hwndEditWindowEditBox = NULL ;
-		Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;		
-		TextOut (hdc, pEditWindowBeg.x + 2, pEditWindowBeg.y + 2, szInput, strlen(szInput)) ;			
+		
+		RECT rec;
+		rec.left = pEditWindowBeg.x;
+		rec.top = pEditWindowBeg.y; 
+		rec.right = pEditWindowEnd.x;
+		rec.bottom = pEditWindowEnd.y;	
+
+		//Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;		
+		TextOut (hdc, pEditWindowBeg.x -30, pEditWindowBeg.y, szInput, strlen(szInput)) ;
+		//ExtTextOut (hdc, pEditWindowBeg.x -30, pEditWindowBeg.y -30, ETO_CLIPPED, &rec, szInput, strlen(szInput), NULL );
+	  	
+		// save new bitmap after input text
+        hEditWindowBitmap = SaveBitmapToMemoryEditWindow () ;
 	}	
 }
 
@@ -519,13 +531,12 @@ void OnPaintEditWindow ()
 	if (!hEditWindowBitmap)
 		return ;
 	ShowPictureInEditModelEditWindow () ;
-	
-	//TextOutFromEditBoxToCanvas () ;
 }	
 
 void OnLButtonDownEditWindow (WPARAM wParam, LPARAM lParam)
 {
-	//TextOutFromEditBoxToCanvas () ;
+	TextOutFromEditBoxToCanvasEditWindow () ;
+	
 	bEditWindowDrawing = true ;	
 	pEditWindowBeg.x = LOWORD (lParam) ;
 	pEditWindowBeg.y = HIWORD (lParam) ;
@@ -543,7 +554,7 @@ void OnLButtonUPEditWindow (WPARAM wParam, LPARAM lParam)
 		// drawing shapes: rectangle, Ellipse or line
 		ShapeEditWindow (hEditPictureChildWindow, pEditWindowBeg, pEditWindowEnd, R2_COPYPEN) ;	
 		// save new bitmap after drawing
-		hEditWindowBitmap = SaveBitmapToMemoryEditWindow () ;
+		//hEditWindowBitmap = SaveBitmapToMemoryEditWindow () ;
 		// update window immediatly after saved new bitmap
 		UpdateWindow (hEditPictureChildWindow) ;
 		// select part or full bitmap
