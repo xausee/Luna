@@ -44,7 +44,7 @@ public:
 	void OnCaptureSpecifiedWindow () ;
 	int  GetEncoderClsid (const WCHAR* format, CLSID* pClsid) ;
 	int  CreateChildWindow () ;
-	bool  CreateEditChildWindow () ;
+	bool CreateEditChildWindow () ;
 	void CreateToolbar () ;
 	void UpdateToobar () ;
 	void CloseToolbar () ;

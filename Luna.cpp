@@ -560,7 +560,12 @@ void Luna::SaveFile ()
 	
 	CLSID   encoderClsid;
 	Status  stat;	
-	Bitmap* bitmap = Bitmap::FromHBITMAP(hBitmap, NULL) ;
+	Bitmap* bitmap ;
+
+	if (hWndToolbar)
+		bitmap = Bitmap::FromHBITMAP(hEditWindowBitmap, NULL) ;
+	else
+		bitmap = Bitmap::FromHBITMAP(hBitmap, NULL) ;
 	
 	// Get the CLSID of the PNG encoder. 
 	if (strstr (fileName, "bmp") != NULL)
