@@ -345,8 +345,17 @@ void ShapeEditWindow (HWND hwnd, POINT pEditWindowBeg, POINT pEditWindowEnd, int
 		break ;
 	case 4:	
 		{
-			SelectObject (hdc, hpenDot) ;
-			Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;			
+			//SelectObject (hdc, hpenDot) ;
+			if (bModel == R2_COPYPEN)
+			{
+				SetROP2(hdc, R2_NOT);
+				Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;				
+			}
+			else
+			{
+				Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
+			}
+						
 		}
 		break ;
 	case 5:
@@ -449,12 +458,16 @@ void TextOutFromEditBoxToCanvasEditWindow ()
 		rec.right = pEditWindowEnd.x;
 		rec.bottom = pEditWindowEnd.y;	
 
-		// erase the dotted rectangle	
-		/*HPEN hpenDot = CreatePen (PS_DOT, 1, RGB(0, 0, 0)) ;
-		SelectObject (hdc, hpenDot) ;	
+		// erase the rectangle by draw double rectangle	
+		HPEN hpen = CreatePen (PS_SOLID, 1, RGB(0, 0, 0)) ;
+		HPEN hpenDot = CreatePen (PS_DOT, 1, RGB(0, 0, 0)) ;
+		SelectObject (hdc, hpen) ;
+
 	    int oldRop = SetROP2 (hdc, R2_NOT) ;
 		Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
-	    SetROP2 (hdc, oldRop) ;*/
+		// draw the rectangle again 			
+		Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
+	    SetROP2 (hdc, oldRop) ;
 
 		//Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;		
 		TextOut (hdc, pEditWindowBeg.x + 4, pEditWindowBeg.y + 2, szInput, strlen(szInput)) ;
@@ -462,6 +475,11 @@ void TextOutFromEditBoxToCanvasEditWindow ()
 	  	
 		// save new bitmap after input text
         hEditWindowBitmap = SaveBitmapToMemoryEditWindow () ;
+
+		// delete objects
+		DeleteObject (hpen) ;
+		DeleteObject (hpenDot) ;
+		ReleaseDC (hEditPictureChildWindow, hdc) ;	
 	}	
 }
 
