@@ -348,7 +348,7 @@ void ShapeEditWindow (HWND hwnd, POINT pEditWindowBeg, POINT pEditWindowEnd, int
 			//SelectObject (hdc, hpenDot) ;
 			if (bModel == R2_COPYPEN)
 			{
-				SetROP2(hdc, R2_NOT);
+				SetROP2(hdc, R2_NOTXORPEN);
 				Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;				
 			}
 			else
@@ -459,11 +459,11 @@ void TextOutFromEditBoxToCanvasEditWindow ()
 		rec.bottom = pEditWindowEnd.y;	
 
 		// erase the rectangle by draw double rectangle	
-		HPEN hpen = CreatePen (PS_SOLID, 1, RGB(0, 0, 0)) ;
-		HPEN hpenDot = CreatePen (PS_DOT, 1, RGB(0, 0, 0)) ;
+		HPEN hpen = CreatePen (PS_SOLID, GetLineSizeEditWindow(), GetColorEditWindow()) ;
+	    HPEN hpenDot = CreatePen (PS_DOT, 1, RGB(0, 0, 0)) ;		
 		SelectObject (hdc, hpen) ;
 
-	    int oldRop = SetROP2 (hdc, R2_NOT) ;
+	    int oldRop = SetROP2 (hdc, R2_NOTXORPEN) ;
 		Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
 		// draw the rectangle again 			
 		Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
