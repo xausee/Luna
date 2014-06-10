@@ -581,7 +581,10 @@ void OnLButtonUPEditWindow (WPARAM wParam, LPARAM lParam)
 		pEditWindowEnd.x = LOWORD (lParam) ;
 		pEditWindowEnd.y = HIWORD (lParam) ;
 		// drawing shapes: rectangle, Ellipse or line
-		ShapeEditWindow (hEditPictureChildWindow, pEditWindowBeg, pEditWindowEnd, R2_COPYPEN) ;	
+		ShapeEditWindow (hEditPictureChildWindow, pEditWindowBeg, pEditWindowEnd, R2_COPYPEN) ;
+
+		// save new bitmap after drawing
+        hEditWindowBitmap = SaveBitmapToMemoryEditWindow () ;
 		
 		// select part or full bitmap
 		if (iEditWindowShape == 4)
