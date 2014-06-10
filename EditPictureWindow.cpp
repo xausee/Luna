@@ -65,7 +65,7 @@ HWND CreateEditPictureChildWindow(HINSTANCE g_hInstance, HWND hwndParent, int nC
    DWORD dwError = 0 ; 	
 
 
-   hEditPictureChildWindow = CreateWindow(szWindowClass, "TestWindow", WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL,
+   hEditPictureChildWindow = CreateWindow(szWindowClass, "TestWindow", WS_CHILD | WS_VISIBLE | ES_LEFT | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL,
 	   clientRect.left, clientRect.top, clientRect.right-clientRect.left, clientRect.bottom-clientRect.top, hwndParent, NULL, g_hInstance, NULL);
    
    if (!hEditPictureChildWindow)
@@ -469,10 +469,10 @@ void TextOutFromEditBoxToCanvasEditWindow ()
 		Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
 	    SetROP2 (hdc, oldRop) ;
 
-		//Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;		
-		TextOut (hdc, pEditWindowBeg.x + 4, pEditWindowBeg.y + 2, szInput, strlen(szInput)) ;
-		//ExtTextOut (hdc, pEditWindowBeg.x -30, pEditWindowBeg.y -30, ETO_CLIPPED, &rec, szInput, strlen(szInput), NULL );
-	  	
+		//Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;			
+		//TextOut (hdc, pEditWindowBeg.x + 4, pEditWindowBeg.y + 2, szInput, strlen(szInput)) ;		
+		DrawText (hdc, szInput, strlen(szInput), &rec, DT_LEFT | DT_EXTERNALLEADING | DT_WORDBREAK) ;
+
 		// save new bitmap after input text
         hEditWindowBitmap = SaveBitmapToMemoryEditWindow () ;
 

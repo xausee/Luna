@@ -30,7 +30,7 @@ LRESULT CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 DWORD WINAPI EditPictureProc(LPVOID lpParameter)
 {
 	Luna *luna = (Luna*)lpParameter ;
-	luna->CreateChildWindow () ;
+	//luna->CreateChildWindow () ;
 	return 0 ;
 }
 
@@ -361,65 +361,6 @@ int Luna::GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 
    free(pImageCodecInfo);
    return -1;  // Failure
-}
-
-int Luna::CreateChildWindow ()
-{
-	DWORD dwError = 0 ; 	
-	EditWindow window (hInstance) ;
-	
-	WNDCLASSEX wcx;
-	wcx.cbSize              = sizeof (WNDCLASSEX) ;							        // size of structure 
-    wcx.style               = CS_HREDRAW | CS_VREDRAW ;						        // redraw if size changes 
-    wcx.lpfnWndProc         = CBaseWindow::stWinMsgHandler ;				        // points to window procedure 
-    wcx.cbClsExtra          = 0 ;											        // no extra class memory 
-    wcx.cbWndExtra          = 0 ;											        // no extra window memory 
-    wcx.hInstance           = hInstance;									        // handle to instance 
-    wcx.hIcon               = LoadIcon (hInstance, MAKEINTRESOURCE (IDI_ICON)) ;	// predefined app. icon 
-    wcx.hCursor             = LoadCursor (NULL, IDC_ARROW );					    // predefined arrow 
-    wcx.hbrBackground       = (HBRUSH)GetStockObject (WHITE_BRUSH) ;	            // white background brush 
-    wcx.lpszMenuName        = MAKEINTRESOURCE (IDM_CAPTURER) ;			            // name of menu resource 
-    wcx.lpszClassName       = "EditWindow" ;						                // name of window class 
-    wcx.hIconSm             = LoadIcon(hInstance, MAKEINTRESOURCE (IDI_ICON)) ;	    // small class icon 	
-	 
-	RECT clientRect;
-	GetClientRect (m_hwnd, &clientRect) ;
-	
-	// put edit window under tool bar
-	clientRect.top += iToolbarHeight ; 
-
-	if (window.RegisterWindow (&wcx))
-	{		
-		if (hBitmap)
-			window.SetBitmap (hBitmap) ;
-		//window.bDrawing = true ;
-
-		if (window.Create (WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL, &clientRect, m_hwnd))
-		{				
-			hwndEditWindow = window.GetHwnd () ;
-			window.MsgLoop () ;			
-		}
-		else
-			dwError = GetLastError () ;
-	}
-	dwError = GetLastError () ;
-
-	// already registered
-	if (dwError == 1410)
-	{
-		if (hBitmap)
-			window.SetBitmap (hBitmap) ;
-
-		if (window.Create (WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL, &clientRect, m_hwnd))
-		{				
-			hwndEditWindow = window.GetHwnd () ;
-			window.MsgLoop () ;			
-		}
-		else
-			dwError = GetLastError () ;
-	}
-
-	return dwError ;	
 }
 
 bool Luna::CreateEditChildWindow ()

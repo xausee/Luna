@@ -5,7 +5,6 @@
 #define _LUNA_H_
 #include "BaseWindow.h"
 #include "TrasparentWindow.h"
-#include "EditWindow.h"
 #include "EditPictureWindow.h"
 #include "Capture.h"
 #include "Structs.h"
@@ -43,7 +42,6 @@ public:
 	void OnCaptureAnyArea () ;
 	void OnCaptureSpecifiedWindow () ;
 	int  GetEncoderClsid (const WCHAR* format, CLSID* pClsid) ;
-	int  CreateChildWindow () ;
 	bool CreateEditChildWindow () ;
 	void CreateToolbar () ;
 	void UpdateToobar () ;
