@@ -1,4 +1,4 @@
-#include "EditPictureWindow.h"
+#include "EditWindow.h"
 
 LPCSTR     szWindowClass = "EditPictureChildWindow" ;
 HINSTANCE  hInstance ;

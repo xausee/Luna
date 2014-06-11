@@ -1,5 +1,5 @@
-#ifndef _EDITPICTURECHILDWINDOW_H_
-#define _EDITPICTURECHILDWINDOW_H_
+#ifndef _EDITWINDOW_H_
+#define _EDITWINDOW_H_
 #include "Structs.h"
 #include "resource.h"
 #include <windows.h>

@@ -5,7 +5,7 @@
 #define _LUNA_H_
 #include "BaseWindow.h"
 #include "TrasparentWindow.h"
-#include "EditPictureWindow.h"
+#include "EditWindow.h"
 #include "Capture.h"
 #include "Structs.h"
 #include "resource.h"

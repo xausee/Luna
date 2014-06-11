@@ -33,7 +33,7 @@
     <ClCompile Include="TrasparentWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EditPictureWindow.cpp">
+    <ClCompile Include="EditWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,7 +59,7 @@
     <ClInclude Include="Structs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EditPictureWindow.h">
+    <ClInclude Include="EditWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
