@@ -451,13 +451,6 @@ void TextOutFromEditBoxToCanvasEditWindow ()
 		DestroyWindow (hwndEditWindowEditBox) ;
 		hwndEditWindowEditBox = NULL ;
 		UpdateWindow (hEditPictureChildWindow) ;
-		
-		RECT rec;
-		rec.left = pEditWindowBeg.x;
-		rec.top = pEditWindowBeg.y; 
-		rec.right = pEditWindowEnd.x;
-		rec.bottom = pEditWindowEnd.y;	
-
 		// erase the rectangle by draw double rectangle	
 		HPEN hpen = CreatePen (PS_SOLID, GetLineSizeEditWindow(), GetColorEditWindow()) ;
 	    HPEN hpenDot = CreatePen (PS_DOT, 1, RGB(0, 0, 0)) ;		
@@ -470,8 +463,13 @@ void TextOutFromEditBoxToCanvasEditWindow ()
 	    SetROP2 (hdc, oldRop) ;
 
 		//Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;			
-		//TextOut (hdc, pEditWindowBeg.x + 4, pEditWindowBeg.y + 2, szInput, strlen(szInput)) ;		
-		DrawText (hdc, szInput, strlen(szInput), &rec, DT_LEFT | DT_EXTERNALLEADING | DT_WORDBREAK) ;
+		//TextOut (hdc, pEditWindowBeg.x + 4, pEditWindowBeg.y + 2, szInput, strlen(szInput)) ;			
+		RECT TextRect;
+		TextRect.left    = pEditWindowBeg.x + 4;
+		TextRect.top     = pEditWindowBeg.y + 1; 
+		TextRect.right   = pEditWindowEnd.x;
+		TextRect.bottom  = pEditWindowEnd.y;
+		DrawText (hdc, szInput, strlen(szInput), &TextRect, DT_LEFT | DT_EXTERNALLEADING | DT_WORDBREAK) ;
 
 		// save new bitmap after input text
         hEditWindowBitmap = SaveBitmapToMemoryEditWindow () ;
@@ -479,6 +477,7 @@ void TextOutFromEditBoxToCanvasEditWindow ()
 		// delete objects
 		DeleteObject (hpen) ;
 		DeleteObject (hpenDot) ;
+		DeleteObject (hFont) ;
 		ReleaseDC (hEditPictureChildWindow, hdc) ;	
 	}	
 }
