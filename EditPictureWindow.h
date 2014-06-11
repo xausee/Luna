@@ -34,6 +34,8 @@ static LRESULT SetEditBoxEditWindow (WPARAM wParam, LPARAM lParam) ;
 static void TextOutFromEditBoxToCanvasEditWindow () ;
 static void DrawRectangleEditWindow (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
 static void DrawEllipseEditWindow (HWND hwnd, POINT pBeg, POINT pEnd, int bModel) ;
+static void InvalideAndUpdateClient () ;
+static HBITMAP SelectBitmap () ;
 static HBITMAP SaveBitmapToMemoryEditWindow () ;
 static HWND GetHwndEditWindow () ;
 static HBITMAP SetBitmapEditWindow (HBITMAP	srcHBitmap) ;

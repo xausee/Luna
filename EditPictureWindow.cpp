@@ -359,8 +359,11 @@ void ShapeEditWindow (HWND hwnd, POINT pEditWindowBeg, POINT pEditWindowEnd, int
 		}
 		break ;
 	case 5:
-		SelectObject (hdc, hpenDot) ;	
-		Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
+		if (bEditWindowSelection)
+		{
+			SelectObject (hdc, hpenDot) ;	
+			Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
+		}
 		break ;
 	default:
 		break ;
@@ -527,6 +530,65 @@ void DrawLineEditWindow (HWND hwnd, POINT pEditWindowBeg, POINT pEditWindowEnd, 
 	ReleaseDC(hwnd, hdc) ;
 }
 
+void InvalideAndUpdateClient ()
+{
+	HDC hdc = GetDC (hEditPictureChildWindow) ;
+	RECT clientRect ;
+	POINT pLeftTop, pRightBottom  ;
+
+	GetWindowRect (hEditPictureChildWindow, &clientRect) ;
+	pLeftTop.x = clientRect.left ;
+	pLeftTop.y = clientRect.top ;
+	pRightBottom.x = clientRect.right ;
+	pRightBottom.y = clientRect.bottom ;
+	
+	ScreenToClient (hEditPictureChildWindow, &pLeftTop) ;
+	ScreenToClient (hEditPictureChildWindow, &pRightBottom) ;
+
+	clientRect.left = pLeftTop.x ;
+	clientRect.top = pLeftTop.y ;
+	clientRect.right = pRightBottom.x ;
+	clientRect.bottom = pRightBottom.y ;
+
+	InvalidateRect (hEditPictureChildWindow, &clientRect, FALSE) ;
+	UpdateWindow (hEditPictureChildWindow) ;
+}
+
+HBITMAP SelectBitmap ()
+{	
+   // update window for avoid some window on top of it, such as input window
+   UpdateWindow (hEditPictureChildWindow) ;
+
+   BITMAP bm ;		
+   HDC hdc = GetDC (hEditPictureChildWindow);
+
+   // create compatible DC
+   HDC hdcCompat = CreateCompatibleDC (hdc); 
+   SelectObject (hdcCompat, hEditWindowBitmap);	
+
+   // get BITMAP object
+   GetObject (hEditWindowBitmap, sizeof (BITMAP), (PSTR) &bm) ;
+
+   RECT selectRect;
+   selectRect.left = pEditWindowBeg.x ;
+   selectRect.top = pEditWindowBeg.y ;
+   selectRect.right = pEditWindowEnd.x ;
+   selectRect.bottom = pEditWindowEnd.y ; 
+   int bmWidth = abs (pEditWindowEnd.x - pEditWindowBeg.x) ;
+   int bmHeight = abs (pEditWindowEnd.y - pEditWindowBeg.y) ;
+
+   // get new bitmap
+   HDC hdcMem = CreateCompatibleDC (hdc) ;
+   hEditWindowBitmap = CreateCompatibleBitmap (hdc, bmWidth, bmHeight) ;
+   SelectObject (hdcMem, hEditWindowBitmap) ;
+   StretchBlt (hdcMem, 0, 0, bmWidth, bmHeight, hdc, selectRect.left, selectRect.top, bmWidth, bmHeight, SRCCOPY) ;
+		
+   DeleteDC (hdcMem) ;
+   ReleaseDC (hEditPictureChildWindow, hdc) ;     
+
+   return hEditWindowBitmap ;
+}
+
 HBITMAP SaveBitmapToMemoryEditWindow ()
 {	
    // update window for avoid some window on top of it, such as input window
@@ -583,13 +645,22 @@ void OnLButtonUPEditWindow (WPARAM wParam, LPARAM lParam)
 		ShapeEditWindow (hEditPictureChildWindow, pEditWindowBeg, pEditWindowEnd, R2_COPYPEN) ;
 
 		// save new bitmap after drawing
-        hEditWindowBitmap = SaveBitmapToMemoryEditWindow () ;
+        //hEditWindowBitmap = SaveBitmapToMemoryEditWindow () ;
 		
 		// select part or full bitmap
 		if (iEditWindowShape == 4)
 			CreateEditBoxEditWindow() ;
+
 		if (bEditWindowSelection)
+		{
+			InvalideAndUpdateClient () ;
+			hEditWindowBitmap = SelectBitmap () ;
+			InvalideAndUpdateClient () ;	
 			bEditWindowSelection = false ;
+		}
+
+		// save new bitmap after drawing
+        hEditWindowBitmap = SaveBitmapToMemoryEditWindow () ;
 	}	
 }
 
