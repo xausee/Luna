@@ -366,8 +366,8 @@ int Luna::GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 bool Luna::CreateEditChildWindow ()
 {	
 	hEditWindowBitmap = hBitmap ;
-	RegisterEditPictureChildWindowClass (hInstance);
-	hwndEditWindow = CreateEditPictureChildWindow (hInstance, m_hwnd, SW_SHOW);
+	RegisterEditWindowClass (hInstance);
+	hwndEditWindow = CreateEditWindow (hInstance, m_hwnd, SW_SHOW);
 	
 	if (hwndEditWindow)
 		return true ;

@@ -2,31 +2,31 @@
 
 LPCSTR     szWindowClass = "EditPictureChildWindow" ;
 HINSTANCE  hInstance ;
-HWND       hEditPictureChildWindow ;
+HWND       hEditWindow ;
 HBITMAP	   hEditWindowBitmap ;
 int        iToolbarHeight = 30 ;
-HWND       hwndEditWindowEditBox ;
-bool	   bEditWindowDrawing ;
-bool       fEditWindowScroll ;
-HScroll    hEditWindowScroll ;
-VScroll    vEditWindowScroll ;	
-bool	   bEditWindowSelection ;
-int 	   iEditWindowShape ;	
-bool	   bEditWindowPenLine ;
-int	       iEditWindowPenSize ;
-int  	   iEditWindowPenColor ;
-POINT      pEditWindowBeg ;
-POINT      pEditWindowEnd ;
-RECT       rEditWindowBitmapRect ;
+HWND       hwndEditBox ;
+bool	   bDrawing ;
+bool       fScroll ;
+HScroll    hScroll ;
+VScroll    vScroll ;	
+bool	   bSelection ;
+int 	   iShape ;	
+bool	   bPenLine ;
+int	       iPenSize ;
+int  	   iPenColor ;
+POINT      pBeg ;
+POINT      pEnd ;
+RECT       rBitmapRect ;
 
-bool RegisterEditPictureChildWindowClass(HINSTANCE hInstance)
+bool RegisterEditWindowClass(HINSTANCE hInstance)
 {
 	DWORD dwError = 0 ; 
 
 	WNDCLASSEX wcx;
 	wcx.cbSize              = sizeof (WNDCLASSEX) ;							        // size of structure 
     wcx.style               = CS_HREDRAW | CS_VREDRAW ;						        // redraw if size changes 
-    wcx.lpfnWndProc         = EditPictureChildWindowWndProc ;				        // points to window procedure 
+    wcx.lpfnWndProc         = EditWindowWndProc ;				                    // points to window procedure 
     wcx.cbClsExtra          = 0 ;											        // no extra class memory 
     wcx.cbWndExtra          = 0 ;											        // no extra window memory 
     wcx.hInstance           = hInstance;									        // handle to instance 
@@ -53,7 +53,7 @@ bool RegisterEditPictureChildWindowClass(HINSTANCE hInstance)
 	//return RegisterClassEx(&wcx);  	
 }
 
-HWND CreateEditPictureChildWindow(HINSTANCE g_hInstance, HWND hwndParent, int nCmdShow)
+HWND CreateEditWindow (HINSTANCE g_hInstance, HWND hwndParent, int nCmdShow)
 {
    HINSTANCE hInstance = g_hInstance; 
 
@@ -65,22 +65,22 @@ HWND CreateEditPictureChildWindow(HINSTANCE g_hInstance, HWND hwndParent, int nC
    DWORD dwError = 0 ; 	
 
 
-   hEditPictureChildWindow = CreateWindow(szWindowClass, "TestWindow", WS_CHILD | WS_VISIBLE | ES_LEFT | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL,
+   hEditWindow = CreateWindow(szWindowClass, "TestWindow", WS_CHILD | WS_VISIBLE | ES_LEFT | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL,
 	   clientRect.left, clientRect.top, clientRect.right-clientRect.left, clientRect.bottom-clientRect.top, hwndParent, NULL, g_hInstance, NULL);
    
-   if (!hEditPictureChildWindow)
+   if (!hEditWindow)
    {
 	   dwError =GetLastError () ;
 	   return FALSE;
    }  
 
-   ShowWindow(hEditPictureChildWindow, nCmdShow);
-   UpdateWindow(hEditPictureChildWindow);
+   ShowWindow(hEditWindow, nCmdShow);
+   UpdateWindow(hEditWindow);
 
-   return hEditPictureChildWindow;
+   return hEditWindow;
 }
 
-LRESULT CALLBACK EditPictureChildWindowWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK EditWindowWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -88,76 +88,76 @@ LRESULT CALLBACK EditPictureChildWindowWndProc(HWND hwnd, UINT uMsg, WPARAM wPar
 		{
 			LPCREATESTRUCT winInfo ;
 			winInfo = (LPCREATESTRUCT)lParam ;			
-			InitializeScrollsEditWindow (hwnd, winInfo->cx, winInfo->cy) ;
+			InitializeScrolls (hwnd, winInfo->cx, winInfo->cy) ;
 		}
 		break ;	
 	case WM_SIZE: 		
-		InitializeHScrollEditWindow (wParam, lParam) ;
-		InitializeVScrollEditWindow (wParam, lParam) ;
+		InitializeHScroll (wParam, lParam) ;
+		InitializeVScroll (wParam, lParam) ;
 		break ;
 	case WM_PAINT:
-		OnPaintEditWindow () ;
+		OnPaint () ;
 		break ;
 	case WM_LBUTTONDOWN:		
-		OnLButtonDownEditWindow (wParam, lParam) ;
+		OnLButtonDown (wParam, lParam) ;
 		return 0 ;	
 	case WM_LBUTTONUP:		
-		OnLButtonUPEditWindow (wParam, lParam) ;
+		OnLButtonUP (wParam, lParam) ;
 		return 0 ;	
 	case WM_MOUSEMOVE:
-		OnMouseMoveEditWindow (wParam, lParam) ;
+		OnMouseMove (wParam, lParam) ;
 		break;
 	case WM_CTLCOLOREDIT:
-		return SetEditBoxEditWindow (wParam, lParam) ;
+		return SetEditBox (wParam, lParam) ;
 	case WM_HSCROLL:
-		OnHScrollEditWindow (wParam, lParam) ;
+		OnHScroll (wParam, lParam) ;
 		break ;
 	case WM_VSCROLL:
-		OnVScrollEditWindow (wParam, lParam) ;
+		OnVScroll (wParam, lParam) ;
 		break ;
 	case WM_COMMAND:
 		switch (LOWORD (wParam)) 
         {
 		case ID_SELECT:			
-			bEditWindowSelection = true ;
-			iEditWindowShape = 5 ;
+			bSelection = true ;
+			iShape = 5 ;
 			break ;
 		case ID_RECTANGLE:
-			iEditWindowShape = 1 ;
+			iShape = 1 ;
 			break ;
 		case ID_CYCLE:
-			iEditWindowShape = 2 ;
+			iShape = 2 ;
 			break ;		
 		case ID_LINE:	
-			iEditWindowShape = 3 ;
+			iShape = 3 ;
 			break ;
 		case ID_TEXT:
-			iEditWindowShape = 4 ;
+			iShape = 4 ;
 			break ;
 		case ID_LINE_SIZE_ONE:
-			iEditWindowPenSize = 1 ;
+			iPenSize = 1 ;
 			break ;
 		case ID_LINE_SIZE_TWO:	
-			iEditWindowPenSize = 2 ;
+			iPenSize = 2 ;
 			break ;
 		case ID_LINE_SIZE_THREE:		
-			iEditWindowPenSize = 3 ;
+			iPenSize = 3 ;
 			break ;
 		case ID_COLOR_RED:
-			iEditWindowPenColor = 1 ;
+			iPenColor = 1 ;
 			break;
 		case ID_COLOR_GREEN:
-			iEditWindowPenColor = 2 ;
+			iPenColor = 2 ;
 			break;
 		case ID_COLOR_BLUE:   			
-			iEditWindowPenColor = 3 ;
+			iPenColor = 3 ;
 			break;		
 		default: 
 			break ; 
 		} 
 		return 0 ; 
 	case WM_DESTROY:
-		DestroyWindow (hEditPictureChildWindow) ;
+		DestroyWindow (hEditWindow) ;
 		break ;
 	default:
 		return DefWindowProc(hwnd, uMsg, wParam, lParam) ;
@@ -165,26 +165,26 @@ LRESULT CALLBACK EditPictureChildWindowWndProc(HWND hwnd, UINT uMsg, WPARAM wPar
 	return 0 ;
 }
 
-HWND GetHwndEditWindow ()
+HWND GetHwnd ()
 {
-	return hEditPictureChildWindow ;
+	return hEditWindow ;
 }
 
-HBITMAP SetBitmapEditWindow (HBITMAP	srcHBitmap)
+HBITMAP SetBitmap (HBITMAP	srcHBitmap)
 {
 	hEditWindowBitmap = srcHBitmap ; 
 	return hEditWindowBitmap ;
 }
 
-HBITMAP GetBitmapEditWindow ()
+HBITMAP GetBitmap ()
 {	
 	return hEditWindowBitmap ;
 }
 
-int GetLineSizeEditWindow ()
+int GetLineSize ()
 {
 	int	size  = 1 ;
-	switch (iEditWindowPenSize)
+	switch (iPenSize)
 	{
 	case 1:
 		size = 1 ;
@@ -202,10 +202,10 @@ int GetLineSizeEditWindow ()
 	return size ;
 }
 
-COLORREF GetColorEditWindow ()
+COLORREF GetColor ()
 {
 	COLORREF  color = RGB (0, 0, 0) ;
-	switch (iEditWindowPenColor)
+	switch (iPenColor)
 	{
 	case 1:
 		color = RGB (255, 0, 0) ;
@@ -223,19 +223,19 @@ COLORREF GetColorEditWindow ()
 	return color ;
 }
 
-LRESULT SetEditBoxEditWindow (WPARAM wParam, LPARAM lParam)
+LRESULT SetEditBox (WPARAM wParam, LPARAM lParam)
 {
 	//SetTextColor ((HDC)wParam,GetSysColor(COLOR_WINDOWTEXT));
-	SetTextColor ((HDC)wParam, GetColorEditWindow());
+	SetTextColor ((HDC)wParam, GetColor());
 	SetBkMode ((HDC)wParam,OPAQUE);
 	SetBkColor ((HDC)wParam,GetSysColor(COLOR_WINDOW));
 	return (LRESULT)CreateSolidBrush(GetSysColor(COLOR_WINDOW));
 }
 
-void ShowPictureInEditModelEditWindow ()
+void ShowPictureInEditModel ()
 {	
     BITMAP bm ;		
-    HDC hdc = GetDC (hEditPictureChildWindow);
+    HDC hdc = GetDC (hEditWindow);
 
 	// create compatible DC
     HDC hdcCompat = CreateCompatibleDC (hdc); 
@@ -247,24 +247,24 @@ void ShowPictureInEditModelEditWindow ()
     COLORREF crBkgnd = GetBkColor (hdc); 
     HBRUSH   hbrBkgnd = CreateSolidBrush (crBkgnd);	
 
-    ReleaseDC (hEditPictureChildWindow, hdc); 
+    ReleaseDC (hEditWindow, hdc); 
 
 	PAINTSTRUCT        ps;  
     RECT               clientRect;
-    hdc = BeginPaint(hEditPictureChildWindow, &ps);
+    hdc = BeginPaint(hEditWindow, &ps);
 
 	// Fill the client area with a brush
-    GetClientRect (hEditPictureChildWindow, &clientRect) ;   
+    GetClientRect (hEditWindow, &clientRect) ;   
     HRGN  bgRgn = CreateRectRgnIndirect(&clientRect);
     HBRUSH  hBrush = CreateSolidBrush(RGB(53, 78, 85));
     FillRgn (hdc, bgRgn, hBrush);    
         
-	SetRect (&rEditWindowBitmapRect, 0, 0, bm.bmWidth, bm.bmHeight) ;
+	SetRect (&rBitmapRect, 0, 0, bm.bmWidth, bm.bmHeight) ;
 	// draw bolder of the bitmap
-    //Rectangle (ps.hdc, rEditWindowBitmapRect.left, rEditWindowBitmapRect.top, rEditWindowBitmapRect.right, rEditWindowBitmapRect.bottom); 
+    //Rectangle (ps.hdc, rBitmapRect.left, rBitmapRect.top, rBitmapRect.right, rBitmapRect.bottom); 
 
 	// draw bitmap
-	BitBlt(ps.hdc, rEditWindowBitmapRect.left, rEditWindowBitmapRect.top, bm.bmWidth, bm.bmHeight, hdcCompat, 0, 0, SRCCOPY) ;      
+	BitBlt(ps.hdc, rBitmapRect.left, rBitmapRect.top, bm.bmWidth, bm.bmHeight, hdcCompat, 0, 0, SRCCOPY) ;      
 
 	// If scrolling has occurred, use the following call to
     // BitBlt to paint the invalid rectangle. 
@@ -277,7 +277,7 @@ void ShowPictureInEditModelEditWindow ()
     // eighth argument (prect->top) by yCurrentScroll in 
     // order to map the correct pixels from the source bitmap. 
 	PRECT prect;
-    if (bEditWindowDrawing) 
+    if (bDrawing) 
     { 
 		prect = &ps.rcPaint;
 		BitBlt(ps.hdc, 
@@ -285,10 +285,10 @@ void ShowPictureInEditModelEditWindow ()
 			(prect->right - prect->left), 
 			(prect->bottom - prect->top), 
 			hdcCompat, 
-			prect->left + hEditWindowScroll.xCurrentScroll, 
-			prect->top + vEditWindowScroll.yCurrentScroll, 
+			prect->left + hScroll.xCurrentScroll, 
+			prect->top + vScroll.yCurrentScroll, 
 			SRCCOPY); 
-		bEditWindowDrawing = FALSE; 
+		bDrawing = FALSE; 
 	} 
 
     // clean up
@@ -296,14 +296,14 @@ void ShowPictureInEditModelEditWindow ()
     DeleteObject(bgRgn);
     DeleteObject(hBrush);	
 
-	EndPaint (hEditPictureChildWindow, &ps); 	
+	EndPaint (hEditWindow, &ps); 	
 }
 
-void ShapeEditWindow (HWND hwnd, POINT pEditWindowBeg, POINT pEditWindowEnd, int bModel)
+void Shape (HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 {
     HDC hdc = GetDC (hwnd) ;
 	int oldRop = SetROP2 (hdc, bModel) ;	
-	HPEN hpen = CreatePen (PS_SOLID, GetLineSizeEditWindow(), GetColorEditWindow()) ;
+	HPEN hpen = CreatePen (PS_SOLID, GetLineSize(), GetColor()) ;
 	HPEN hpenDot = CreatePen (PS_DOT, 1, RGB(0, 0, 0)) ;
 
 	SelectObject (hdc, hpen) ;	
@@ -312,36 +312,36 @@ void ShapeEditWindow (HWND hwnd, POINT pEditWindowBeg, POINT pEditWindowEnd, int
 	if (hEditWindowBitmap)
 	{
 	  // restrict the shape in bitmap rectangle
-	  if (pEditWindowBeg.x < rEditWindowBitmapRect.left)
-		  pEditWindowBeg.x = rEditWindowBitmapRect.left ;
-	  if (pEditWindowBeg.x > rEditWindowBitmapRect.right)
-		  pEditWindowBeg.x = rEditWindowBitmapRect.right ;
-	  if (pEditWindowBeg.y < rEditWindowBitmapRect.top)
-		  pEditWindowBeg.y = rEditWindowBitmapRect.top ;
-	  if (pEditWindowBeg.y > rEditWindowBitmapRect.bottom)
-		  pEditWindowBeg.y = rEditWindowBitmapRect.bottom ;
+	  if (pBeg.x < rBitmapRect.left)
+		  pBeg.x = rBitmapRect.left ;
+	  if (pBeg.x > rBitmapRect.right)
+		  pBeg.x = rBitmapRect.right ;
+	  if (pBeg.y < rBitmapRect.top)
+		  pBeg.y = rBitmapRect.top ;
+	  if (pBeg.y > rBitmapRect.bottom)
+		  pBeg.y = rBitmapRect.bottom ;
 
-	  if (pEditWindowEnd.x < rEditWindowBitmapRect.left)
-		  pEditWindowEnd.x = rEditWindowBitmapRect.left ;
-	  if (pEditWindowEnd.x > rEditWindowBitmapRect.right)
-		  pEditWindowEnd.x = rEditWindowBitmapRect.right ;
-	  if (pEditWindowEnd.y < rEditWindowBitmapRect.top)
-		  pEditWindowEnd.y = rEditWindowBitmapRect.top ;
-	  if (pEditWindowEnd.y > rEditWindowBitmapRect.bottom)
-		  pEditWindowEnd.y = rEditWindowBitmapRect.bottom ;
+	  if (pEnd.x < rBitmapRect.left)
+		  pEnd.x = rBitmapRect.left ;
+	  if (pEnd.x > rBitmapRect.right)
+		  pEnd.x = rBitmapRect.right ;
+	  if (pEnd.y < rBitmapRect.top)
+		  pEnd.y = rBitmapRect.top ;
+	  if (pEnd.y > rBitmapRect.bottom)
+		  pEnd.y = rBitmapRect.bottom ;
 	}
 
-	switch (iEditWindowShape)
+	switch (iShape)
 	{
 	case 1:
-		Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
+		Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
 		break ;
 	case 2:
-		Ellipse(hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
+		Ellipse(hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
 		break ;
 	case 3:
-		MoveToEx (hdc, pEditWindowBeg.x, pEditWindowBeg.y, (LPPOINT) NULL) ; 
-		LineTo (hdc, pEditWindowEnd.x, pEditWindowEnd.y) ;
+		MoveToEx (hdc, pBeg.x, pBeg.y, (LPPOINT) NULL) ; 
+		LineTo (hdc, pEnd.x, pEnd.y) ;
 		break ;
 	case 4:	
 		{
@@ -349,20 +349,20 @@ void ShapeEditWindow (HWND hwnd, POINT pEditWindowBeg, POINT pEditWindowEnd, int
 			if (bModel == R2_COPYPEN)
 			{
 				SetROP2(hdc, R2_NOTXORPEN);
-				Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;				
+				Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;				
 			}
 			else
 			{
-				Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
+				Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
 			}
 						
 		}
 		break ;
 	case 5:
-		if (bEditWindowSelection)
+		if (bSelection)
 		{
 			SelectObject (hdc, hpenDot) ;	
-			Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
+			Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
 		}
 		break ;
 	default:
@@ -375,155 +375,155 @@ void ShapeEditWindow (HWND hwnd, POINT pEditWindowBeg, POINT pEditWindowEnd, int
 	ReleaseDC (hwnd, hdc) ;	
 }
 
-HWND CreateEditBoxEditWindow ()
+HWND CreateEditBox ()
 {
 	POINT pStart ;
 	int weight, height ;
 
 	// destroy the old edit box
-	if (hwndEditWindowEditBox)
-		DestroyWindow (hwndEditWindowEditBox) ;
+	if (hwndEditBox)
+		DestroyWindow (hwndEditBox) ;
 
 	if (hEditWindowBitmap)
 	{
 	  // restrict Edit Box in bitmap rectangle
-	  if (pEditWindowBeg.x < rEditWindowBitmapRect.left)
-		  pEditWindowBeg.x = rEditWindowBitmapRect.left ;
-	  if (pEditWindowBeg.x > rEditWindowBitmapRect.right)
-		  pEditWindowBeg.x = rEditWindowBitmapRect.right ;
-	  if (pEditWindowBeg.y < rEditWindowBitmapRect.top)
-		  pEditWindowBeg.y = rEditWindowBitmapRect.top ;
-	  if (pEditWindowBeg.y > rEditWindowBitmapRect.bottom)
-		  pEditWindowBeg.y = rEditWindowBitmapRect.bottom ;
+	  if (pBeg.x < rBitmapRect.left)
+		  pBeg.x = rBitmapRect.left ;
+	  if (pBeg.x > rBitmapRect.right)
+		  pBeg.x = rBitmapRect.right ;
+	  if (pBeg.y < rBitmapRect.top)
+		  pBeg.y = rBitmapRect.top ;
+	  if (pBeg.y > rBitmapRect.bottom)
+		  pBeg.y = rBitmapRect.bottom ;
 
-	  if (pEditWindowEnd.x < rEditWindowBitmapRect.left)
-		  pEditWindowEnd.x = rEditWindowBitmapRect.left ;
-	  if (pEditWindowEnd.x > rEditWindowBitmapRect.right)
-		  pEditWindowEnd.x = rEditWindowBitmapRect.right ;
-	  if (pEditWindowEnd.y < rEditWindowBitmapRect.top)
-		  pEditWindowEnd.y = rEditWindowBitmapRect.top ;
-	  if (pEditWindowEnd.y > rEditWindowBitmapRect.bottom)
-		  pEditWindowEnd.y = rEditWindowBitmapRect.bottom ;
+	  if (pEnd.x < rBitmapRect.left)
+		  pEnd.x = rBitmapRect.left ;
+	  if (pEnd.x > rBitmapRect.right)
+		  pEnd.x = rBitmapRect.right ;
+	  if (pEnd.y < rBitmapRect.top)
+		  pEnd.y = rBitmapRect.top ;
+	  if (pEnd.y > rBitmapRect.bottom)
+		  pEnd.y = rBitmapRect.bottom ;
 	}
 
-	pStart.x = pEditWindowBeg.x < pEditWindowEnd.x ? pEditWindowBeg.x : pEditWindowEnd.x ;
-	pStart.y = pEditWindowBeg.y < pEditWindowEnd.y ? pEditWindowBeg.y : pEditWindowEnd.y ;
-	weight = abs (pEditWindowEnd.x - pEditWindowBeg.x) ;
-	height = abs (pEditWindowEnd.y - pEditWindowBeg.y) ;	
+	pStart.x = pBeg.x < pEnd.x ? pBeg.x : pEnd.x ;
+	pStart.y = pBeg.y < pEnd.y ? pBeg.y : pEnd.y ;
+	weight = abs (pEnd.x - pBeg.x) ;
+	height = abs (pEnd.y - pBeg.y) ;	
 
-	HDC hdc = GetDC (hEditPictureChildWindow) ;
-	int iFontSize = GetLineSizeEditWindow() * 16 ;
+	HDC hdc = GetDC (hEditWindow) ;
+	int iFontSize = GetLineSize() * 16 ;
 	HFONT hFont = CreateFont(iFontSize, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, "Arial") ;
-	SetTextColor (hdc, GetColorEditWindow()) ;
+	SetTextColor (hdc, GetColor()) ;
 
 	// Creates textbox for input
-	hwndEditWindowEditBox  = CreateWindowEx(NULL, "EDIT", "",
+	hwndEditBox  = CreateWindowEx(NULL, "EDIT", "",
 			WS_CHILD | WS_VISIBLE | ES_MULTILINE | WS_TABSTOP | ES_LEFT,
 			// restrict editbox in the dot rectangle drawed when before
 			pStart.x+1, pStart.y+1, weight-2, height-2,	
-			hEditPictureChildWindow, (HMENU)(101),
+			hEditWindow, (HMENU)(101),
 			hInstance, NULL) ; 	 
 
 	// Set text font
-	SendMessage (hwndEditWindowEditBox, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(FALSE, 0)) ;
+	SendMessage (hwndEditBox, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(FALSE, 0)) ;
 	// char array to hold the text from the textbox
 	char szInput[MAX_PATH];
 	// Obtains input from the textbox and puts it into the char array
-	GetWindowText(GetDlgItem(hEditPictureChildWindow, 101), szInput, MAX_PATH);
-	if (hwndEditWindowEditBox)
-		return hwndEditWindowEditBox;
+	GetWindowText(GetDlgItem(hEditWindow, 101), szInput, MAX_PATH);
+	if (hwndEditBox)
+		return hwndEditBox;
 	else
 		return NULL;
 
 	DeleteObject (hFont) ;
 }
 
-void TextOutFromEditBoxToCanvasEditWindow ()
+void TextOutFromEditBoxToCanvas ()
 {
-	if (hwndEditWindowEditBox)
+	if (hwndEditBox)
 	{		
 		char szInput[MAX_PATH];		
-		GetWindowText (GetDlgItem (hEditPictureChildWindow, 101), szInput, MAX_PATH);
-		HDC hdc = GetDC (hEditPictureChildWindow) ;	
-		int iFontSize = GetLineSizeEditWindow () * 16 ;
+		GetWindowText (GetDlgItem (hEditWindow, 101), szInput, MAX_PATH);
+		HDC hdc = GetDC (hEditWindow) ;	
+		int iFontSize = GetLineSize () * 16 ;
 		HFONT hFont = CreateFont(iFontSize, 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, "Arial") ;
 		SelectObject (hdc, hFont) ;
-		SetTextColor (hdc, GetColorEditWindow()) ;
+		SetTextColor (hdc, GetColor()) ;
 
 		// destroy edit window
-		DestroyWindow (hwndEditWindowEditBox) ;
-		hwndEditWindowEditBox = NULL ;
-		UpdateWindow (hEditPictureChildWindow) ;
+		DestroyWindow (hwndEditBox) ;
+		hwndEditBox = NULL ;
+		UpdateWindow (hEditWindow) ;
 		// erase the rectangle by draw double rectangle	
-		HPEN hpen = CreatePen (PS_SOLID, GetLineSizeEditWindow(), GetColorEditWindow()) ;
+		HPEN hpen = CreatePen (PS_SOLID, GetLineSize(), GetColor()) ;
 	    HPEN hpenDot = CreatePen (PS_DOT, 1, RGB(0, 0, 0)) ;		
 		SelectObject (hdc, hpen) ;
 
 	    int oldRop = SetROP2 (hdc, R2_NOTXORPEN) ;
-		Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
+		Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
 		// draw the rectangle again 			
-		Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
+		Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
 	    SetROP2 (hdc, oldRop) ;
 
-		//Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;			
-		//TextOut (hdc, pEditWindowBeg.x + 4, pEditWindowBeg.y + 2, szInput, strlen(szInput)) ;			
+		//Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;			
+		//TextOut (hdc, pBeg.x + 4, pBeg.y + 2, szInput, strlen(szInput)) ;			
 		RECT TextRect;
-		TextRect.left    = pEditWindowBeg.x + 4;
-		TextRect.top     = pEditWindowBeg.y + 1; 
-		TextRect.right   = pEditWindowEnd.x;
-		TextRect.bottom  = pEditWindowEnd.y;
+		TextRect.left    = pBeg.x + 4;
+		TextRect.top     = pBeg.y + 1; 
+		TextRect.right   = pEnd.x;
+		TextRect.bottom  = pEnd.y;
 		DrawText (hdc, szInput, strlen(szInput), &TextRect, DT_LEFT | DT_EXTERNALLEADING | DT_WORDBREAK) ;
 
 		// save new bitmap after input text
-        hEditWindowBitmap = SaveBitmapToMemoryEditWindow () ;
+        hEditWindowBitmap = SaveBitmapToMemory () ;
 
 		// delete objects
 		DeleteObject (hpen) ;
 		DeleteObject (hpenDot) ;
 		DeleteObject (hFont) ;
-		ReleaseDC (hEditPictureChildWindow, hdc) ;	
+		ReleaseDC (hEditWindow, hdc) ;	
 	}	
 }
 
-void DrawRectangleEditWindow (HWND hwnd, POINT pEditWindowBeg, POINT pEditWindowEnd, int bModel)
+void DrawRectangle (HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 {
     HDC hdc = GetDC (hwnd) ;
 	int oldRop = SetROP2 (hdc, bModel) ;
-	HPEN hpen = CreatePen (PS_SOLID, GetLineSizeEditWindow(), GetColorEditWindow()) ;
+	HPEN hpen = CreatePen (PS_SOLID, GetLineSize(), GetColor()) ;
 
 	SelectObject (hdc, hpen) ;	
 	SelectObject(hdc, GetStockObject(NULL_BRUSH)) ;	
-	Rectangle (hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
+	Rectangle (hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
 	SetROP2 (hdc, oldRop) ;	
 
 	DeleteObject (hpen) ;
 	ReleaseDC(hwnd, hdc) ;
 }
 
-void DrawEllipseEditWindow (HWND hwnd, POINT pEditWindowBeg, POINT pEditWindowEnd, int bModel)
+void DrawEllipse (HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 {
 	 HDC hdc = GetDC (hwnd) ;
 	int oldRop = SetROP2 (hdc, bModel) ;
-	HPEN hpen = CreatePen (PS_SOLID, GetLineSizeEditWindow(), GetColorEditWindow()) ;
+	HPEN hpen = CreatePen (PS_SOLID, GetLineSize(), GetColor()) ;
 
 	SelectObject (hdc, hpen) ;	
 	SelectObject(hdc, GetStockObject(NULL_BRUSH)) ;		
-	Ellipse(hdc, pEditWindowBeg.x, pEditWindowBeg.y, pEditWindowEnd.x, pEditWindowEnd.y) ;
+	Ellipse(hdc, pBeg.x, pBeg.y, pEnd.x, pEnd.y) ;
 	SetROP2 (hdc, oldRop) ;	
 
 	DeleteObject (hpen) ;
 	ReleaseDC(hwnd, hdc);
 }
 
-void DrawLineEditWindow (HWND hwnd, POINT pEditWindowBeg, POINT pEditWindowEnd, int bModel)
+void DrawLine (HWND hwnd, POINT pBeg, POINT pEnd, int bModel)
 {
     HDC hdc = GetDC (hwnd) ;
 	int oldRop = SetROP2 (hdc, bModel) ;
-	HPEN hpen = CreatePen (PS_SOLID, GetLineSizeEditWindow(), GetColorEditWindow()) ;
+	HPEN hpen = CreatePen (PS_SOLID, GetLineSize(), GetColor()) ;
 
 	SelectObject (hdc, hpen) ;		
-	MoveToEx (hdc, pEditWindowBeg.x, pEditWindowBeg.y, (LPPOINT) NULL) ; 
-	LineTo (hdc, pEditWindowEnd.x, pEditWindowEnd.y) ;	
+	MoveToEx (hdc, pBeg.x, pBeg.y, (LPPOINT) NULL) ; 
+	LineTo (hdc, pEnd.x, pEnd.y) ;	
 	SetROP2 (hdc, oldRop) ;	
 
 	DeleteObject (hpen) ;
@@ -532,35 +532,35 @@ void DrawLineEditWindow (HWND hwnd, POINT pEditWindowBeg, POINT pEditWindowEnd, 
 
 void InvalideAndUpdateClient ()
 {
-	HDC hdc = GetDC (hEditPictureChildWindow) ;
+	HDC hdc = GetDC (hEditWindow) ;
 	RECT clientRect ;
 	POINT pLeftTop, pRightBottom  ;
 
-	GetWindowRect (hEditPictureChildWindow, &clientRect) ;
+	GetWindowRect (hEditWindow, &clientRect) ;
 	pLeftTop.x = clientRect.left ;
 	pLeftTop.y = clientRect.top ;
 	pRightBottom.x = clientRect.right ;
 	pRightBottom.y = clientRect.bottom ;
 	
-	ScreenToClient (hEditPictureChildWindow, &pLeftTop) ;
-	ScreenToClient (hEditPictureChildWindow, &pRightBottom) ;
+	ScreenToClient (hEditWindow, &pLeftTop) ;
+	ScreenToClient (hEditWindow, &pRightBottom) ;
 
 	clientRect.left = pLeftTop.x ;
 	clientRect.top = pLeftTop.y ;
 	clientRect.right = pRightBottom.x ;
 	clientRect.bottom = pRightBottom.y ;
 
-	InvalidateRect (hEditPictureChildWindow, &clientRect, FALSE) ;
-	UpdateWindow (hEditPictureChildWindow) ;
+	InvalidateRect (hEditWindow, &clientRect, FALSE) ;
+	UpdateWindow (hEditWindow) ;
 }
 
 HBITMAP SelectBitmap ()
 {	
    // update window for avoid some window on top of it, such as input window
-   UpdateWindow (hEditPictureChildWindow) ;
+   UpdateWindow (hEditWindow) ;
 
    BITMAP bm ;		
-   HDC hdc = GetDC (hEditPictureChildWindow);
+   HDC hdc = GetDC (hEditWindow);
 
    // create compatible DC
    HDC hdcCompat = CreateCompatibleDC (hdc); 
@@ -570,12 +570,12 @@ HBITMAP SelectBitmap ()
    GetObject (hEditWindowBitmap, sizeof (BITMAP), (PSTR) &bm) ;
 
    RECT selectRect;
-   selectRect.left = pEditWindowBeg.x ;
-   selectRect.top = pEditWindowBeg.y ;
-   selectRect.right = pEditWindowEnd.x ;
-   selectRect.bottom = pEditWindowEnd.y ; 
-   int bmWidth = abs (pEditWindowEnd.x - pEditWindowBeg.x) ;
-   int bmHeight = abs (pEditWindowEnd.y - pEditWindowBeg.y) ;
+   selectRect.left = pBeg.x ;
+   selectRect.top = pBeg.y ;
+   selectRect.right = pEnd.x ;
+   selectRect.bottom = pEnd.y ; 
+   int bmWidth = abs (pEnd.x - pBeg.x) ;
+   int bmHeight = abs (pEnd.y - pBeg.y) ;
 
    // get new bitmap
    HDC hdcMem = CreateCompatibleDC (hdc) ;
@@ -584,18 +584,18 @@ HBITMAP SelectBitmap ()
    StretchBlt (hdcMem, 0, 0, bmWidth, bmHeight, hdc, selectRect.left, selectRect.top, bmWidth, bmHeight, SRCCOPY) ;
 		
    DeleteDC (hdcMem) ;
-   ReleaseDC (hEditPictureChildWindow, hdc) ;     
+   ReleaseDC (hEditWindow, hdc) ;     
 
    return hEditWindowBitmap ;
 }
 
-HBITMAP SaveBitmapToMemoryEditWindow ()
+HBITMAP SaveBitmapToMemory ()
 {	
    // update window for avoid some window on top of it, such as input window
-   UpdateWindow (hEditPictureChildWindow) ;
+   UpdateWindow (hEditWindow) ;
 
    BITMAP bm ;		
-   HDC hdc = GetDC (hEditPictureChildWindow);
+   HDC hdc = GetDC (hEditWindow);
 
    // create compatible DC
    HDC hdcCompat = CreateCompatibleDC (hdc); 
@@ -611,143 +611,143 @@ HBITMAP SaveBitmapToMemoryEditWindow ()
    StretchBlt (hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdc, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
 		
    DeleteDC (hdcMem) ;
-   ReleaseDC (hEditPictureChildWindow, hdc) ;     
+   ReleaseDC (hEditWindow, hdc) ;     
 
    return hEditWindowBitmap ;
 }
 
-void OnPaintEditWindow ()
+void OnPaint ()
 {		
 	if (!hEditWindowBitmap)
 		return ;
-	ShowPictureInEditModelEditWindow () ;
+	ShowPictureInEditModel () ;
 }	
 
-void OnLButtonDownEditWindow (WPARAM wParam, LPARAM lParam)
+void OnLButtonDown (WPARAM wParam, LPARAM lParam)
 {
-	TextOutFromEditBoxToCanvasEditWindow () ;
+	TextOutFromEditBoxToCanvas () ;
 	
-	bEditWindowDrawing = true ;	
-	pEditWindowBeg.x = LOWORD (lParam) ;
-	pEditWindowBeg.y = HIWORD (lParam) ;
-	pEditWindowEnd.x = LOWORD (lParam) ;
-	pEditWindowEnd.y = HIWORD (lParam) ;		
+	bDrawing = true ;	
+	pBeg.x = LOWORD (lParam) ;
+	pBeg.y = HIWORD (lParam) ;
+	pEnd.x = LOWORD (lParam) ;
+	pEnd.y = HIWORD (lParam) ;		
 }
 
-void OnLButtonUPEditWindow (WPARAM wParam, LPARAM lParam)
+void OnLButtonUP (WPARAM wParam, LPARAM lParam)
 {
-	if (bEditWindowDrawing)
+	if (bDrawing)
 	{	
-		bEditWindowDrawing = false ;			
-		pEditWindowEnd.x = LOWORD (lParam) ;
-		pEditWindowEnd.y = HIWORD (lParam) ;
+		bDrawing = false ;			
+		pEnd.x = LOWORD (lParam) ;
+		pEnd.y = HIWORD (lParam) ;
 		// drawing shapes: rectangle, Ellipse or line
-		ShapeEditWindow (hEditPictureChildWindow, pEditWindowBeg, pEditWindowEnd, R2_COPYPEN) ;
+		Shape (hEditWindow, pBeg, pEnd, R2_COPYPEN) ;
 
 		// save new bitmap after drawing
-        //hEditWindowBitmap = SaveBitmapToMemoryEditWindow () ;
+        //hEditWindowBitmap = SaveBitmapToMemory () ;
 		
 		// select part or full bitmap
-		if (iEditWindowShape == 4)
-			CreateEditBoxEditWindow() ;
+		if (iShape == 4)
+			CreateEditBox() ;
 
-		if (bEditWindowSelection)
+		if (bSelection)
 		{
 			InvalideAndUpdateClient () ;
 			hEditWindowBitmap = SelectBitmap () ;
 			InvalideAndUpdateClient () ;	
-			bEditWindowSelection = false ;
+			bSelection = false ;
 		}
 
 		// save new bitmap after drawing
-        hEditWindowBitmap = SaveBitmapToMemoryEditWindow () ;
+        hEditWindowBitmap = SaveBitmapToMemory () ;
 	}	
 }
 
-void OnMouseMoveEditWindow (WPARAM wParam, LPARAM lParam)
+void OnMouseMove (WPARAM wParam, LPARAM lParam)
 {	
-	if (bEditWindowDrawing)
+	if (bDrawing)
 	{
-		ShapeEditWindow (hEditPictureChildWindow, pEditWindowBeg, pEditWindowEnd, R2_NOTXORPEN) ;
-		pEditWindowEnd.x = LOWORD (lParam) ;
-		pEditWindowEnd.y = HIWORD (lParam) ;	
-		ShapeEditWindow (hEditPictureChildWindow, pEditWindowBeg, pEditWindowEnd, R2_NOTXORPEN) ;
+		Shape (hEditWindow, pBeg, pEnd, R2_NOTXORPEN) ;
+		pEnd.x = LOWORD (lParam) ;
+		pEnd.y = HIWORD (lParam) ;	
+		Shape (hEditWindow, pBeg, pEnd, R2_NOTXORPEN) ;
 	}
 }
 
-void InitializeScrollsEditWindow (HWND hwnd, int cx, int cy) 
+void InitializeScrolls (HWND hwnd, int cx, int cy) 
 {
 	BITMAP             bm ;    
     GetObject (hEditWindowBitmap, sizeof (BITMAP), (PSTR) &bm) ;	
 
 	// initialize horizonal scroll bar
 	int   xNewSize = cx;   
-	hEditWindowScroll.xMaxScroll = max (bm.bmWidth - xNewSize, 0); 
-	hEditWindowScroll.xCurrentScroll = min (hEditWindowScroll.xCurrentScroll, hEditWindowScroll.xMaxScroll); 
+	hScroll.xMaxScroll = max (bm.bmWidth - xNewSize, 0); 
+	hScroll.xCurrentScroll = min (hScroll.xCurrentScroll, hScroll.xMaxScroll); 
 	
 	SCROLLINFO si;
 	si.cbSize = sizeof (si) ; 
 	si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS ; 
-	si.nMin   = hEditWindowScroll.xMinScroll ; 
+	si.nMin   = hScroll.xMinScroll ; 
 	si.nMax   = bm.bmWidth ; 
 	si.nPage  = xNewSize ; 
-	si.nPos   = hEditWindowScroll.xCurrentScroll ; 
+	si.nPos   = hScroll.xCurrentScroll ; 
 	SetScrollInfo (hwnd, SB_HORZ, &si, TRUE) ; 
 
 
 	// initialize verticle scroll bar
 	int   yNewSize = cy;
-	vEditWindowScroll.yMaxScroll = max (bm.bmHeight - yNewSize, 0);
-	vEditWindowScroll.yCurrentScroll = min (vEditWindowScroll.yCurrentScroll, vEditWindowScroll.yMaxScroll) ;
+	vScroll.yMaxScroll = max (bm.bmHeight - yNewSize, 0);
+	vScroll.yCurrentScroll = min (vScroll.yCurrentScroll, vScroll.yMaxScroll) ;
 	
 	si.cbSize = sizeof(si) ; 
 	si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS ; 
-	si.nMin   = vEditWindowScroll.yMinScroll ; 
+	si.nMin   = vScroll.yMinScroll ; 
 	si.nMax   = bm.bmHeight ; 
 	si.nPage  = yNewSize ; 
-	si.nPos   = vEditWindowScroll.yCurrentScroll ; 
+	si.nPos   = vScroll.yCurrentScroll ; 
 	SetScrollInfo(hwnd, SB_VERT, &si, TRUE);
 }
 
-void InitializeHScrollEditWindow (WPARAM wParam, LPARAM lParam)
+void InitializeHScroll (WPARAM wParam, LPARAM lParam)
 {	
 	BITMAP             bm ;    
     GetObject (hEditWindowBitmap, sizeof (BITMAP), (PSTR) &bm) ;	
 
 	int   xNewSize = LOWORD (lParam);   
-	hEditWindowScroll.xMaxScroll = max (bm.bmWidth - xNewSize, 0); 
-	hEditWindowScroll.xCurrentScroll = min (hEditWindowScroll.xCurrentScroll, hEditWindowScroll.xMaxScroll); 
+	hScroll.xMaxScroll = max (bm.bmWidth - xNewSize, 0); 
+	hScroll.xCurrentScroll = min (hScroll.xCurrentScroll, hScroll.xMaxScroll); 
 	
 	SCROLLINFO si;
 	si.cbSize = sizeof (si) ; 
 	si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS ; 
-	si.nMin   = hEditWindowScroll.xMinScroll ; 
+	si.nMin   = hScroll.xMinScroll ; 
 	si.nMax   = bm.bmWidth ; 
 	si.nPage  = xNewSize ; 
-	si.nPos   = hEditWindowScroll.xCurrentScroll ; 
-	SetScrollInfo (hEditPictureChildWindow, SB_HORZ, &si, TRUE) ; 	
+	si.nPos   = hScroll.xCurrentScroll ; 
+	SetScrollInfo (hEditWindow, SB_HORZ, &si, TRUE) ; 	
 }
 
-void InitializeVScrollEditWindow (WPARAM wParam, LPARAM lParam)
+void InitializeVScroll (WPARAM wParam, LPARAM lParam)
 {	
 	BITMAP             bm ;    
     GetObject (hEditWindowBitmap, sizeof (BITMAP), (PSTR) &bm) ;
 
 	int   yNewSize = HIWORD (lParam);
-	vEditWindowScroll.yMaxScroll = max (bm.bmHeight - yNewSize, 0);
-	vEditWindowScroll.yCurrentScroll = min (vEditWindowScroll.yCurrentScroll, vEditWindowScroll.yMaxScroll) ; 
+	vScroll.yMaxScroll = max (bm.bmHeight - yNewSize, 0);
+	vScroll.yCurrentScroll = min (vScroll.yCurrentScroll, vScroll.yMaxScroll) ; 
 
 	SCROLLINFO si;
 	si.cbSize = sizeof(si) ; 
 	si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS ; 
-	si.nMin   = vEditWindowScroll.yMinScroll ; 
+	si.nMin   = vScroll.yMinScroll ; 
 	si.nMax   = bm.bmHeight ; 
 	si.nPage  = yNewSize ; 
-	si.nPos   = vEditWindowScroll.yCurrentScroll ; 
-	SetScrollInfo(hEditPictureChildWindow, SB_VERT, &si, TRUE); 
+	si.nPos   = vScroll.yCurrentScroll ; 
+	SetScrollInfo(hEditWindow, SB_VERT, &si, TRUE); 
 }
 
-void OnHScrollEditWindow (WPARAM wParam, LPARAM lParam)
+void OnHScroll (WPARAM wParam, LPARAM lParam)
 {
 	int xDelta;     // xDelta = new_pos - current_pos  
     int xNewPos;    // new position 
@@ -757,22 +757,22 @@ void OnHScrollEditWindow (WPARAM wParam, LPARAM lParam)
     { 
         // User clicked the scroll bar shaft left of the scroll box. 
         case SB_PAGEUP: 
-            xNewPos = hEditWindowScroll.xCurrentScroll - 50; 
+            xNewPos = hScroll.xCurrentScroll - 50; 
             break; 
     
         // User clicked the scroll bar shaft right of the scroll box. 
         case SB_PAGEDOWN: 
-            xNewPos = hEditWindowScroll.xCurrentScroll + 50; 
+            xNewPos = hScroll.xCurrentScroll + 50; 
             break; 
     
         // User clicked the left arrow. 
         case SB_LINEUP: 
-            xNewPos = hEditWindowScroll.xCurrentScroll - 5; 
+            xNewPos = hScroll.xCurrentScroll - 5; 
             break; 
     
         // User clicked the right arrow. 
         case SB_LINEDOWN: 
-            xNewPos = hEditWindowScroll.xCurrentScroll + 5; 
+            xNewPos = hScroll.xCurrentScroll + 5; 
             break; 
     
         // User dragged the scroll box. 
@@ -781,44 +781,44 @@ void OnHScrollEditWindow (WPARAM wParam, LPARAM lParam)
             break; 
     
         default: 
-            xNewPos = hEditWindowScroll.xCurrentScroll; 
+            xNewPos = hScroll.xCurrentScroll; 
     } 
     
     // New position must be between 0 and the screen width. 
     xNewPos = max(0, xNewPos); 
-    xNewPos = min(hEditWindowScroll.xMaxScroll, xNewPos); 
+    xNewPos = min(hScroll.xMaxScroll, xNewPos); 
     
     // If the current position does not change, do not scroll.
-    if (xNewPos == hEditWindowScroll.xCurrentScroll) 
+    if (xNewPos == hScroll.xCurrentScroll) 
         return ;
     
     // Set the scroll flag to TRUE. 
-    bEditWindowDrawing = true; 
+    bDrawing = true; 
     
     // Determine the amount scrolled (in pixels). 
-    xDelta = xNewPos - hEditWindowScroll.xCurrentScroll; 
+    xDelta = xNewPos - hScroll.xCurrentScroll; 
     
     // Reset the current scroll position. 
-    hEditWindowScroll.xCurrentScroll = xNewPos; 
+    hScroll.xCurrentScroll = xNewPos; 
     
     // Scroll the window. (The system repaints most of the 
     // client area when ScrollWindowEx is called; however, it is 
     // necessary to call UpdateWindow in order to repaint the 
     // rectangle of pixels that were invalidated.) 
-    ScrollWindowEx(hEditPictureChildWindow, -xDelta, -yDelta, (CONST RECT *) NULL, 
+    ScrollWindowEx(hEditWindow, -xDelta, -yDelta, (CONST RECT *) NULL, 
         (CONST RECT *) NULL, (HRGN) NULL, (PRECT) NULL, 
         SW_INVALIDATE); 
-    UpdateWindow(hEditPictureChildWindow); 
+    UpdateWindow(hEditWindow); 
     
     // Reset the scroll bar. 
 	SCROLLINFO si;
     si.cbSize = sizeof(si); 
     si.fMask  = SIF_POS; 
-    si.nPos   = hEditWindowScroll.xCurrentScroll; 
-    SetScrollInfo(hEditPictureChildWindow, SB_HORZ, &si, TRUE); 
+    si.nPos   = hScroll.xCurrentScroll; 
+    SetScrollInfo(hEditWindow, SB_HORZ, &si, TRUE); 
 }
 
-void OnVScrollEditWindow (WPARAM wParam, LPARAM lParam)
+void OnVScroll (WPARAM wParam, LPARAM lParam)
 {	
     int xDelta = 0; 
     int yDelta;     // yDelta = new_pos - current_pos 
@@ -828,22 +828,22 @@ void OnVScrollEditWindow (WPARAM wParam, LPARAM lParam)
     { 
         // User clicked the scroll bar shaft above the scroll box. 
         case SB_PAGEUP: 
-            yNewPos = vEditWindowScroll.yCurrentScroll - 50; 
+            yNewPos = vScroll.yCurrentScroll - 50; 
             break; 
     
         // User clicked the scroll bar shaft below the scroll box. 
         case SB_PAGEDOWN: 
-            yNewPos = vEditWindowScroll.yCurrentScroll + 50; 
+            yNewPos = vScroll.yCurrentScroll + 50; 
             break; 
     
         // User clicked the top arrow. 
         case SB_LINEUP: 
-            yNewPos = vEditWindowScroll.yCurrentScroll - 5; 
+            yNewPos = vScroll.yCurrentScroll - 5; 
             break; 
     
         // User clicked the bottom arrow. 
         case SB_LINEDOWN: 
-            yNewPos = vEditWindowScroll.yCurrentScroll + 5; 
+            yNewPos = vScroll.yCurrentScroll + 5; 
             break; 
     
         // User dragged the scroll box. 
@@ -852,39 +852,39 @@ void OnVScrollEditWindow (WPARAM wParam, LPARAM lParam)
             break; 
     
         default: 
-            yNewPos = vEditWindowScroll.yCurrentScroll; 
+            yNewPos = vScroll.yCurrentScroll; 
     } 
     
     // New position must be between 0 and the screen height. 
     yNewPos = max(0, yNewPos); 
-    yNewPos = min(vEditWindowScroll.yMaxScroll, yNewPos); 
+    yNewPos = min(vScroll.yMaxScroll, yNewPos); 
     
     // If the current position does not change, do not scroll.
-    if (yNewPos == vEditWindowScroll.yCurrentScroll) 
+    if (yNewPos == vScroll.yCurrentScroll) 
         return ;
     
     // Set the scroll flag to TRUE. 
-    bEditWindowDrawing = true; 
+    bDrawing = true; 
     
     // Determine the amount scrolled (in pixels). 
-    yDelta = yNewPos - vEditWindowScroll.yCurrentScroll; 
+    yDelta = yNewPos - vScroll.yCurrentScroll; 
     
     // Reset the current scroll position. 
-    vEditWindowScroll.yCurrentScroll = yNewPos; 
+    vScroll.yCurrentScroll = yNewPos; 
     
     // Scroll the window. (The system repaints most of the 
     // client area when ScrollWindowEx is called; however, it is 
     // necessary to call UpdateWindow in order to repaint the 
     // rectangle of pixels that were invalidated.) 
-    ScrollWindowEx (hEditPictureChildWindow, -xDelta, -yDelta, (CONST RECT *) NULL, 
+    ScrollWindowEx (hEditWindow, -xDelta, -yDelta, (CONST RECT *) NULL, 
         (CONST RECT *) NULL, (HRGN) NULL, (PRECT) NULL, 
         SW_INVALIDATE); 
-    UpdateWindow (hEditPictureChildWindow); 
+    UpdateWindow (hEditWindow); 
     
     // Reset the scroll bar. 
 	SCROLLINFO si;
     si.cbSize = sizeof(si); 
     si.fMask  = SIF_POS; 
-    si.nPos   = vEditWindowScroll.yCurrentScroll; 
-    SetScrollInfo(hEditPictureChildWindow, SB_VERT, &si, TRUE);
+    si.nPos   = vScroll.yCurrentScroll; 
+    SetScrollInfo(hEditWindow, SB_VERT, &si, TRUE);
 }
