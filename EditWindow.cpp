@@ -18,6 +18,9 @@ int  	   iPenColor ;
 POINT      pBeg ;
 POINT      pEnd ;
 RECT       rBitmapRect ;
+const int  BITMAP_COUNT = 10 ;
+int        iBitmapIndex ;
+HBITMAP    hBitmaps[BITMAP_COUNT] ;
 
 bool RegisterEditWindowClass(HINSTANCE hInstance)
 {
@@ -63,7 +66,7 @@ HWND CreateEditWindow (HINSTANCE g_hInstance, HWND hwndParent, int nCmdShow)
    clientRect.top += iToolbarHeight ; 
 
    DWORD dwError = 0 ; 	
-
+   hBitmaps[0] = hEditWindowBitmap ;
 
    hEditWindow = CreateWindow(szWindowClass, "TestWindow", WS_CHILD | WS_VISIBLE | ES_LEFT | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL,
 	   clientRect.left, clientRect.top, clientRect.right-clientRect.left, clientRect.bottom-clientRect.top, hwndParent, NULL, g_hInstance, NULL);
@@ -107,6 +110,10 @@ LRESULT CALLBACK EditWindowWndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 	case WM_MOUSEMOVE:
 		OnMouseMove (wParam, lParam) ;
 		break;
+	case WM_SYSKEYDOWN:
+	case WM_KEYDOWN: 
+		OnKeyDown (uMsg, wParam, lParam) ;
+		break ;
 	case WM_CTLCOLOREDIT:
 		return SetEditBox (wParam, lParam) ;
 	case WM_HSCROLL:
@@ -606,14 +613,20 @@ HBITMAP SaveBitmapToMemory ()
 
    // get new bitmap
    HDC hdcMem = CreateCompatibleDC (hdc) ;
-   hEditWindowBitmap = CreateCompatibleBitmap (hdc, bm.bmWidth, bm.bmHeight) ;
-   SelectObject (hdcMem, hEditWindowBitmap) ;
+   HBITMAP bitmap ;
+   bitmap = CreateCompatibleBitmap (hdc, bm.bmWidth, bm.bmHeight) ;
+   SelectObject (hdcMem, bitmap) ;
    StretchBlt (hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdc, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
+
+  /* hEditWindowBitmap = CreateCompatibleBitmap (hdc, bm.bmWidth, bm.bmHeight) ;
+   SelectObject (hdcMem, hEditWindowBitmap) ;
+   StretchBlt (hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdc, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;*/
 		
    DeleteDC (hdcMem) ;
    ReleaseDC (hEditWindow, hdc) ;     
 
-   return hEditWindowBitmap ;
+   return bitmap ;
+   //return hEditWindowBitmap ;
 }
 
 void OnPaint ()
@@ -648,8 +661,20 @@ void OnLButtonUP (WPARAM wParam, LPARAM lParam)
 		if (iShape == 4)
 			CreateEditBox() ;
 		else
+		{
 			// save new bitmap after drawing
-			hEditWindowBitmap = SaveBitmapToMemory () ;
+			iBitmapIndex ++ ;
+			if (iBitmapIndex > BITMAP_COUNT)
+			{
+				iBitmapIndex == BITMAP_COUNT ;
+				for (int i = 0; i < BITMAP_COUNT-1; i ++)
+				{
+					hBitmaps[i] = hBitmaps[i+1] ;
+				}				
+			}	
+			hBitmaps[iBitmapIndex] = SaveBitmapToMemory () ;
+			hEditWindowBitmap = hBitmaps[iBitmapIndex] ;
+		}
 
 		if (iShape == 5 && bSelection)
 		{
@@ -670,6 +695,52 @@ void OnMouseMove (WPARAM wParam, LPARAM lParam)
 		pEnd.y = HIWORD (lParam) ;	
 		Shape (hEditWindow, pBeg, pEnd, R2_NOTXORPEN) ;
 	}
+}
+
+void OnKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam) 
+{
+	// Ctrl + Z keys
+	if (GetAsyncKeyState(VK_CONTROL) && GetAsyncKeyState(0x5A))
+	{
+		if (iBitmapIndex != 0)
+			iBitmapIndex -- ;
+		hEditWindowBitmap = hBitmaps[iBitmapIndex] ;
+	}
+
+	wchar_t msg[32];
+    switch (uMsg)
+    {
+    case WM_SYSKEYDOWN:
+        swprintf_s(msg, L"WM_SYSKEYDOWN: 0x%x\n", wParam);
+        OutputDebugString(LPCSTR(msg));
+        break;
+
+    case WM_SYSCHAR:
+        swprintf_s(msg, L"WM_SYSCHAR: %c\n", (wchar_t)wParam);
+        OutputDebugString(LPCSTR(msg));
+        break;
+
+    case WM_SYSKEYUP:
+        swprintf_s(msg, L"WM_SYSKEYUP: 0x%x\n", wParam);
+        OutputDebugString(LPCSTR(msg));
+        break;
+
+    case WM_KEYDOWN:
+        swprintf_s(msg, L"WM_KEYDOWN: 0x%x\n", wParam);
+        OutputDebugString(LPCSTR(msg));
+        break;
+
+    case WM_KEYUP:
+        swprintf_s(msg, L"WM_KEYUP: 0x%x\n", wParam);
+        OutputDebugString(LPCSTR(msg));
+        break;
+
+    case WM_CHAR:
+        swprintf_s(msg, L"WM_CHAR: %c\n", (wchar_t)wParam);
+        OutputDebugString(LPCSTR(msg));
+        break;   
+
+    }
 }
 
 void InitializeScrolls (HWND hwnd, int cx, int cy) 

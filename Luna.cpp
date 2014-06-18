@@ -89,6 +89,10 @@ LRESULT CALLBACK Luna::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 	case WM_MOUSEMOVE:
 		OnMouseMove (wParam, lParam) ;
 		break;
+	case WM_SYSKEYDOWN:
+	case WM_KEYDOWN: 
+		SendMessage (hwndEditWindow, uMsg, wParam, lParam) ;
+		break ;
 	case WM_COMMAND:
 		switch (LOWORD (wParam)) 
         {
@@ -365,7 +369,7 @@ int Luna::GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 
 bool Luna::CreateEditChildWindow ()
 {	
-	hEditWindowBitmap = hBitmap ;
+	hEditWindowBitmap = hBitmap ;	
 	RegisterEditWindowClass (hInstance);
 	hwndEditWindow = CreateEditWindow (hInstance, m_hwnd, SW_SHOW);
 	

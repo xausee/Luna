@@ -19,6 +19,7 @@ static void OnPaint ();
 static void OnLButtonDown (WPARAM wParam, LPARAM lParam) ;	
 static void OnLButtonUP (WPARAM wParam, LPARAM lParam) ;
 static void OnMouseMove (WPARAM wParam, LPARAM lParam) ;
+static void OnKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam) ;
 static void InitializeScrolls (HWND hwnd, int cx, int cy) ;
 static void InitializeHScroll (WPARAM wParam, LPARAM lParam) ;
 static void InitializeVScroll (WPARAM wParam, LPARAM lParam) ;
