@@ -643,13 +643,13 @@ void OnLButtonUP (WPARAM wParam, LPARAM lParam)
 		pEnd.y = HIWORD (lParam) ;
 		// drawing shapes: rectangle, Ellipse or line
 		Shape (hEditWindow, pBeg, pEnd, R2_COPYPEN) ;
-
-		// save new bitmap after drawing
-        //hEditWindowBitmap = SaveBitmapToMemory () ;
 		
 		// select part or full bitmap
 		if (iShape == 4)
 			CreateEditBox() ;
+		else
+			// save new bitmap after drawing
+			hEditWindowBitmap = SaveBitmapToMemory () ;
 
 		if (bSelection)
 		{
@@ -657,10 +657,7 @@ void OnLButtonUP (WPARAM wParam, LPARAM lParam)
 			hEditWindowBitmap = SelectBitmap () ;
 			InvalideAndUpdateClient () ;	
 			bSelection = false ;
-		}
-
-		// save new bitmap after drawing
-        hEditWindowBitmap = SaveBitmapToMemory () ;
+		}		
 	}	
 }
 
