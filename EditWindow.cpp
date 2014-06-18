@@ -651,7 +651,7 @@ void OnLButtonUP (WPARAM wParam, LPARAM lParam)
 			// save new bitmap after drawing
 			hEditWindowBitmap = SaveBitmapToMemory () ;
 
-		if (bSelection)
+		if (iShape == 5 && bSelection)
 		{
 			InvalideAndUpdateClient () ;
 			hEditWindowBitmap = SelectBitmap () ;
