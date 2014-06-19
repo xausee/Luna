@@ -41,5 +41,7 @@ static HBITMAP SaveBitmapToMemory () ;
 static HWND GetHwnd () ;
 static HBITMAP SetBitmap (HBITMAP	srcHBitmap) ;
 static HBITMAP GetBitmap () ;
+static HBITMAP GetDIB() ;
+static HBITMAP DIBToDDB (HBITMAP hbitmap) ;
 
 #endif

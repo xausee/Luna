@@ -21,6 +21,7 @@ RECT       rBitmapRect ;
 const int  BITMAP_COUNT = 10 ;
 int        iBitmapIndex ;
 HBITMAP    hBitmaps[BITMAP_COUNT] ;
+BITMAP     Bitmaps[BITMAP_COUNT] ;
 
 bool RegisterEditWindowClass(HINSTANCE hInstance)
 {
@@ -613,10 +614,13 @@ HBITMAP SaveBitmapToMemory ()
 
    // get new bitmap
    HDC hdcMem = CreateCompatibleDC (hdc) ;
-   HBITMAP bitmap ;
-   bitmap = CreateCompatibleBitmap (hdc, bm.bmWidth, bm.bmHeight) ;
-   SelectObject (hdcMem, bitmap) ;
+   HBITMAP hBitmap ;
+   hBitmap = CreateCompatibleBitmap (hdc, bm.bmWidth, bm.bmHeight) ;
+   SelectObject (hdcMem, hBitmap) ;
    StretchBlt (hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdc, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY) ;
+
+   BITMAP bitmap;
+   GetObject(hBitmap, sizeof(BITMAP), &bitmap);
 
   /* hEditWindowBitmap = CreateCompatibleBitmap (hdc, bm.bmWidth, bm.bmHeight) ;
    SelectObject (hdcMem, hEditWindowBitmap) ;
@@ -625,7 +629,7 @@ HBITMAP SaveBitmapToMemory ()
    DeleteDC (hdcMem) ;
    ReleaseDC (hEditWindow, hdc) ;     
 
-   return bitmap ;
+   return hBitmap ;
    //return hEditWindowBitmap ;
 }
 
@@ -633,6 +637,7 @@ void OnPaint ()
 {		
 	if (!hEditWindowBitmap)
 		return ;
+	hEditWindowBitmap = DIBToDDB (NULL) ;
 	ShowPictureInEditModel () ;
 }	
 
@@ -666,13 +671,13 @@ void OnLButtonUP (WPARAM wParam, LPARAM lParam)
 			iBitmapIndex ++ ;
 			if (iBitmapIndex > BITMAP_COUNT)
 			{
-				iBitmapIndex == BITMAP_COUNT ;
+				iBitmapIndex = BITMAP_COUNT ;
 				for (int i = 0; i < BITMAP_COUNT-1; i ++)
 				{
 					hBitmaps[i] = hBitmaps[i+1] ;
 				}				
 			}	
-			hBitmaps[iBitmapIndex] = SaveBitmapToMemory () ;
+			hBitmaps[iBitmapIndex] =  GetDIB () ;//SaveBitmapToMemory () ; GetDIB () ;
 			hEditWindowBitmap = hBitmaps[iBitmapIndex] ;
 		}
 
@@ -699,9 +704,11 @@ void OnMouseMove (WPARAM wParam, LPARAM lParam)
 
 void OnKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam) 
 {
+	
 	// Ctrl + Z keys
 	if (GetAsyncKeyState(VK_CONTROL) && GetAsyncKeyState(0x5A))
 	{
+		//hEditWindowBitmap = GetDIB ();
 		if (iBitmapIndex != 0)
 			iBitmapIndex -- ;
 		hEditWindowBitmap = hBitmaps[iBitmapIndex] ;
@@ -955,4 +962,158 @@ void OnVScroll (WPARAM wParam, LPARAM lParam)
     si.fMask  = SIF_POS; 
     si.nPos   = vScroll.yCurrentScroll; 
     SetScrollInfo(hEditWindow, SB_VERT, &si, TRUE);
+}
+
+HBITMAP GetDIB ()
+{	
+	//HDC WindowDC = GetDC(Window); // grab a device content to it      
+
+ //   BITMAP bm ;		
+ //   HDC hdc = GetDC (hEditWindow);
+
+ //   // create compatible DC
+ //   HDC hdcCompat = CreateCompatibleDC (hdc); 
+ //   SelectObject (hdcCompat, hEditWindowBitmap);	
+
+ //   // get BITMAP object
+ //   GetObject (hEditWindowBitmap, sizeof (BITMAP), (PSTR) &bm) ;
+
+ //   BITMAPINFO bi24BitInfo; // We set this up to grab what we want
+	//bi24BitInfo.bmiHeader.biBitCount = 24; // rgb 8 bytes for each component(3)
+	//bi24BitInfo.bmiHeader.biCompression = BI_RGB;// rgb = 3 components
+	//bi24BitInfo.bmiHeader.biPlanes = 1;
+	//bi24BitInfo.bmiHeader.biSize = sizeof(bi24BitInfo.bmiHeader); // size of this struct
+	//bi24BitInfo.bmiHeader.biWidth = bm.bmWidth ; // width of window
+	//bi24BitInfo.bmiHeader.biHeight = bm.bmHeight ; // height of window
+
+ //   BYTE *bBytes = new BYTE[bi24BitInfo.bmiHeader.biWidth * bi24BitInfo.bmiHeader.biHeight * 3]; // create enough room. all pixels * each color component
+	//HDC iDC = CreateCompatibleDC(0); // create dc to store the image
+	//HBITMAP iBitmap = CreateDIBSection(iDC, &bi24BitInfo, DIB_RGB_COLORS, 0, 0, 0); // create a dib section for the dc
+	//SelectObject(iDC, iBitmap); // assign the dib section to the dc
+
+ //  	//SendMessage(Window, WM_PAINT, 0, 0); // send a paint message so it will paint before we try to paint to it
+
+ //   BitBlt(iDC, 0, 0, bi24BitInfo.bmiHeader.biWidth, bi24BitInfo.bmiHeader.biHeight, hdc, 0, 0, SRCCOPY); // copy hdc to our hdc
+ //   GetDIBits(iDC, iBitmap, 0, bi24BitInfo.bmiHeader.biHeight, &bBytes[0], &bi24BitInfo, DIB_RGB_COLORS); // grab the pixels in the dc
+
+ // //  for (int Cnt = 0; Cnt < bi24BitInfo.bmiHeader.biWidth * bi24BitInfo.bmiHeader.biHeight * 3; Cnt+=3) // run through each pixel
+ // //  {
+	//	//RGB* Pixel = (RGB*)&bBytes[Cnt];
+	//	//
+	//	//BYTE Temp = Pixel->Red;
+	//	//Pixel->Red = Pixel->Green;
+	//	//Pixel->Blue = Pixel->Red;
+	//	//Pixel->Green = Temp;
+ // //   }
+
+	//SetDIBitsToDevice(iDC, 0, 0, bi24BitInfo.bmiHeader.biWidth, bi24BitInfo.bmiHeader.biHeight, 0, 0, 0, bi24BitInfo.bmiHeader.biHeight, &bBytes[0], &bi24BitInfo, DIB_RGB_COLORS); // set the new dibs to the dc
+ //   BitBlt(hdc, 0, 0, bi24BitInfo.bmiHeader.biWidth, bi24BitInfo.bmiHeader.biHeight, iDC, 0, 0, SRCCOPY); // copy hdc to their hdc
+
+ //   DeleteDC(iDC); // delete dc
+	//ReleaseDC(hEditWindow, hdc); // release our dc handle
+	////DeleteObject(iBitmap); // delete object
+	////delete [] bBytes;
+	//return iBitmap ;
+
+		
+   BITMAP bm ;		
+   HDC hdc = GetDC (hEditWindow);
+
+   // create compatible DC
+   HDC hdcCompat = CreateCompatibleDC (hdc); 
+   SelectObject (hdcCompat, hEditWindowBitmap);	
+
+   // get BITMAP object
+   GetObject (hEditWindowBitmap, sizeof (BITMAP), (PSTR) &bm) ;
+
+	BYTE * pBits ;
+	BITMAPINFO mybmi;
+	//HDC hdc = GetDC(hEditWindow);
+	mybmi.bmiHeader.biSize = sizeof (BITMAPINFOHEADER) ;
+	mybmi.bmiHeader.biWidth = bm.bmWidth ;
+	mybmi.bmiHeader.biHeight = bm.bmHeight ;
+    mybmi.bmiHeader.biPlanes = 1;
+    mybmi.bmiHeader.biBitCount = 32;
+    mybmi.bmiHeader.biCompression = BI_RGB;
+    //mybmi.bmiHeader.biSizeImage = ((256 * (mybmi.bmiHeader.biBitCount / 8) + 3) & -4) * 192;	
+
+	HBITMAP newbitmap = CreateDIBSection(hdc, &mybmi, DIB_RGB_COLORS, (VOID **)&pBits, 0, 0);
+	//int result = GetDIBits(hdc, newbitmap, 0, bm.bmHeight, NULL, (BITMAPINFO *)&mybmi, DIB_RGB_COLORS);	
+
+	BITMAP bmn ;
+
+    // create compatible DC
+    HDC hdcCompatn = CreateCompatibleDC (hdc); 
+    SelectObject (hdcCompatn, newbitmap);	
+
+    // get BITMAP object
+    GetObject (newbitmap, sizeof (BITMAP), (PSTR) &bmn) ;
+
+	ReleaseDC(hEditWindow, hdc);
+
+	return newbitmap ;
+}
+
+HBITMAP DIBToDDB (HBITMAP hbitmap)
+{
+     //BITMAPFILEHEADER * pbmfh ;
+     //BOOL               bSuccess ;
+     //DWORD              dwFileSize, dwHighSize, dwBytesRead ;
+     //HANDLE             hFile ;
+     //HBITMAP            hBitmap ;
+     // 
+
+     //pbmfh = malloc (dwFileSize) ;
+
+     //bSuccess = ReadFile (hFile, pbmfh, dwFileSize, &dwBytesRead, NULL) ;
+     //  
+
+     //// Create the DDB 
+
+     //hBitmap = CreateDIBitmap (hdc,              
+     //                          (BITMAPINFOHEADER *) (pbmfh + 1),
+     //                          CBM_INIT,
+     //                          (BYTE *) pbmfh + pbmfh->bfOffBits,
+     //                          (BITMAPINFO *) (pbmfh + 1),
+     //                          DIB_RGB_COLORS) ;
+     //free (pbmfh) ;
+
+     //return hBitmap ;
+
+	/* BITMAPFILEHEADER   *pbmfh ;
+	 pbmfh->bfType = 0 ;
+	 BITMAPINFO         lpbmi ;*/	
+	
+	 
+
+	BITMAP bm ;		
+    HDC hdc = GetDC (hEditWindow);
+
+    // create compatible DC
+    HDC hdcCompat = CreateCompatibleDC (hdc); 
+    SelectObject (hdcCompat, hEditWindowBitmap);	
+
+    // get BITMAP object
+    GetObject (hEditWindowBitmap, sizeof (BITMAP), (PSTR) &bm) ;
+
+	BYTE * pBits ;
+	BITMAPINFO mybmi;
+	//HDC hdc = GetDC(hEditWindow);
+	mybmi.bmiHeader.biSize = sizeof (BITMAPINFOHEADER) ;
+	mybmi.bmiHeader.biWidth = bm.bmWidth ;
+	mybmi.bmiHeader.biHeight = bm.bmHeight ;
+    mybmi.bmiHeader.biPlanes = 1;
+    mybmi.bmiHeader.biBitCount = 32;
+    mybmi.bmiHeader.biCompression = BI_RGB;
+		 
+	HBITMAP hBitmap = CreateDIBitmap (hdc, &mybmi.bmiHeader, CBM_INIT, bm.bmBits, &mybmi, DIB_RGB_COLORS) ;
+	/* HBITMAP CreateDIBitmap(
+  _In_  HDC hdc,
+  _In_  const BITMAPINFOHEADER *lpbmih,
+  _In_  DWORD fdwInit,
+  _In_  const VOID *lpbInit,
+  _In_  const BITMAPINFO *lpbmi,
+  _In_  UINT fuUsage*/
+//);
+	return hBitmap;
 }
